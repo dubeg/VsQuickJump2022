@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<Extern href="stdidcmd.h"/>
+	<Extern href="vsshlids.h"/>
+	<Include href="KnownImageIds.vsct"/>
+	<Include href="VSGlobals.vsct"/>
+
+	<Commands package="QuickJump2022">
+		<Groups>
+			<Group guid="QuickJump2022" id="MainCmdGroup" priority="0x0600">
+				<Parent guid="VSMainMenu" id="Tools"/>
+			</Group>
+		</Groups>
+
+		<Buttons>
+			<Button guid="QuickJump2022" id="ShowMethodSearchForm" priority="0x0100" type="Button">
+				<Parent guid="QuickJump2022" id="MainCmdGroup" />
+				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Search symbols</ButtonText>
+					<LocCanonicalName>.QuickJump.ShowMethodSearchForm</LocCanonicalName>
+					<CanonicalName>.QuickJump.ShowMethodSearchForm</CanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="QuickJump2022" id="ShowFileSearchForm" priority="0x0100" type="Button">
+				<Parent guid="QuickJump2022" id="MainCmdGroup" />
+				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Search files</ButtonText>
+					<LocCanonicalName>.QuickJump.ShowFileSearchForm</LocCanonicalName>
+					<CanonicalName>.QuickJump.ShowFileSearchForm</CanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="QuickJump2022" id="ShowAllSearchForm" priority="0x0100" type="Button">
+				<Parent guid="QuickJump2022" id="MainCmdGroup" />
+				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Search all</ButtonText>
+					<LocCanonicalName>.QuickJump.ShowAllSearchForm</LocCanonicalName>
+					<CanonicalName>.QuickJump.ShowAllSearchForm</CanonicalName>
+				</Strings>
+			</Button>
+			
+		</Buttons>
+	</Commands>
+
+	<Symbols>
+		<GuidSymbol name="QuickJump2022" value="{a9dbbd24-a865-4aba-a916-b5cf41993d73}">
+			<IDSymbol name="MainCmdGroup" value="0x0001" />
+			<IDSymbol name="ShowMethodSearchForm" value="0x0100" />
+			<IDSymbol name="ShowFileSearchForm" value="0x0200" />
+			<IDSymbol name="ShowAllSearchForm" value="0x0300" />
+		</GuidSymbol>
+	</Symbols>
+</CommandTable>
