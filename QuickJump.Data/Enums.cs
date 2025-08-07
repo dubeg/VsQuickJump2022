@@ -24,19 +24,33 @@ public static class Enums
 		Delegate,
 		Event,
 		Interface,
-		Struct
+		Struct,
+		Constructor,
+		Indexer,
+		Operator,
+		Record,
+		RecordStruct
 	}
 
 	[Flags]
 	public enum EAccessType
 	{
-		Sealed = 0,
+		None = 0,
 		Static = 1,
 		Const = 2,
 		Public = 4,
 		Private = 8,
 		Protected = 0x10,
-		Internal = 0x20
+		Internal = 0x20,
+		Abstract = 0x40,
+		Virtual = 0x80,
+		Override = 0x100,
+		Sealed = 0x200,
+		Async = 0x400,
+		Readonly = 0x800,
+		Partial = 0x1000,
+		Extern = 0x2000,
+		Record = 0x4000
 	}
 
 	public enum SortType

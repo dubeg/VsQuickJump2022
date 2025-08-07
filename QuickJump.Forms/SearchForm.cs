@@ -43,10 +43,12 @@ public class SearchForm : Form
 		SearchType = type;
 	}
 
-	private void SearchForm_Load(object sender, EventArgs e)
-	{
-		ThreadHelper.ThrowIfNotOnUIThread("SearchForm_Load");
-		pnlStatus.Visible = QuickJumpData.Instance.GeneralOptions.ShowStatusBar;
+	private async void SearchForm_Load(object sender, EventArgs e) {
+        // TODO:
+        // ThreadHelper.ThrowIfNotOnUIThread("SearchForm_Load");
+        // _package.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+        pnlStatus.Visible = QuickJumpData.Instance.GeneralOptions.ShowStatusBar;
 		base.Width = QuickJumpData.Instance.GeneralOptions.Width;
 		CenterToScreen();
 		base.Top += QuickJumpData.Instance.GeneralOptions.OffsetTop;
@@ -61,8 +63,10 @@ public class SearchForm : Form
 			}
 			if (SearchType == Enums.ESearchType.Methods || SearchType == Enums.ESearchType.All)
 			{
-				CodeItems = QuickJumpData.Instance.GetCodeItems(document);
-			}
+                CodeItems = await QuickJumpData.Instance.GetCodeItemsUsingSymbolFinderAsync(document);
+                // CodeItems = await QuickJumpData.Instance.GetCodeItemsUsingWorkspaceAsync(document);
+                // CodeItems = QuickJumpData.Instance.GetCodeItemsUsingManualCompilation(document);
+            }
 			txtSearch.Font = QuickJumpData.Instance.GeneralOptions.SearchFont;
 			lstItems.ItemHeight = QuickJumpData.Instance.GeneralOptions.ItemFont.Height + 6;
 			lblSolutionName.Text = ((_Solution)((_DTE)QuickJumpData.Instance.Dte).Solution).FullName;

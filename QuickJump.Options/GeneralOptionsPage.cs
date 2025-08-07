@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 using QuickJump2022.Data;
+using FontStyle = System.Drawing.FontStyle;
 
 namespace QuickJump2022.Options;
 

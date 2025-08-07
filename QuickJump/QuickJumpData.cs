@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using EnvDTE;
 using EnvDTE80;
@@ -14,12 +15,13 @@ using QuickJump2022.Data;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
 using QuickJump2022.Tools;
+using Document = EnvDTE.Document;
 using DocumentEvents = EnvDTE.DocumentEvents;
 using Project = EnvDTE.Project;
 
 namespace QuickJump2022;
 
-public class QuickJumpData {
+public partial class QuickJumpData {
     public GeneralOptionsPage GeneralOptions;
 
     public static QuickJumpData Instance;
@@ -40,6 +42,7 @@ public class QuickJumpData {
             Dte = package.GetService<DTE, DTE2>(),
             m_Package = package
         };
+        Instance.InitializeWorkspace();
         Instance.DocEvents = Instance.Dte.Events.DocumentEvents;
         Instance.WinEvents = Instance.Dte.Events.WindowEvents;
         Instance.DteEvents = Instance.Dte.Events.DTEEvents;
@@ -143,7 +146,6 @@ public class QuickJumpData {
     }
 
     private void SaveSettings() {
-        //IL_0006: Unknown result type (might be due to invalid IL or missing references)
         WritableSettingsStore writableSettingsStore = ((SettingsManager)new ShellSettingsManager((IServiceProvider)(object)m_Package)).GetWritableSettingsStore((SettingsScope)2);
         writableSettingsStore.SetString("General", "ItemSeperatorColor", Instance.GeneralOptions.ItemSeperatorColor.Name);
         writableSettingsStore.SetBoolean("General", "UseModernIcons", Instance.GeneralOptions.UseModernIcons);
@@ -198,146 +200,5 @@ public class QuickJumpData {
                 list.Add(projItem);
             }
         }
-    }
-
-    public List<CodeItem> GetCodeItems(Document document) {
-        ThreadHelper.ThrowIfNotOnUIThread("GetCodeItems");
-        var list = new List<CodeItem>();
-        var path = document.ProjectItem.TryGetProperty<string>("FullPath");
-        if (string.IsNullOrEmpty(path)) {
-            return list;
-        }
-        var fileContent = File.ReadAllText(path);
-        var syntaxTree = CSharpSyntaxTree.ParseText(fileContent, CSharpParseOptions.Default, "", null, default);
-        var root = (CompilationUnitSyntax)syntaxTree.GetRoot();
-        NodeHandler(root.Members, list, document);
-        GC.Collect();
-        return list;
-    }
-
-    private void NodeHandler(SyntaxList<MemberDeclarationSyntax> nodes, List<CodeItem> list, Document document) {
-        SyntaxList<MemberDeclarationSyntax>.Enumerator enumerator = nodes.GetEnumerator();
-        while (enumerator.MoveNext()) {
-            MemberDeclarationSyntax current = enumerator.Current;
-            LinePosition startLinePosition = current.SyntaxTree.GetLineSpan(current.Span).StartLinePosition;
-            SyntaxKind syntaxKind = current.Kind();
-            int line = startLinePosition.Line + 1;
-            Enums.EBindType bindType = Enums.EBindType.None;
-            string name = string.Empty;
-            int flagType = -1;
-            switch (syntaxKind) {
-                case SyntaxKind.NamespaceDeclaration:
-                    NodeHandler(((NamespaceDeclarationSyntax)current).Members, list, document);
-                    continue;
-                case SyntaxKind.ClassDeclaration: {
-                        ClassDeclarationSyntax declarationSyntax10 = (ClassDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax10.Modifiers);
-                        bindType = Enums.EBindType.Class;
-                        name = declarationSyntax10.Identifier.Text;
-                        NodeHandler(declarationSyntax10.Members, list, document);
-                        break;
-                    }
-                case SyntaxKind.PropertyDeclaration: {
-                        PropertyDeclarationSyntax declarationSyntax9 = (PropertyDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax9.Modifiers);
-                        bindType = Enums.EBindType.Property;
-                        name = declarationSyntax9.Identifier.Text;
-                        break;
-                    }
-                case SyntaxKind.MethodDeclaration: {
-                        MethodDeclarationSyntax declarationSyntax8 = (MethodDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax8.Modifiers);
-                        bindType = Enums.EBindType.Method;
-                        name = declarationSyntax8.Identifier.Text;
-                        break;
-                    }
-                case SyntaxKind.EnumDeclaration: {
-                        EnumDeclarationSyntax declarationSyntax7 = (EnumDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax7.Modifiers);
-                        bindType = Enums.EBindType.Enum;
-                        name = declarationSyntax7.Identifier.Text;
-                        break;
-                    }
-                case SyntaxKind.DelegateDeclaration: {
-                        DelegateDeclarationSyntax declarationSyntax6 = (DelegateDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax6.Modifiers);
-                        bindType = Enums.EBindType.Delegate;
-                        name = declarationSyntax6.Identifier.Text;
-                        break;
-                    }
-                case SyntaxKind.EventDeclaration: {
-                        EventDeclarationSyntax declarationSyntax5 = (EventDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax5.Modifiers);
-                        bindType = Enums.EBindType.Event;
-                        name = declarationSyntax5.Identifier.Text;
-                        break;
-                    }
-                case SyntaxKind.EventFieldDeclaration: {
-                        EventFieldDeclarationSyntax declarationSyntax4 = (EventFieldDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax4.Modifiers);
-                        VariableDeclaratorSyntax variableDeclaratorSyntax2 = declarationSyntax4.Declaration.Variables.First();
-                        bindType = Enums.EBindType.Event;
-                        name = variableDeclaratorSyntax2.Identifier.Text;
-                        break;
-                    }
-                case SyntaxKind.InterfaceDeclaration: {
-                        InterfaceDeclarationSyntax declarationSyntax3 = (InterfaceDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax3.Modifiers);
-                        bindType = Enums.EBindType.Interface;
-                        name = declarationSyntax3.Identifier.Text;
-                        NodeHandler(declarationSyntax3.Members, list, document);
-                        break;
-                    }
-                case SyntaxKind.StructDeclaration: {
-                        StructDeclarationSyntax declarationSyntax2 = (StructDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax2.Modifiers);
-                        bindType = Enums.EBindType.Struct;
-                        name = declarationSyntax2.Identifier.Text;
-                        NodeHandler(declarationSyntax2.Members, list, document);
-                        break;
-                    }
-                case SyntaxKind.FieldDeclaration: {
-                        FieldDeclarationSyntax declarationSyntax = (FieldDeclarationSyntax)current;
-                        flagType = (int)GetFlagType(declarationSyntax.Modifiers);
-                        VariableDeclaratorSyntax variableDeclaratorSyntax = declarationSyntax.Declaration.Variables.First();
-                        bindType = Enums.EBindType.Field;
-                        name = variableDeclaratorSyntax.Identifier.Text;
-                        break;
-                    }
-                default:
-                    continue;
-            }
-            list.Add(new CodeItem {
-                ProjDocument = document,
-                Line = line,
-                BindType = bindType,
-                AccessType = (Enums.EAccessType)flagType,
-                Name = name
-            });
-        }
-    }
-
-    private uint GetFlagType(SyntaxTokenList modifiers) {
-        uint num = 0u;
-        modifiers.Any(SyntaxKind.SealedKeyword);
-        if (modifiers.Any(SyntaxKind.StaticKeyword)) {
-            num |= 1;
-        }
-        if (modifiers.Any(SyntaxKind.ConstKeyword)) {
-            num |= 2;
-        }
-        if (modifiers.Any(SyntaxKind.PublicKeyword)) {
-            num |= 4;
-        }
-        if (modifiers.Any(SyntaxKind.PrivateKeyword)) {
-            num |= 8;
-        }
-        if (modifiers.Any(SyntaxKind.ProtectedKeyword)) {
-            num |= 0x10;
-        }
-        if (modifiers.Any(SyntaxKind.InternalKeyword)) {
-            num |= 0x20;
-        }
-        return num;
     }
 }
