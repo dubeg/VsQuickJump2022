@@ -71,7 +71,7 @@ public class SearchForm : Form
 				DocFileNames = QuickJumpData.Instance.GetDocFilenames();
 			}
 			if (SearchType == Enums.ESearchType.Methods || SearchType == Enums.ESearchType.All) {
-                CodeItems = await QuickJumpData.Instance.GetCodeItemsUsingSymbolFinderAsync(document);
+                CodeItems = await QuickJumpData.Instance.GetCodeItemsUsingWorkspaceAsync(document);
             }
 			txtSearch.Font = QuickJumpData.Instance.GeneralOptions.SearchFont;
 			lstItems.ItemHeight = QuickJumpData.Instance.GeneralOptions.ItemFont.Height + 6;
