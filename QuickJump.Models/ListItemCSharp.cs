@@ -25,7 +25,8 @@ public class ListItemCSharp : ListItemBase
 			accessTypeString = accessTypeString.TrimEnd(' ');
 		}
 		Description = $"{accessTypeString} {codeItem.BindType}";
-		Name = codeItem.Name;
+		Name = codeItem.NameOnly;
+		Type = codeItem.Type;
 		Line = codeItem.Line;
 		IconImage = Utilities.GetCodeIcon(codeItem.BindType);
 	}

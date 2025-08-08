@@ -51,6 +51,8 @@ public class GeneralOptionsPage : DialogPage
 
 	private Color m_BorderColor = Color.FromArgb(0, 122, 204); // VSCode blue
 
+ private Color m_StatusBackgroundColor = Color.FromArgb(90, 90, 90);
+
 	private bool m_UseModernIcons;
 
 	private bool m_ShowStatusBar = true;
@@ -272,6 +274,21 @@ public class GeneralOptionsPage : DialogPage
 			m_BorderColor = value;
 		}
 	}
+
+ [LocDisplayName("Status Background Color")]
+ [Description("Background color for the status panel at the bottom")] 
+ [Category("Miscellaneous")]
+ public Color StatusBackgroundColor
+ {
+     get
+     {
+         return m_StatusBackgroundColor;
+     }
+     set
+     {
+         m_StatusBackgroundColor = value;
+     }
+ }
 
 	[LocDisplayName("Use Modern Icons")]
 	[Description("Use modern icons for the CSharp code parts. This requires a restart of Visual Studio to take effect.")]

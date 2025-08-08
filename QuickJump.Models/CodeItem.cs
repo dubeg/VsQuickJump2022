@@ -13,5 +13,9 @@ public class CodeItem
 
 	public string Name;
 
+	public string NameOnly;
+
+	public string Type;
+
 	public int Line;
 }

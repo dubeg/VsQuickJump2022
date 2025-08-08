@@ -49,6 +49,13 @@ public class SearchForm : Form
         // _package.JoinableTaskFactory.SwitchToMainThreadAsync();
 
         pnlStatus.Visible = QuickJumpData.Instance.GeneralOptions.ShowStatusBar;
+        // Apply status background color from options
+        var options = QuickJumpData.Instance.GeneralOptions;
+        pnlStatus.BackColor = options.StatusBackgroundColor;
+        lblCount.BackColor = Color.Transparent;
+        lblCountValue.BackColor = Color.Transparent;
+        lblSolutionName.BackColor = Color.Transparent;
+
 		base.Width = QuickJumpData.Instance.GeneralOptions.Width;
 		CenterToScreen();
 		base.Top += QuickJumpData.Instance.GeneralOptions.OffsetTop;
@@ -349,8 +356,14 @@ public class SearchForm : Form
 		{
 			iconSpace = 0;
 		}
-		if (item is ListItemCSharp)
+		// Build optional type suffix and set colors for C# items
+		string typeSuffix = string.Empty;
+		if (item is ListItemCSharp csharpItem)
 		{
+			if (!string.IsNullOrEmpty(csharpItem.Type))
+			{
+				typeSuffix = " -> " + csharpItem.Type;
+			}
 			rightSide = $"{item.Description}:{item.Line}";
 			itemBackgroundColor = options.CodeBackgroundColor;
 			itemForegroundColor = options.CodeForegroundColor;
@@ -359,11 +372,14 @@ public class SearchForm : Form
 			itemSelectedForegroundColor = options.CodeSelectedForegroundColor;
 			itemSelectedDescriptionForegroundColor = options.CodeSelectedDescriptionForegroundColor;
 		}
-		SizeF nameSize = e.Graphics.MeasureString(name, itemFont);
+		// Measure combined left text (name + optional type suffix)
+		string leftText = name + typeSuffix;
+		SizeF leftSize = e.Graphics.MeasureString(leftText, itemFont);
 		SizeF descriptionSize = e.Graphics.MeasureString(rightSide, itemFont);
-		if (nameSize.Width < (float)(e.Bounds.Width - 50))
+		int availableLeftWidth = (int)(e.Bounds.Width - (iconSpace + 6));
+		if (leftSize.Width < (float)(e.Bounds.Width - 50))
 		{
-			while (nameSize.Width + descriptionSize.Width > (float)(e.Bounds.Width - (iconSpace + 6)))
+			while (leftSize.Width + descriptionSize.Width > (float)availableLeftWidth && rightSide.Length > 4)
 			{
 				rightSide = "..." + rightSide.Substring(4);
 				descriptionSize = e.Graphics.MeasureString(rightSide, itemFont);
@@ -372,24 +388,47 @@ public class SearchForm : Form
 		else
 		{
 			rightSide = string.Empty;
-			while (nameSize.Width > (float)(e.Bounds.Width - 50))
+			while (leftSize.Width > (float)(e.Bounds.Width - 50) && leftText.Length > 5)
 			{
-				name = name.Substring(0, name.Length - 5) + "...";
-				nameSize = e.Graphics.MeasureString(name, itemFont);
+				leftText = leftText.Substring(0, leftText.Length - 5) + "...";
+				leftSize = e.Graphics.MeasureString(leftText, itemFont);
 			}
+		}
+		// Split the (possibly truncated) left text into name and type parts for drawing with different colors
+		string leftNamePart;
+		string leftTypePart;
+		if (leftText.Length <= name.Length)
+		{
+			leftNamePart = leftText;
+			leftTypePart = string.Empty;
+		}
+		else
+		{
+			leftNamePart = name;
+			leftTypePart = leftText.Substring(name.Length);
 		}
 		if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
 		{
 			e = new DrawItemEventArgs(e.Graphics, itemFont, e.Bounds, e.Index, e.State ^ DrawItemState.Selected, e.ForeColor, itemSelectedBackgroundColor);
 			e.DrawBackground();
-			e.Graphics.DrawString(name, itemFont, new SolidBrush(itemSelectedForegroundColor), new PointF(e.Bounds.X + iconSpace, e.Bounds.Y + 4));
+			// Draw name (left part) in selected foreground
+			e.Graphics.DrawString(leftNamePart, itemFont, new SolidBrush(itemSelectedForegroundColor), new PointF(e.Bounds.X + iconSpace, e.Bounds.Y + 4));
+			// Draw type suffix (if any) in selected description foreground, right after name
+			var leftNamePartSize = e.Graphics.MeasureString(leftNamePart, itemFont);
+			e.Graphics.DrawString(leftTypePart, itemFont, new SolidBrush(itemSelectedDescriptionForegroundColor), new PointF(e.Bounds.X + iconSpace + leftNamePartSize.Width, e.Bounds.Y + 4));
+			// Draw right side
 			e.Graphics.DrawString(rightSide, itemFont, new SolidBrush(itemSelectedDescriptionForegroundColor), new PointF((float)e.Bounds.Width - descriptionSize.Width - 2f, e.Bounds.Y + 4));
 		}
 		else
 		{
 			e = new DrawItemEventArgs(e.Graphics, itemFont, e.Bounds, e.Index, e.State, e.ForeColor, itemBackgroundColor);
 			e.DrawBackground();
-			e.Graphics.DrawString(name, itemFont, new SolidBrush(itemForegroundColor), new PointF(e.Bounds.X + iconSpace, e.Bounds.Y + 4));
+			// Draw name (left part) in normal foreground
+			e.Graphics.DrawString(leftNamePart, itemFont, new SolidBrush(itemForegroundColor), new PointF(e.Bounds.X + iconSpace, e.Bounds.Y + 4));
+			// Draw type suffix (if any) in description foreground, right after name
+			var leftNamePartSize2 = e.Graphics.MeasureString(leftNamePart, itemFont);
+			e.Graphics.DrawString(leftTypePart, itemFont, new SolidBrush(itemDescriptionForegroundColor), new PointF(e.Bounds.X + iconSpace + leftNamePartSize2.Width, e.Bounds.Y + 4));
+			// Draw right side
 			e.Graphics.DrawString(rightSide, itemFont, new SolidBrush(itemDescriptionForegroundColor), new PointF((float)e.Bounds.Width - descriptionSize.Width - 2f, e.Bounds.Y + 4));
 		}
 		e.Graphics.DrawLine(new Pen(options.ItemSeperatorColor, 1f), e.Bounds.X, e.Bounds.Y, e.Bounds.X + e.Bounds.Width, e.Bounds.Y);
@@ -440,7 +479,7 @@ public class SearchForm : Form
 		this.pnlStatus.Name = "pnlStatus";
 		this.pnlStatus.Size = new System.Drawing.Size(700, 21);
 		this.pnlStatus.TabIndex = 5;
-		this.lblSolutionName.BackColor = System.Drawing.SystemColors.ControlText;
+        this.lblSolutionName.BackColor = System.Drawing.Color.Transparent;
 		this.lblSolutionName.Dock = System.Windows.Forms.DockStyle.Fill;
 		this.lblSolutionName.Font = new System.Drawing.Font("Consolas", 12f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel, 0);
 		this.lblSolutionName.ForeColor = System.Drawing.SystemColors.GradientActiveCaption;

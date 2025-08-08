@@ -11,6 +11,8 @@ public class ListItemBase : IComparable
 
 	public string Name;
 
+	public string Type;
+
 	public string Description;
 
 	public int Line = 1;

@@ -129,6 +129,8 @@ public partial class QuickJumpData {
         var bindType = GetBindTypeFromSymbol(symbol);
         var accessType = GetAccessTypeFromSymbol(symbol);
         var name = GetSymbolDisplayName(symbol);
+        var nameOnly = GetSymbolName(symbol);
+        var type = GetSymbolType(symbol);
         
         if (bindType == Enums.EBindType.None || string.IsNullOrEmpty(name))
         {
@@ -141,7 +143,9 @@ public partial class QuickJumpData {
             Line = line,
             BindType = bindType,
             AccessType = accessType,
-            Name = name
+            Name = name,
+            NameOnly = nameOnly,
+            Type = type
         };
     }
     
@@ -232,6 +236,36 @@ public partial class QuickJumpData {
         return accessType;
     }
     
+    private string GetSymbolName(ISymbol symbol)
+    {
+        if (symbol is IMethodSymbol method)
+        {
+            if (method.MethodKind == MethodKind.Destructor)
+            {
+                return $"~{method.ContainingType.Name}";
+            }
+            return method.Name;
+        }
+        else if (symbol is IPropertySymbol property && property.IsIndexer)
+        {
+            return "this";
+        }
+        else if (symbol is IFieldSymbol field)
+        {
+            return field.Name;
+        }
+        else if (symbol is IEventSymbol eventSymbol)
+        {
+            return eventSymbol.Name;
+        }
+        else if (symbol is INamedTypeSymbol namedType)
+        {
+            return namedType.Name;
+        }
+        
+        return symbol.Name;
+    }
+
     private string GetSymbolDisplayName(ISymbol symbol)
     {
         var format = new SymbolDisplayFormat(
@@ -263,6 +297,55 @@ public partial class QuickJumpData {
         }
         
         return displayName;
+    }
+
+    private string GetSymbolType(ISymbol symbol)
+    {
+        if (symbol is IMethodSymbol method)
+        {
+            if (method.MethodKind == MethodKind.Constructor || method.MethodKind == MethodKind.Destructor)
+            {
+                return string.Empty; // Constructors and destructors don't have return types
+            }
+            
+            var returnType = method.ReturnType;
+            if (returnType.SpecialType == SpecialType.System_Void)
+            {
+                return string.Empty; // Void methods don't show return type
+            }
+            
+            return returnType.ToDisplayString(new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes));
+        }
+        else if (symbol is IPropertySymbol property)
+        {
+            return property.Type.ToDisplayString(new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes));
+        }
+        else if (symbol is IFieldSymbol field)
+        {
+            return field.Type.ToDisplayString(new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes));
+        }
+        else if (symbol is IEventSymbol eventSymbol)
+        {
+            return eventSymbol.Type.ToDisplayString(new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes));
+        }
+        else if (symbol is INamedTypeSymbol namedType)
+        {
+            return string.Empty; // Types don't have a separate type
+        }
+        
+        return string.Empty;
     }
     
     private void ProcessSyntaxNodeWithSemantics(SyntaxNode node, List<CodeItem> list, 
