@@ -36,6 +36,9 @@ public class SearchForm : Form
 
 	private CustomListBox lstItems;
 
+	// Prevent the form from closing on deactivate during preview navigation
+	private bool _suppressDeactivateClose;
+
 	public SearchForm(Enums.ESearchType type)
 	{
 		InitializeComponent();
@@ -255,6 +258,7 @@ public class SearchForm : Form
 			{
 				lstItems.SelectedIndex = 0;
 			}
+			PreviewSelectedItem();
 			e.Handled = true;
 		}
 		else if (e.KeyCode == Keys.Next)
@@ -267,6 +271,7 @@ public class SearchForm : Form
 			{
 				lstItems.SelectedIndex = lstItems.Items.Count - 1;
 			}
+			PreviewSelectedItem();
 			e.Handled = true;
 		}
 		else if (e.KeyCode == Keys.Up)
@@ -277,6 +282,7 @@ public class SearchForm : Form
 				int selectedIndex = customListBox.SelectedIndex - 1;
 				customListBox.SelectedIndex = selectedIndex;
 			}
+			PreviewSelectedItem();
 			e.Handled = true;
 		}
 		else if (e.KeyCode == Keys.Down)
@@ -287,6 +293,7 @@ public class SearchForm : Form
 				int selectedIndex = customListBox2.SelectedIndex + 1;
 				customListBox2.SelectedIndex = selectedIndex;
 			}
+			PreviewSelectedItem();
 			e.Handled = true;
 		}
 	}
@@ -315,7 +322,10 @@ public class SearchForm : Form
 		base.OnDeactivate(e);
 		try
 		{
-			Close();
+			if (!_suppressDeactivateClose)
+			{
+				Close();
+			}
 		}
 		catch
 		{
@@ -355,6 +365,37 @@ public class SearchForm : Form
 			lstItems.SelectedIndex = index;
 			GotoItem();
 			Close();
+		}
+	}
+
+	private void PreviewSelectedItem()
+	{
+		ThreadHelper.ThrowIfNotOnUIThread("PreviewSelectedItem");
+		object selectedItem = lstItems.SelectedItem;
+		if (selectedItem is ListItemCSharp csharpItem)
+		{
+			try
+			{
+				_suppressDeactivateClose = true;
+				csharpItem.Go();
+			}
+			catch
+			{
+				// Ignore preview navigation exceptions
+			}
+			finally
+			{
+				_suppressDeactivateClose = false;
+				try
+				{
+					Activate();
+					txtSearch.Focus();
+				}
+				catch
+				{
+					// Best-effort to restore focus
+				}
+			}
 		}
 	}
 
