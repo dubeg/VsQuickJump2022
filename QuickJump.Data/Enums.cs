@@ -60,6 +60,8 @@ public static class Enums
 		Alphabetical = 10,
 		AlphabeticalReverse = 11,
 		LineNumber = 20,
-		LineNumberReverse = 21
+		LineNumberReverse = 21,
+		Fuzzy = 30,
+		FuzzyReverse = 31
 	}
 }

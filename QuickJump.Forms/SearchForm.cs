@@ -110,13 +110,48 @@ public class SearchForm : Form
 					}
 				}
 			}
-			Enums.SortType sortType = Enums.SortType.Alphabetical;
-			SortObjects(objectList, SearchType switch
+
+			// Apply fuzzy search scoring to improve relevance
+			if (!string.IsNullOrEmpty(str))
 			{
-				Enums.ESearchType.Files => QuickJumpData.Instance.GeneralOptions.FileSortType, 
-				Enums.ESearchType.Methods => QuickJumpData.Instance.GeneralOptions.CSharpSortType, 
-				_ => QuickJumpData.Instance.GeneralOptions.MixedSortType, 
-			});
+				// Update weights based on fuzzy search scores
+				foreach (var item in objectList)
+				{
+					var fuzzyScore = FuzzySearch.ScoreFuzzy(item.Name, str);
+					item.Weight = fuzzyScore.Score;
+				}
+
+				// Sort by fuzzy score first, then by the configured sort type
+				objectList.Sort((a, b) =>
+				{
+					// Primary sort: fuzzy score (higher is better)
+					if (a.Weight != b.Weight)
+					{
+						return b.Weight.CompareTo(a.Weight);
+					}
+
+					// Secondary sort: configured sort type
+					var sortType = SearchType switch
+					{
+						Enums.ESearchType.Files => QuickJumpData.Instance.GeneralOptions.FileSortType,
+						Enums.ESearchType.Methods => QuickJumpData.Instance.GeneralOptions.CSharpSortType,
+						_ => QuickJumpData.Instance.GeneralOptions.MixedSortType,
+					};
+
+					return GetSortComparison(a, b, sortType);
+				});
+			}
+			else
+			{
+				// No search query, use normal sorting
+				SortObjects(objectList, SearchType switch
+				{
+					Enums.ESearchType.Files => QuickJumpData.Instance.GeneralOptions.FileSortType,
+					Enums.ESearchType.Methods => QuickJumpData.Instance.GeneralOptions.CSharpSortType,
+					_ => QuickJumpData.Instance.GeneralOptions.MixedSortType,
+				});
+			}
+
 			ListBox.ObjectCollection items = lstItems.Items;
 			object[] items2 = objectList.ToArray();
 			items.AddRange(items2);
@@ -151,6 +186,31 @@ public class SearchForm : Form
 		case Enums.SortType.WeightReverse:
 			objectList.Sort(Sort.WeightReverse);
 			break;
+		}
+	}
+
+	private int GetSortComparison(ListItemBase a, ListItemBase b, Enums.SortType sortType)
+	{
+		switch (sortType)
+		{
+		case Enums.SortType.Alphabetical:
+			return Sort.Alphabetical(a, b);
+		case Enums.SortType.AlphabeticalReverse:
+			return Sort.AlphabeticalReverse(a, b);
+		case Enums.SortType.LineNumber:
+			return Sort.LineNumber(a, b);
+		case Enums.SortType.LineNumberReverse:
+			return Sort.LineNumberReverse(a, b);
+		case Enums.SortType.Weight:
+			return Sort.Weight(a, b);
+		case Enums.SortType.WeightReverse:
+			return Sort.WeightReverse(a, b);
+		case Enums.SortType.Fuzzy:
+			return Sort.Fuzzy(a, b);
+		case Enums.SortType.FuzzyReverse:
+			return Sort.FuzzyReverse(a, b);
+		default:
+			return Sort.Alphabetical(a, b);
 		}
 	}
 
@@ -268,6 +328,16 @@ public class SearchForm : Form
 	private void SearchForm_FormClosed(object sender, FormClosedEventArgs e)
 	{
 		ClearData();
+	}
+
+	private void SearchForm_Paint(object sender, PaintEventArgs e)
+	{
+		// Draw a 1-pixel border around the form
+		using (Pen borderPen = new Pen(QuickJumpData.Instance.GeneralOptions.BorderColor, 1f))
+		{
+			Rectangle borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
+			e.Graphics.DrawRectangle(borderPen, borderRect);
+		}
 	}
 
 	private void lstItems_DrawItem(object sender, DrawItemEventArgs e)
@@ -428,6 +498,7 @@ public class SearchForm : Form
 		this.BackColor = System.Drawing.SystemColors.ControlText;
 		base.ClientSize = new System.Drawing.Size(700, 189);
 		base.ControlBox = false;
+		base.SetStyle(ControlStyles.ResizeRedraw | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
 		base.Controls.Add(this.lstItems);
 		base.Controls.Add(this.pnlStatus);
 		base.Controls.Add(this.txtSearch);
@@ -438,6 +509,7 @@ public class SearchForm : Form
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 		base.FormClosed += new System.Windows.Forms.FormClosedEventHandler(SearchForm_FormClosed);
 		base.Load += new System.EventHandler(SearchForm_Load);
+		base.Paint += new System.Windows.Forms.PaintEventHandler(SearchForm_Paint);
 		this.pnlStatus.ResumeLayout(false);
 		base.ResumeLayout(false);
 		base.PerformLayout();

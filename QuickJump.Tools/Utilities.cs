@@ -116,7 +116,8 @@ public static class Utilities
 	{
 		if (srcStr.Length > 0)
 		{
-			return str.IndexOf(srcStr, StringComparison.OrdinalIgnoreCase) >= 0;
+			// Use fuzzy search instead of simple substring matching
+			return FuzzySearch.IsMatch(str, srcStr);
 		}
 		return true;
 	}

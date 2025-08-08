@@ -34,4 +34,18 @@ public static class Sort
 	{
 		return b2.Weight.CompareTo(b1.Weight);
 	}
+
+	public static int Fuzzy(ListItemBase b1, ListItemBase b2)
+	{
+		// This method is used when fuzzy search is explicitly selected as sort type
+		// The actual fuzzy scoring is handled in SearchForm.RefreshList()
+		return b1.Weight.CompareTo(b2.Weight);
+	}
+
+	public static int FuzzyReverse(ListItemBase b1, ListItemBase b2)
+	{
+		// This method is used when fuzzy search is explicitly selected as sort type
+		// The actual fuzzy scoring is handled in SearchForm.RefreshList()
+		return b2.Weight.CompareTo(b1.Weight);
+	}
 }

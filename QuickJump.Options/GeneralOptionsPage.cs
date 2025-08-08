@@ -49,6 +49,8 @@ public class GeneralOptionsPage : DialogPage
 
 	private Color m_SeperatorColor = Color.DarkGray;
 
+	private Color m_BorderColor = Color.FromArgb(0, 122, 204); // VSCode blue
+
 	private bool m_UseModernIcons;
 
 	private bool m_ShowStatusBar = true;
@@ -253,6 +255,21 @@ public class GeneralOptionsPage : DialogPage
 		set
 		{
 			m_SeperatorColor = value;
+		}
+	}
+
+	[LocDisplayName("Border Color")]
+	[Description("Color for the border around the search form")]
+	[Category("Miscellaneous")]
+	public Color BorderColor
+	{
+		get
+		{
+			return m_BorderColor;
+		}
+		set
+		{
+			m_BorderColor = value;
 		}
 	}
 
