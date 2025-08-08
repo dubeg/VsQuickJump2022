@@ -63,20 +63,16 @@ public class SearchForm : Form
 		try
 		{
 			ClearData();
-			Document document = ((_DTE)QuickJumpData.Instance.Dte).ActiveWindow.Document;
-			if (SearchType == Enums.ESearchType.Files || SearchType == Enums.ESearchType.All)
-			{
+			Document document = QuickJumpData.Instance.Dte.ActiveWindow.Document;
+			if (SearchType == Enums.ESearchType.Files || SearchType == Enums.ESearchType.All) {
 				DocFileNames = QuickJumpData.Instance.GetDocFilenames();
 			}
-			if (SearchType == Enums.ESearchType.Methods || SearchType == Enums.ESearchType.All)
-			{
+			if (SearchType == Enums.ESearchType.Methods || SearchType == Enums.ESearchType.All) {
                 CodeItems = await QuickJumpData.Instance.GetCodeItemsUsingSymbolFinderAsync(document);
-                // CodeItems = await QuickJumpData.Instance.GetCodeItemsUsingWorkspaceAsync(document);
-                // CodeItems = QuickJumpData.Instance.GetCodeItemsUsingManualCompilation(document);
             }
 			txtSearch.Font = QuickJumpData.Instance.GeneralOptions.SearchFont;
 			lstItems.ItemHeight = QuickJumpData.Instance.GeneralOptions.ItemFont.Height + 6;
-			lblSolutionName.Text = ((_Solution)((_DTE)QuickJumpData.Instance.Dte).Solution).FullName;
+			lblSolutionName.Text = QuickJumpData.Instance.Dte.Solution.FullName;
 			RefreshList();
 			if (lstItems.Items.Count > 0)
 			{
@@ -540,8 +536,7 @@ public class SearchForm : Form
 		this.BackColor = System.Drawing.SystemColors.ControlText;
 		base.ClientSize = new System.Drawing.Size(700, 189);
 		base.ControlBox = false;
-		// base.SetStyle(ControlStyles.ResizeRedraw | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
-        base.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+        base.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer | ControlStyles.ResizeRedraw, true);
         base.Padding = new System.Windows.Forms.Padding(1,1,1,1);
 		base.BackColor = QuickJumpData.Instance.GeneralOptions.BorderColor;
         base.Controls.Add(this.lstItems);
