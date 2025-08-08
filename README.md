@@ -20,11 +20,3 @@ The extension has not been updated since 2019, as it seems that Christian Schube
 
 ### Options
 <img width="879" height="788" alt="Options" src="https://github.com/user-attachments/assets/ab03a342-d460-4965-9f67-95c0e01ab086" />
-
-
-
-## Roadmap
-- [ ] Implement fuzzy search when filtering files & symbols.
-- [ ] Select file/symbol on click.
-- [ ] Use Roslyn to parse documents.
-  + It would probably improve symbol recognition.
