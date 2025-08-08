@@ -1,0 +1,203 @@
+﻿<platformui:DialogWindow x:Class="QuickJump2022.Forms.SearchFormWpf"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+        mc:Ignorable="d"
+        Title="QuickJump Search" 
+        Height="189" Width="700"
+        WindowStartupLocation="CenterOwner"
+        BorderThickness="0"
+        AllowsTransparency="False"
+        Background="White"
+        ShowInTaskbar="False"
+        HasMaximizeButton="False"
+        HasMinimizeButton="False"
+        ResizeMode="NoResize"
+        Loaded="Window_Loaded"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Closed="Window_Closed"
+        RenderOptions.BitmapScalingMode="HighQuality"
+        RenderOptions.EdgeMode="Aliased"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        Focusable="True"
+        ShowActivated="True"
+        >
+    <!--
+    WindowStyle="None"
+    AllowsTransparency="True"
+    Background="Transparent"
+    -->
+    
+    <Border BorderBrush="{Binding BorderColor}" BorderThickness="2" Background="{Binding BackgroundColor}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Search TextBox -->
+            <TextBox x:Name="txtSearch" 
+                     Grid.Row="0"
+                     Height="26"
+                     Background="#FF646464"
+                     Foreground="White"
+                     BorderBrush="#FF3C3C3C"
+                     BorderThickness="1"
+                     FontFamily="{Binding SearchFontFamily}"
+                     FontSize="{Binding SearchFontSize}"
+                     VerticalContentAlignment="Center"
+                     TextChanged="txtSearch_TextChanged"
+                     PreviewKeyDown="txtSearch_PreviewKeyDown"
+                     KeyDown="txtSearch_KeyDown"
+                     Focusable="True"
+                     >
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="0"/>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
+            
+            <!-- Items ListBox -->
+            <ListBox x:Name="lstItems" 
+                     Grid.Row="1"
+                     ItemsSource="{Binding Items}"
+                     Background="DimGray"
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                     ScrollViewer.IsDeferredScrollingEnabled="True"
+                     ScrollViewer.CanContentScroll="True"
+                     VirtualizingStackPanel.IsVirtualizing="True"
+                     VirtualizingStackPanel.VirtualizationMode="Recycling"
+                     VirtualizingStackPanel.ScrollUnit="Pixel"
+                     VirtualizingStackPanel.CacheLength="20"
+                     VirtualizingStackPanel.CacheLengthUnit="Item"
+                     PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
+                     PreviewKeyUp="lstItems_PreviewKeyUp">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="Border" 
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0">
+                                        <ContentPresenter />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="Background" 
+                                                    Value="{Binding DataContext.SelectedBackgroundColor, RelativeSource={RelativeSource AncestorType=platformui:DialogWindow}}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="{Binding ItemHeight}" Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Icon -->
+                            <Image Grid.Column="0" 
+                                   Source="{Binding IconSource}" 
+                                   Width="16" Height="16" 
+                                   Margin="4,0,4,0"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding ShowIcon, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            
+                            <!-- Name and Type -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DisplayName}" 
+                                           FontFamily="{Binding ItemFontFamily}"
+                                           FontSize="{Binding ItemFontSize}"
+                                           Foreground="{Binding NameForeground}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding TypeSuffix}" 
+                                           FontFamily="{Binding ItemFontFamily}"
+                                           FontSize="{Binding ItemFontSize}"
+                                           Foreground="{Binding TypeForeground}"
+                                           Margin="0,0,5,0"/>
+                            </StackPanel>
+                            
+                            <!-- Description -->
+                            <TextBlock Grid.Column="2" 
+                                       Text="{Binding DescriptionText}" 
+                                       FontFamily="{Binding ItemFontFamily}"
+                                       FontSize="{Binding ItemFontSize}"
+                                       Foreground="{Binding DescriptionForeground}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,5,0"/>
+                            
+                            <!-- Separator Line -->
+                            <Rectangle Grid.ColumnSpan="3" 
+                                       Height="1" 
+                                       Fill="{Binding SeparatorColor}"
+                                       VerticalAlignment="Top"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <!-- Status Panel -->
+            <Grid x:Name="pnlStatus" 
+                  Grid.Row="2" 
+                  Height="21"
+                  Background="{Binding StatusBackgroundColor}"
+                  Visibility="{Binding ShowStatusBar, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" 
+                           Text="Results:" 
+                           FontFamily="Consolas" 
+                           FontSize="12"
+                           Foreground="#FF91C7FF"
+                           VerticalAlignment="Center"
+                           Margin="5,0,5,0"/>
+                
+                <TextBlock x:Name="lblCountValue" 
+                           Grid.Column="1" 
+                           Text="0" 
+                           FontFamily="Consolas" 
+                           FontSize="12"
+                           Foreground="#FF91C7FF"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+                
+                <TextBlock x:Name="lblSolutionName" 
+                           Grid.Column="2" 
+                           FontFamily="Consolas" 
+                           FontSize="12"
+                           Foreground="#FF91C7FF"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0"
+                           TextTrimming="CharacterEllipsis"/>
+            </Grid>
+        </Grid>
+    </Border>
+</platformui:DialogWindow>

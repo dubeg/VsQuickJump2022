@@ -58,8 +58,16 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="QuickJump.Data\Enums.cs" />
+    <Compile Include="QuickJump.Forms\ListViewItemModel.cs" />
     <Compile Include="QuickJump.Forms\SearchForm.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Page Include="QuickJump.Forms\SearchFormWpf.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="QuickJump.Forms\SearchFormWpf.xaml.cs">
+      <DependentUpon>SearchFormWpf.xaml</DependentUpon>
     </Compile>
     <Compile Include="QuickJump.Models\CodeItem.cs" />
     <Compile Include="QuickJump.Models\ListItemBase.cs" />
@@ -107,6 +115,10 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Community.VisualStudio.VSCT" Version="16.0.29.6" PrivateAssets="all" />

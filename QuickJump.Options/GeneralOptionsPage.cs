@@ -59,6 +59,8 @@ public class GeneralOptionsPage : DialogPage
 
 	private bool m_ShowIcons = true;
 
+	private bool m_UseWPFInterface = false;
+
 	private Enums.SortType m_CSharpSortType = Enums.SortType.LineNumber;
 
 	private Enums.SortType m_FileSortType = Enums.SortType.Alphabetical;
@@ -332,6 +334,21 @@ public class GeneralOptionsPage : DialogPage
 		set
 		{
 			m_ShowStatusBar = value;
+		}
+	}
+
+	[LocDisplayName("Use WPF Interface")]
+	[Description("Use WPF interface instead of WinForms to support font ligatures (requires restart)")]
+	[Category("Miscellaneous")]
+	public bool UseWPFInterface
+	{
+		get
+		{
+			return m_UseWPFInterface;
+		}
+		set
+		{
+			m_UseWPFInterface = value;
 		}
 	}
 

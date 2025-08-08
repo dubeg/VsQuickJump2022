@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell.Interop;
 using QuickJump2022.Data;
 using QuickJump2022.Forms;
 using QuickJump2022.Tools;
@@ -19,8 +20,15 @@ internal sealed class ShowAllSearchForm : BaseCommand<ShowAllSearchForm> {
         }
         var file = new FileInfo(path);
         var isCSharp = (file.Extension ?? "") == ".cs";
-        var type = isCSharp ? Enums.ESearchType.All : Enums.ESearchType.Files;
-        // Show modeless so clicking outside can deactivate and close the form
-        new SearchForm(type).Show();
+        var searchType = isCSharp ? Enums.ESearchType.All : Enums.ESearchType.Files;
+        if (QuickJumpData.Instance.GeneralOptions.UseWPFInterface) {
+            // Show WPF form 
+            SearchFormWpf.ShowNonBlockingModal(searchType);
+        }
+        else {
+            // Show WinForms form
+            new SearchForm(searchType).Show();
+        }
     }
 }
+
