@@ -330,16 +330,6 @@ public class SearchForm : Form
 		ClearData();
 	}
 
-	private void SearchForm_Paint(object sender, PaintEventArgs e)
-	{
-		// Draw a 1-pixel border around the form
-		using (Pen borderPen = new Pen(QuickJumpData.Instance.GeneralOptions.BorderColor, 1f))
-		{
-			Rectangle borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
-			e.Graphics.DrawRectangle(borderPen, borderRect);
-		}
-	}
-
 	private void lstItems_DrawItem(object sender, DrawItemEventArgs e)
 	{
 		ThreadHelper.ThrowIfNotOnUIThread("lstItems_DrawItem");
@@ -498,8 +488,11 @@ public class SearchForm : Form
 		this.BackColor = System.Drawing.SystemColors.ControlText;
 		base.ClientSize = new System.Drawing.Size(700, 189);
 		base.ControlBox = false;
-		base.SetStyle(ControlStyles.ResizeRedraw | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
-		base.Controls.Add(this.lstItems);
+		// base.SetStyle(ControlStyles.ResizeRedraw | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
+        base.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+        base.Padding = new System.Windows.Forms.Padding(1,1,1,1);
+		base.BackColor = QuickJumpData.Instance.GeneralOptions.BorderColor;
+        base.Controls.Add(this.lstItems);
 		base.Controls.Add(this.pnlStatus);
 		base.Controls.Add(this.txtSearch);
 		base.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -509,7 +502,6 @@ public class SearchForm : Form
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 		base.FormClosed += new System.Windows.Forms.FormClosedEventHandler(SearchForm_FormClosed);
 		base.Load += new System.EventHandler(SearchForm_Load);
-		base.Paint += new System.Windows.Forms.PaintEventHandler(SearchForm_Paint);
 		this.pnlStatus.ResumeLayout(false);
 		base.ResumeLayout(false);
 		base.PerformLayout();
