@@ -13,6 +13,7 @@ internal sealed class ShowFileSearchForm : BaseCommand<ShowFileSearchForm> {
             await VS.MessageBox.ShowWarningAsync(nameof(ShowFileSearchForm), "You must be in a solution to search files.");
             return;
         }
-        new SearchForm(Enums.ESearchType.Files).ShowDialog();
+        // Show modeless so clicking outside can deactivate and close the form
+        new SearchForm(Enums.ESearchType.Files).Show();
     }
 }

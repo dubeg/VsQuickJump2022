@@ -20,6 +20,7 @@ internal sealed class ShowMethodSearchForm : BaseCommand<ShowMethodSearchForm> {
         var file = new FileInfo(path);
         var isCsharp = !string.IsNullOrEmpty(file.Extension) && file.Extension.Equals(".cs", StringComparison.InvariantCultureIgnoreCase);
         if (!isCsharp) return;
-        new SearchForm(Enums.ESearchType.Methods).ShowDialog();
+        // Show modeless so clicking outside can deactivate and close the form
+        new SearchForm(Enums.ESearchType.Methods).Show();
     }
 }

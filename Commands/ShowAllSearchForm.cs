@@ -20,6 +20,7 @@ internal sealed class ShowAllSearchForm : BaseCommand<ShowAllSearchForm> {
         var file = new FileInfo(path);
         var isCSharp = (file.Extension ?? "") == ".cs";
         var type = isCSharp ? Enums.ESearchType.All : Enums.ESearchType.Files;
-        new SearchForm(type).ShowDialog();
+        // Show modeless so clicking outside can deactivate and close the form
+        new SearchForm(type).Show();
     }
 }

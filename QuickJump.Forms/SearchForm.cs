@@ -314,6 +314,19 @@ public class SearchForm : Form
 		return base.ProcessCmdKey(ref msg, keyData);
 	}
 
+	protected override void OnDeactivate(EventArgs e)
+	{
+		base.OnDeactivate(e);
+		try
+		{
+			Close();
+		}
+		catch
+		{
+			// Ignore exceptions during close on deactivate
+		}
+	}
+
 	private void txtSearch_TextChanged(object sender, EventArgs e)
 	{
 		ThreadHelper.ThrowIfNotOnUIThread("txtSearch_TextChanged");
