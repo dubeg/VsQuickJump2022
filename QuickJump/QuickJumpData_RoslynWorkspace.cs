@@ -240,11 +240,25 @@ public partial class QuickJumpData {
     {
         if (symbol is IMethodSymbol method)
         {
+            var format = new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                // Just the method name
+                memberOptions: SymbolDisplayMemberOptions.IncludeParameters,
+                // Show only parameter names
+                parameterOptions: SymbolDisplayParameterOptions.IncludeName,
+                // Suppress everything else
+                genericsOptions: SymbolDisplayGenericsOptions.None,
+                kindOptions: SymbolDisplayKindOptions.None,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.None
+            );
+
+            var displayName = symbol.ToDisplayString(format);
+
             if (method.MethodKind == MethodKind.Destructor)
             {
                 return $"~{method.ContainingType.Name}";
             }
-            return method.Name;
+            return displayName;
         }
         else if (symbol is IPropertySymbol property && property.IsIndexer)
         {
