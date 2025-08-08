@@ -58,10 +58,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="QuickJump.Data\Enums.cs" />
-    <Compile Include="QuickJump.Forms\ListViewItemModel.cs" />
-    <Compile Include="QuickJump.Forms\SearchForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="QuickJump.Models\ListViewItemModel.cs" />
     <Page Include="QuickJump.Forms\SearchFormWpf.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -71,11 +68,13 @@
     </Compile>
     <Compile Include="QuickJump.Models\CodeItem.cs" />
     <Compile Include="QuickJump.Models\ListItemBase.cs" />
-    <Compile Include="QuickJump.Models\ListItemCSharp.cs" />
+    <Compile Include="QuickJump.Models\ListItemSymbol.cs" />
     <Compile Include="QuickJump.Models\ListItemFile.cs" />
     <Compile Include="QuickJump.Options\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="QuickJump.Tools\DocumentExtensions.cs" />
+    <Compile Include="QuickJump.Tools\SearchController.cs" />
     <Compile Include="QuickJump.Tools\Sort.cs" />
     <Compile Include="QuickJump.Tools\Utilities.cs" />
     <Compile Include="QuickJump.Tools\FuzzySearch.cs" />

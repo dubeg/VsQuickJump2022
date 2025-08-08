@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.LanguageServices;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 using QuickJump2022.Data;
@@ -34,15 +36,20 @@ public partial class QuickJumpData {
 
     public DTE Dte;
 
-    private QuickJump2022Package m_Package;
+    public QuickJump2022Package Package {  get; private set; }
+
+    private VisualStudioWorkspace _workspace;
 
     public static void Create(QuickJump2022Package package, GeneralOptionsPage generalOptions) {
         ThreadHelper.ThrowIfNotOnUIThread("Create");
+        var dte = package.GetService<DTE, DTE2>();
+        var componentModel = package.GetService<SComponentModel, IComponentModel>();
+        var workspace = componentModel.GetService<VisualStudioWorkspace>();
         Instance = new QuickJumpData {
-            Dte = package.GetService<DTE, DTE2>(),
-            m_Package = package
+            Dte = dte,
+            Package = package,
+            _workspace = workspace
         };
-        Instance.InitializeWorkspace();
         Instance.DocEvents = Instance.Dte.Events.DocumentEvents;
         Instance.WinEvents = Instance.Dte.Events.WindowEvents;
         Instance.DteEvents = Instance.Dte.Events.DTEEvents;
@@ -55,13 +62,10 @@ public partial class QuickJumpData {
     private static void DTEEvents_OnBeginShutdown() => Instance.SaveSettings();
 
     private void LoadSettings() {
-        var userSettingsStore = new ShellSettingsManager((IServiceProvider)(object)m_Package).GetReadOnlySettingsStore((SettingsScope)2);
+        var userSettingsStore = new ShellSettingsManager((IServiceProvider)(object)Package).GetReadOnlySettingsStore((SettingsScope)2);
         if (userSettingsStore.CollectionExists("General")) {
-            if (userSettingsStore.PropertyExists("General", "ItemSeperatorColor")) {
-                Instance.GeneralOptions.ItemSeperatorColor = Color.FromName(userSettingsStore.GetString("General", "ItemSeperatorColor"));
-            }
-            if (userSettingsStore.PropertyExists("General", "UseModernIcons")) {
-                Instance.GeneralOptions.UseModernIcons = userSettingsStore.GetBoolean("General", "UseModernIcons");
+            if (userSettingsStore.PropertyExists("General", "ItemSeparatorColor")) {
+                Instance.GeneralOptions.ItemSeparatorColor = Color.FromName(userSettingsStore.GetString("General", "ItemSeparatorColor"));
             }
             if (userSettingsStore.PropertyExists("General", "ShowStatusBar")) {
                 Instance.GeneralOptions.ShowStatusBar = userSettingsStore.GetBoolean("General", "ShowStatusBar");
@@ -142,13 +146,15 @@ public partial class QuickJumpData {
             else {
                 Instance.GeneralOptions.MixedSortType = Enums.SortType.Alphabetical;
             }
+            if (userSettingsStore.PropertyExists("General", "BorderColor")) {
+                Instance.GeneralOptions.BorderColor = Color.FromName(userSettingsStore.GetString("General", "BorderColor"));
+            }
         }
     }
 
     private void SaveSettings() {
-        WritableSettingsStore writableSettingsStore = ((SettingsManager)new ShellSettingsManager((IServiceProvider)(object)m_Package)).GetWritableSettingsStore((SettingsScope)2);
-        writableSettingsStore.SetString("General", "ItemSeperatorColor", Instance.GeneralOptions.ItemSeperatorColor.Name);
-        writableSettingsStore.SetBoolean("General", "UseModernIcons", Instance.GeneralOptions.UseModernIcons);
+        WritableSettingsStore writableSettingsStore = ((SettingsManager)new ShellSettingsManager((IServiceProvider)(object)Package)).GetWritableSettingsStore((SettingsScope)2);
+        writableSettingsStore.SetString("General", "ItemSeparatorColor", Instance.GeneralOptions.ItemSeparatorColor.Name);
         writableSettingsStore.SetBoolean("General", "ShowStatusBar", Instance.GeneralOptions.ShowStatusBar);
         writableSettingsStore.SetBoolean("General", "ShowIcons", Instance.GeneralOptions.ShowIcons);
         writableSettingsStore.SetString("General", "FileBackgroundColor", Instance.GeneralOptions.FileBackgroundColor.Name);
@@ -163,7 +169,8 @@ public partial class QuickJumpData {
         writableSettingsStore.SetString("General", "CodeSelectedBackgroundColor", Instance.GeneralOptions.CodeSelectedBackgroundColor.Name);
         writableSettingsStore.SetString("General", "CodeSelectedDescriptionForegroundColor", Instance.GeneralOptions.CodeSelectedDescriptionForegroundColor.Name);
         writableSettingsStore.SetString("General", "CodeSelectedForegroundColor", Instance.GeneralOptions.CodeSelectedForegroundColor.Name);
-        FontConverter fontConverter = new FontConverter();
+        writableSettingsStore.SetString("General", "BorderColor", Instance.GeneralOptions.BorderColor.Name);
+        var fontConverter = new FontConverter();
         writableSettingsStore.SetString("General", "ItemFont", fontConverter.ConvertToInvariantString(Instance.GeneralOptions.ItemFont));
         writableSettingsStore.SetString("General", "SearchFont", fontConverter.ConvertToInvariantString(Instance.GeneralOptions.SearchFont));
         writableSettingsStore.SetInt32("General", "OffsetTop", Instance.GeneralOptions.OffsetTop);
@@ -175,27 +182,25 @@ public partial class QuickJumpData {
         writableSettingsStore.SetInt32("General", "MixedSortType", (int)Instance.GeneralOptions.MixedSortType);
     }
 
-    public List<ProjectItem> GetDocFilenames() {
+    public List<ProjectItem> GetProjectItems() {
         ThreadHelper.ThrowIfNotOnUIThread("GetDocFilenames");
-        List<ProjectItem> list = new List<ProjectItem>();
-        foreach (Project project2 in Dte.Solution.Projects) {
-            Project project = project2;
-            InternalGetDocFilenames(project.ProjectItems, list);
+        var list = new List<ProjectItem>();
+        foreach (Project project in Dte.Solution.Projects) {
+            InternalGetProjectItems(project.ProjectItems, list);
         }
         return list;
     }
 
-    private void InternalGetDocFilenames(ProjectItems projItems, List<ProjectItem> list) {
+    private void InternalGetProjectItems(ProjectItems projItems, List<ProjectItem> list) {
         ThreadHelper.ThrowIfNotOnUIThread("InternalGetDocFilenames");
-        if (projItems == null) {
+        if (projItems is null) {
             return;
         }
-        foreach (ProjectItem projItem2 in projItems) {
-            ProjectItem projItem = projItem2;
+        foreach (ProjectItem projItem in projItems) {
             if (projItem.ProjectItems != null && projItem.ProjectItems.Count > 0) {
-                InternalGetDocFilenames(projItem.ProjectItems, list);
+                InternalGetProjectItems(projItem.ProjectItems, list);
             }
-            string path = projItem.TryGetProperty<string>("FullPath");
+            var path = projItem.TryGetProperty<string>("FullPath");
             if (projItem.Name.Contains(".") && !string.IsNullOrEmpty(path) && File.Exists(path)) {
                 list.Add(projItem);
             }

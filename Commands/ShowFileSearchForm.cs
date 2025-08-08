@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using QuickJump2022.Data;
 using QuickJump2022.Forms;
+using QuickJump2022.Tools;
 
 namespace QuickJump2022;
 
@@ -15,13 +16,7 @@ internal sealed class ShowFileSearchForm : BaseCommand<ShowFileSearchForm> {
         }
 
         var searchType = Enums.ESearchType.Files;
-        if (QuickJumpData.Instance.GeneralOptions.UseWPFInterface) {
-            // Show WPF form 
-            SearchFormWpf.ShowNonBlockingModal(searchType);
-        }
-        else {
-            // Show WinForms form
-            new SearchForm(searchType).Show();
-        }
+        var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
+        SearchFormWpf.ShowNonBlockingModal(searchController);
     }
 }

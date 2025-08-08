@@ -20,15 +20,8 @@ internal sealed class ShowMethodSearchForm : BaseCommand<ShowMethodSearchForm> {
         var file = new FileInfo(path);
         var isCsharp = !string.IsNullOrEmpty(file.Extension) && file.Extension.Equals(".cs", StringComparison.InvariantCultureIgnoreCase);
         if (!isCsharp) return;
-
         var searchType = Enums.ESearchType.Methods;
-        if (QuickJumpData.Instance.GeneralOptions.UseWPFInterface) {
-            // Show WPF form 
-            SearchFormWpf.ShowNonBlockingModal(searchType);
-        }
-        else {
-            // Show WinForms form
-            new SearchForm(searchType).Show();
-        }
+        var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
+        SearchFormWpf.ShowNonBlockingModal(searchController);
     }
 }

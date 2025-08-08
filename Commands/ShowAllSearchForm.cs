@@ -21,14 +21,8 @@ internal sealed class ShowAllSearchForm : BaseCommand<ShowAllSearchForm> {
         var file = new FileInfo(path);
         var isCSharp = (file.Extension ?? "") == ".cs";
         var searchType = isCSharp ? Enums.ESearchType.All : Enums.ESearchType.Files;
-        if (QuickJumpData.Instance.GeneralOptions.UseWPFInterface) {
-            // Show WPF form 
-            SearchFormWpf.ShowNonBlockingModal(searchType);
-        }
-        else {
-            // Show WinForms form
-            new SearchForm(searchType).Show();
-        }
+        var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
+        SearchFormWpf.ShowNonBlockingModal(searchController);
     }
 }
 

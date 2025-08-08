@@ -21,16 +21,6 @@ namespace QuickJump2022;
 /// Document parsing using Roslyn Workspace API (recommended)
 /// </summary>
 public partial class QuickJumpData {
-    private VisualStudioWorkspace _workspace;
-    
-    /// <summary>
-    /// Initialize the Roslyn workspace service
-    /// </summary>
-    private void InitializeWorkspace() {
-        ThreadHelper.ThrowIfNotOnUIThread();
-        var componentModel = m_Package.GetService<SComponentModel, IComponentModel>();
-        _workspace = componentModel.GetService<VisualStudioWorkspace>();
-    }
     
     /// <summary>
     /// Get code items using Roslyn Workspace API - no file reading required!

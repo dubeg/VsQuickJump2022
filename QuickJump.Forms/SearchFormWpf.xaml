@@ -9,15 +9,14 @@
         Height="189" Width="700"
         WindowStartupLocation="CenterOwner"
         BorderThickness="0"
-        AllowsTransparency="False"
-        Background="White"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         ShowInTaskbar="False"
         HasMaximizeButton="False"
         HasMinimizeButton="False"
         ResizeMode="NoResize"
         Loaded="Window_Loaded"
-        PreviewKeyDown="Window_PreviewKeyDown"
-        Closed="Window_Closed"
         RenderOptions.BitmapScalingMode="HighQuality"
         RenderOptions.EdgeMode="Aliased"
         SnapsToDevicePixels="True"
@@ -25,12 +24,6 @@
         Focusable="True"
         ShowActivated="True"
         >
-    <!--
-    WindowStyle="None"
-    AllowsTransparency="True"
-    Background="Transparent"
-    -->
-    
     <Border BorderBrush="{Binding BorderColor}" BorderThickness="2" Background="{Binding BackgroundColor}">
         <Grid>
             <Grid.RowDefinitions>
@@ -52,7 +45,6 @@
                      VerticalContentAlignment="Center"
                      TextChanged="txtSearch_TextChanged"
                      PreviewKeyDown="txtSearch_PreviewKeyDown"
-                     KeyDown="txtSearch_KeyDown"
                      Focusable="True"
                      >
                 <TextBox.Resources>
@@ -89,21 +81,16 @@
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border x:Name="Border" 
-                                            Background="{TemplateBinding Background}"
+                                            Background="{Binding BackgroundColor}"
                                             BorderBrush="Transparent"
                                             BorderThickness="0">
                                         <ContentPresenter />
                                     </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="Border" Property="Background" 
-                                                    Value="{Binding DataContext.SelectedBackgroundColor, RelativeSource={RelativeSource AncestorType=platformui:DialogWindow}}"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
