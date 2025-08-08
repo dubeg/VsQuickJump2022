@@ -341,6 +341,23 @@ public class SearchForm : Form
 		txtSearch.Focus();
 	}
 
+	private void lstItems_MouseClick(object sender, MouseEventArgs e)
+	{
+		// Treat a left-click on an item the same as pressing ENTER
+		if (e.Button != MouseButtons.Left)
+		{
+			return;
+		}
+
+		int index = lstItems.IndexFromPoint(e.Location);
+		if (index >= 0 && index < lstItems.Items.Count)
+		{
+			lstItems.SelectedIndex = index;
+			GotoItem();
+			Close();
+		}
+	}
+
 	private void SearchForm_FormClosed(object sender, FormClosedEventArgs e)
 	{
 		ClearData();
@@ -531,6 +548,7 @@ public class SearchForm : Form
 		this.lstItems.TabIndex = 6;
 		this.lstItems.DrawItem += new System.Windows.Forms.DrawItemEventHandler(lstItems_DrawItem);
 		this.lstItems.KeyUp += new System.Windows.Forms.KeyEventHandler(lstItems_KeyUp);
+		this.lstItems.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lstItems_MouseClick);
 		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 13f);
 		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 		this.BackColor = System.Drawing.SystemColors.ControlText;
