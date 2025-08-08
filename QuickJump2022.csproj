@@ -73,8 +73,6 @@
     <Compile Include="QuickJump.Tools\FuzzySearch.cs" />
     <Compile Include="QuickJump2022Package.cs" />
     <Compile Include="QuickJump\QuickJumpData.cs" />
-    <Compile Include="QuickJump\QuickJumpData_CodeModel.cs" />
-    <Compile Include="QuickJump\QuickJumpData_Manual.cs" />
     <Compile Include="QuickJump\QuickJumpData_RoslynWorkspace.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
@@ -132,9 +130,7 @@
       <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="QuickJump.FuzzySearch\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
