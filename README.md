@@ -1,7 +1,8 @@
 # README
-Re-compiled [QuickJump](https://marketplace.visualstudio.com/items?itemName=ChristianSchubert.QuickJump), an extension made by Christian Schubert, to support Visual Studio 2022.
+[QuickJump](https://marketplace.visualstudio.com/items?itemName=ChristianSchubert.QuickJump) was initially an extension made by Christian Schubert, but it hasn't been updated since 2019. It seems that he disappeared from the online world.
+So I decompiled & recompiled it to support Visual Studio 2022.
 
-The extension has not been updated since 2019, as it seems that Christian Schubert disappeared from the online world.
+I've also trying to add few niceties to it, mostly using LLMs. 
 
 ## Commands
 - `QuickJump.ShowMethodSearchForm`: search symbols in the active document.
