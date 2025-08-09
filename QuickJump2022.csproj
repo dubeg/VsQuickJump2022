@@ -74,6 +74,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="QuickJump.Tools\DocumentExtensions.cs" />
+    <Compile Include="QuickJump.Tools\KnownMonikerService.cs" />
     <Compile Include="QuickJump.Tools\SearchController.cs" />
     <Compile Include="QuickJump.Tools\Sort.cs" />
     <Compile Include="QuickJump.Tools\Utilities.cs" />

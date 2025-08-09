@@ -117,9 +117,11 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
             Items.Clear();
             var results = SearchController.Search(searchText);
             foreach (var item in results) {
-                Items.Add(
-                    new ListItemViewModel(item, _options)
-                );
+                var viewModel = new ListItemViewModel(item, _options);
+                Items.Add(viewModel);
+                
+                // Load icon asynchronously
+                _ = LoadIconAsync(viewModel, item);
             }
             lblCountValue.Text = Items.Count.ToString();
             var itemHeight = _options.ItemFont.Height + 6;
@@ -127,6 +129,38 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
         }
         catch (Exception ex) {
             System.Windows.MessageBox.Show(ex.ToString());
+        }
+    }
+
+    private async Task LoadIconAsync(ListItemViewModel viewModel, ListItemBase item) {
+        try {
+            var monikerService = QuickJumpData.Instance.MonikerService;
+            if (monikerService == null) return;
+
+            BitmapSource iconBitmap = null;
+            var size = (int)_options.ItemFont.Size;
+            
+            // Optional: Convert the list background color to ARGB format for exact matching
+            // var listBgColor = ColorToUInt32(Colors.DimGray); // or use _options color
+            
+            if (item is ListItemFile fileItem) {
+                var extension = System.IO.Path.GetExtension(fileItem.FullPath);
+                iconBitmap = await monikerService.GetFileIconAsync(extension, size);
+            }
+            else if (item is ListItemSymbol symbolItem) {
+                iconBitmap = await monikerService.GetCodeIconAsync(symbolItem.BindType, size);
+            }
+
+            if (iconBitmap != null) {
+                // Update the icon on the UI thread
+                await Dispatcher.InvokeAsync(() => {
+                    viewModel.UpdateIcon(iconBitmap);
+                });
+            }
+        }
+        catch (Exception ex) {
+            // Log but don't crash on icon loading errors
+            ex.Log();
         }
     }
 
@@ -218,6 +252,10 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
 
     private static Color ToMediaColor(System.Drawing.Color color) {
         return Color.FromArgb(color.A, color.R, color.G, color.B);
+    }
+
+    private static uint ColorToUInt32(Color color) {
+        return (uint)((color.A << 24) | (color.R << 16) | (color.G << 8) | color.B);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

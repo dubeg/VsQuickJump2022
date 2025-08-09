@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.CodeAnalysis;
@@ -39,9 +40,11 @@ public partial class QuickJumpData {
     public QuickJump2022Package Package {  get; private set; }
 
     private VisualStudioWorkspace _workspace;
+    
+    public KnownMonikerService MonikerService { get; private set; }
 
-    public static void Create(QuickJump2022Package package, GeneralOptionsPage generalOptions) {
-        ThreadHelper.ThrowIfNotOnUIThread("Create");
+    public static async Task CreateAsync(QuickJump2022Package package, GeneralOptionsPage generalOptions) {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
         var dte = package.GetService<DTE, DTE2>();
         var componentModel = package.GetService<SComponentModel, IComponentModel>();
         var workspace = componentModel.GetService<VisualStudioWorkspace>();
@@ -55,7 +58,12 @@ public partial class QuickJumpData {
         Instance.DteEvents = Instance.Dte.Events.DTEEvents;
         Instance.GeneralOptions = generalOptions;
         Instance.LoadSettings();
-        Utilities.PreloadCodeIcons();
+        
+        // Initialize KnownMonikerService
+        Instance.MonikerService = new KnownMonikerService(package);
+        await Instance.MonikerService.InitializeAsync();
+        await Instance.MonikerService.PreloadCommonIconsAsync((int)generalOptions.ItemFont.Size);
+        
         Instance.DteEvents.OnBeginShutdown += new _dispDTEEvents_OnBeginShutdownEventHandler(DTEEvents_OnBeginShutdown);
     }
 

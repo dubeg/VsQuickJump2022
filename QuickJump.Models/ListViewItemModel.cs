@@ -93,15 +93,24 @@ public class ListItemViewModel : INotifyPropertyChanged {
 
     public BitmapSource IconSource {
         get {
-            if (!ShowIcon || Item.IconImage == null)
+            if (!ShowIcon)
                 return null;
 
-            using (var icon = Item.IconImage) {
-                return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                    icon.Handle,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
+            // Use the new BitmapSource if available
+            if (Item.IconBitmapSource != null)
+                return Item.IconBitmapSource;
+
+            // Fallback to Icon if BitmapSource not yet loaded
+            if (Item.IconImage != null) {
+                using (var icon = Item.IconImage) {
+                    return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                        icon.Handle,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
+                }
             }
+
+            return null;
         }
     }
 
@@ -128,5 +137,10 @@ public class ListItemViewModel : INotifyPropertyChanged {
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void UpdateIcon(BitmapSource iconBitmapSource) {
+        Item.IconBitmapSource = iconBitmapSource;
+        OnPropertyChanged(nameof(IconSource));
     }
 }

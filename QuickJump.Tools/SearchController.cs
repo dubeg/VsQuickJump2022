@@ -94,6 +94,7 @@ public class SearchController {
                         Weight = 0,
                         Description = $"{accessType} {item.BindType}",
                         Document = item.ProjDocument,
+                        BindType = item.BindType,
                         IconImage = Utilities.GetCodeIcon(item.BindType)
                     }
                 );

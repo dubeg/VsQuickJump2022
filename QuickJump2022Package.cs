@@ -18,6 +18,6 @@ public sealed class QuickJump2022Package : ToolkitPackage {
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
         await this.RegisterCommandsAsync();
         var generalOptionsPage = (GeneralOptionsPage)GetDialogPage(typeof(GeneralOptionsPage));
-        QuickJumpData.Create(this, generalOptionsPage);
+        await QuickJumpData.CreateAsync(this, generalOptionsPage);
     }
 }
