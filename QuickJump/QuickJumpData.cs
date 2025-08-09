@@ -60,8 +60,7 @@ public partial class QuickJumpData {
         Instance.LoadSettings();
         
         // Initialize KnownMonikerService
-        Instance.MonikerService = new KnownMonikerService(package);
-        await Instance.MonikerService.InitializeAsync();
+        Instance.MonikerService = new KnownMonikerService();
         await Instance.MonikerService.PreloadCommonIconsAsync();
         
         Instance.DteEvents.OnBeginShutdown += new _dispDTEEvents_OnBeginShutdownEventHandler(DTEEvents_OnBeginShutdown);

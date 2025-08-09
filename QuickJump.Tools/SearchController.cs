@@ -35,7 +35,7 @@ public class SearchController {
         });
     }
 
-    private async Task LoadDataAsync() {
+    public async Task LoadDataAsync() {
 
         string GetFileDescription(string fullPath) {
             if (string.IsNullOrEmpty(fullPath)) return string.Empty;
@@ -59,6 +59,7 @@ public class SearchController {
         // -----------
         // Files
         // -----------
+        // TODO check for project (null or not)
         if (SearchType == Enums.ESearchType.Files || SearchType == Enums.ESearchType.All) {
             var items = QuickJumpData.Instance.GetProjectItems();
             Files = new List<ListItemFile>(items.Count);
@@ -72,7 +73,6 @@ public class SearchController {
                         Weight = 0,
                         Description = GetFileDescription(filePath),
                         Line = 1,
-                        IconImage = Utilities.GetMimeTypeIcon(filePath)
                     }
                 );
             }
@@ -80,8 +80,8 @@ public class SearchController {
         // -----------
         // Symbols
         // -----------
-        if (SearchType == Enums.ESearchType.Methods || SearchType == Enums.ESearchType.All) {
-            var document = QuickJumpData.Instance.Dte.ActiveWindow.Document;
+        var document = QuickJumpData.Instance.Dte.ActiveWindow.Document;
+        if ((SearchType == Enums.ESearchType.Methods || SearchType == Enums.ESearchType.All) && document is not null) {
             var codeItems = await QuickJumpData.Instance.GetCodeItemsUsingWorkspaceAsync(document);
             Symbols = new List<ListItemSymbol>(codeItems.Count);
             foreach (var item in codeItems) {
@@ -95,7 +95,6 @@ public class SearchController {
                         Description = $"{accessType} {item.BindType}",
                         Document = item.ProjDocument,
                         BindType = item.BindType,
-                        IconImage = Utilities.GetCodeIcon(item.BindType)
                     }
                 );
             }

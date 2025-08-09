@@ -49,20 +49,36 @@
     <Compile Include="Commands\ShowFileSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
     <Compile Include="Commands\ShowMonikerTestDialogCommand.cs" />
+    <Compile Include="Commands\ShowAllSearchFormDualWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resource1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resource1.resx</DependentUpon>
-    </Compile>
     <Compile Include="QuickJump.Data\Enums.cs" />
     <Compile Include="QuickJump.Models\ListViewItemModel.cs" />
+    <Compile Include="QuickJump.Tools\WindowUtils.cs" />
+    <Compile Include="VSCommandTable.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSCommandTable.vsct</DependentUpon>
+    </Compile>
     <Page Include="QuickJump.Forms\SearchFormWpf.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="QuickJump.Forms\SearchFormWpf.xaml.cs">
       <DependentUpon>SearchFormWpf.xaml</DependentUpon>
+    </Compile>
+    <Page Include="QuickJump.Forms\InputCaptureWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="QuickJump.Forms\InputCaptureWindow.xaml.cs">
+      <DependentUpon>InputCaptureWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="QuickJump.Forms\MainSearchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="QuickJump.Forms\MainSearchWindow.xaml.cs">
+      <DependentUpon>MainSearchWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="QuickJump.Forms\MonikerTestDialog.xaml">
       <SubType>Designer</SubType>
@@ -91,11 +107,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
-    </Compile>
-    <Compile Include="VSCommandTable.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -140,12 +151,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resource1.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -57,6 +57,18 @@
 					<CanonicalName>.QuickJump.ShowMonikerTestDialog</CanonicalName>
 				</Strings>
 			</Button>
+
+			<!-- Dual Window Commands -->
+			<Button guid="QuickJump2022" id="ShowAllSearchFormDualWindow" priority="0x0100" type="Button">
+				<Parent guid="QuickJump2022" id="MainCmdGroup" />
+				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Search all (Dual Window)</ButtonText>
+					<LocCanonicalName>.QuickJump.ShowAllSearchFormDualWindow</LocCanonicalName>
+					<CanonicalName>.QuickJump.ShowAllSearchFormDualWindow</CanonicalName>
+				</Strings>
+			</Button>
 			
 		</Buttons>
 	</Commands>
@@ -68,6 +80,7 @@
 			<IDSymbol name="ShowFileSearchForm" value="0x0200" />
 			<IDSymbol name="ShowAllSearchForm" value="0x0300" />
 			<IDSymbol name="ShowMonikerTestDialog" value="0x0400" />
-		</GuidSymbol>
+			<IDSymbol name="ShowAllSearchFormDualWindow" value="0x0500" /> 
+		</GuidSymbol> 
 	</Symbols>
 </CommandTable>

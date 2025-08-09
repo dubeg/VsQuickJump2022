@@ -1,14 +1,13 @@
-﻿using System.IO;
 using EnvDTE;
-using Microsoft.VisualStudio.Shell.Interop;
 using QuickJump2022.Data;
 using QuickJump2022.Forms;
 using QuickJump2022.Tools;
+using System.IO;
 
 namespace QuickJump2022;
 
-[Command(PackageIds.ShowAllSearchForm)]
-internal sealed class ShowAllSearchForm : BaseCommand<ShowAllSearchForm> {
+[Command(PackageIds.ShowAllSearchFormDualWindow)]
+internal sealed class ShowAllSearchFormDualWindow : BaseCommand<ShowAllSearchFormDualWindow> {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
         var path = QuickJumpData.Instance.Dte.ActiveWindow.Document?.ProjectItem.TryGetProperty<string>("FullPath") ?? "";
@@ -17,9 +16,8 @@ internal sealed class ShowAllSearchForm : BaseCommand<ShowAllSearchForm> {
             var file = new FileInfo(path);
             isCSharp = (file.Extension ?? "") == ".cs";
         }
-        var searchType = isCSharp ? Enums.ESearchType.All : Enums.ESearchType.Files;
+        var searchType = Enums.ESearchType.All;
         var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
-        SearchFormWpf.ShowNonBlockingModal(searchController);
+        await MainSearchWindow.ShowWithDualWindowAsync(searchController);
     }
 }
-

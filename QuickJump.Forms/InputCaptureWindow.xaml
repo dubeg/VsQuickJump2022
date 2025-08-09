@@ -1,0 +1,34 @@
+<Window x:Class="QuickJump2022.Forms.InputCaptureWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="InputCapture" 
+        Height="30" Width="700"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        Focusable="True"
+        ShowActivated="True"
+    >
+    <!-- Single TextBox for capturing keyboard input -->
+    <TextBox x:Name="txtInput" 
+                Height="26"
+                Background="Red"
+                Foreground="Black"
+                BorderBrush="Red"
+                BorderThickness="1"
+                VerticalContentAlignment="Center"
+                PreviewKeyDown="txtInput_PreviewKeyDown"
+                TextChanged="txtInput_TextChanged"
+                Focusable="True">
+        <TextBox.Resources>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="CornerRadius" Value="0"/>
+            </Style>
+        </TextBox.Resources>
+    </TextBox>
+</Window>

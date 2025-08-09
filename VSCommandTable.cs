@@ -27,5 +27,6 @@ namespace QuickJump2022
         public const int ShowFileSearchForm = 0x0200;
         public const int ShowAllSearchForm = 0x0300;
         public const int ShowMonikerTestDialog = 0x0400;
+        public const int ShowAllSearchFormDualWindow = 0x0500;
     }
 }

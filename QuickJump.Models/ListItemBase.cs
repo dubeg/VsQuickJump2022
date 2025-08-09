@@ -5,7 +5,6 @@ namespace QuickJump2022.Models;
 
 public abstract class ListItemBase : IComparable {
     public int Weight;
-    public Icon IconImage;
     public BitmapSource IconBitmapSource;
     public string Name;
     public string Type;

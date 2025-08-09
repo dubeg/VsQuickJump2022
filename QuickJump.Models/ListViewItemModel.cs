@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
 
@@ -91,15 +92,11 @@ public class ListItemViewModel : INotifyPropertyChanged {
 
     public Brush SeparatorColor => new SolidColorBrush(ToMediaColor(_options.ItemSeparatorColor));
 
+    public ImageMoniker IconMoniker { get; set; }
     public BitmapSource IconSource {
         get {
-            if (!ShowIcon)
-                return null;
-
-            // Use the new BitmapSource if available
-            if (Item.IconBitmapSource != null)
-                return Item.IconBitmapSource;
-
+            if (!ShowIcon) return null;
+            if (Item.IconBitmapSource != null) return Item.IconBitmapSource;
             return null;
         }
     }
@@ -119,18 +116,17 @@ public class ListItemViewModel : INotifyPropertyChanged {
         }
     }
 
-    private static Color ToMediaColor(System.Drawing.Color color) {
-        return Color.FromArgb(color.A, color.R, color.G, color.B);
-    }
-
+    private static Color ToMediaColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
     public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public void UpdateIcon(BitmapSource iconBitmapSource) {
         Item.IconBitmapSource = iconBitmapSource;
         OnPropertyChanged(nameof(IconSource));
+    }
+
+    public void UpdateIcon(ImageMoniker imageMoniker) {
+        IconMoniker = imageMoniker;
+        OnPropertyChanged(nameof(IconMoniker));
     }
 }
