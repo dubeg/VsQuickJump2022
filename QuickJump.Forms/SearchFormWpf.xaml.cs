@@ -25,10 +25,11 @@ using QuickJump2022.Options;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Tools;
 using Utilities = QuickJump2022.Tools.Utilities;
+using Window = System.Windows.Window;
 
 namespace QuickJump2022.Forms;
 
-public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
+public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     public SearchController SearchController { get; init; }
     private ObservableCollection<ListItemViewModel> _items;
     private GeneralOptionsPage _options;
@@ -138,17 +139,16 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
             if (monikerService == null) return;
 
             BitmapSource iconBitmap = null;
-            var size = (int)_options.ItemFont.Size;
             
             // Optional: Convert the list background color to ARGB format for exact matching
             // var listBgColor = ColorToUInt32(Colors.DimGray); // or use _options color
             
             if (item is ListItemFile fileItem) {
                 var extension = System.IO.Path.GetExtension(fileItem.FullPath);
-                iconBitmap = await monikerService.GetFileIconAsync(extension, size);
+                iconBitmap = await monikerService.GetFileIconAsync(extension);
             }
             else if (item is ListItemSymbol symbolItem) {
-                iconBitmap = await monikerService.GetCodeIconAsync(symbolItem.BindType, size);
+                iconBitmap = await monikerService.GetCodeIconAsync(symbolItem.BindType);
             }
 
             if (iconBitmap != null) {

@@ -100,16 +100,6 @@ public class ListItemViewModel : INotifyPropertyChanged {
             if (Item.IconBitmapSource != null)
                 return Item.IconBitmapSource;
 
-            // Fallback to Icon if BitmapSource not yet loaded
-            if (Item.IconImage != null) {
-                using (var icon = Item.IconImage) {
-                    return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                        icon.Handle,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-                }
-            }
-
             return null;
         }
     }

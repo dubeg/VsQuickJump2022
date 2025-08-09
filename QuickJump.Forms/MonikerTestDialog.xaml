@@ -1,0 +1,165 @@
+<platform:DialogWindow 
+    x:Class="QuickJump2022.Forms.MonikerTestDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    toolkit:Themes.UseVsTheme="True"
+    Title="Moniker Icon Test - VS Theming"
+    Width="600" Height="500"
+    WindowStartupLocation="CenterOwner"
+    theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBackgroundColorKey}}"
+    >
+    <Window.Resources>
+        <utilities:BrushToColorConverter x:Key="BrushToColorConverter"/>
+    </Window.Resources>
+    
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Title -->
+        <TextBlock Grid.Row="0" Text="Visual Studio Known Moniker Icons" 
+                   FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+        
+        <!-- Icons Grid -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel >
+                <TextBlock Text="Common Icons:" FontWeight="Bold" Margin="0,5"/>
+                
+                <WrapPanel Margin="0,5">
+                    <!-- Solution Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" 
+                                Moniker="{x:Static imagecatalog:KnownMonikers.Solution}"
+                                Grayscale="False"
+                                />
+                            <TextBlock Text="Solution" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Project Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.CSProjectNode}"/>
+                            <TextBlock Text="CS Project" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Class Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.Class}"/>
+                            <TextBlock Text="Class" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Method Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.Method}"/>
+                            <TextBlock Text="Method" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </WrapPanel>
+                
+                <TextBlock Text="File Type Icons:" FontWeight="Bold" Margin="0,15,0,5"/>
+                
+                <WrapPanel Margin="0,5">
+                    <!-- CS File Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.CSFileNode}"/>
+                            <TextBlock Text="CS File" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- XML File Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.XMLFile}"/>
+                            <TextBlock Text="XML File" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- JSON File Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.JSONScript}"/>
+                            <TextBlock Text="JSON File" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Image File Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.Image}"/>
+                            <TextBlock Text="Image" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </WrapPanel>
+                
+                <TextBlock Text="Status Icons:" FontWeight="Bold" Margin="0,15,0,5"/>
+                
+                <WrapPanel Margin="0,5">
+                    <!-- Error Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.StatusError}"/>
+                            <TextBlock Text="Error" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Warning Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.StatusWarning}"/>
+                            <TextBlock Text="Warning" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Information Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.StatusInformation}"/>
+                            <TextBlock Text="Information" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Success Icon -->
+                    <Border BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}" 
+                            BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <imaging:CrispImage Width="32" Height="32" Moniker="{x:Static imagecatalog:KnownMonikers.StatusOK}"/>
+                            <TextBlock Text="Success" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Name="CloseButton" Content="Close" Width="75" Height="23" IsCancel="True" Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</platform:DialogWindow>

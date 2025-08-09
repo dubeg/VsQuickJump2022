@@ -1,30 +1,29 @@
-﻿<platformui:DialogWindow x:Class="QuickJump2022.Forms.SearchFormWpf"
+﻿<Window x:Class="QuickJump2022.Forms.SearchFormWpf"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+        xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+        xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+        xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+        xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+        xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+        xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+                         
         mc:Ignorable="d"
         Title="QuickJump Search" 
-        Height="189" Width="700"
+        Height="190" Width="700"
         WindowStartupLocation="CenterOwner"
         BorderThickness="0"
         WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
+        Background="Black"
         ShowInTaskbar="False"
-        HasMaximizeButton="False"
-        HasMinimizeButton="False"
         ResizeMode="NoResize"
         Loaded="Window_Loaded"
-        RenderOptions.BitmapScalingMode="HighQuality"
-        RenderOptions.EdgeMode="Aliased"
-        SnapsToDevicePixels="True"
-        UseLayoutRounding="True"
         Focusable="True"
         ShowActivated="True"
         >
-    <Border BorderBrush="{Binding BorderColor}" BorderThickness="2" Background="{Binding BackgroundColor}">
+    <Border BorderBrush="CornflowerBlue" BorderThickness="2" Background="Black">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -36,7 +35,7 @@
             <TextBox x:Name="txtSearch" 
                      Grid.Row="0"
                      Height="26"
-                     Background="#FF646464"
+                     Background="Black"
                      Foreground="White"
                      BorderBrush="#FF3C3C3C"
                      BorderThickness="1"
@@ -58,7 +57,7 @@
             <ListBox x:Name="lstItems" 
                      Grid.Row="1"
                      ItemsSource="{Binding Items}"
-                     Background="DimGray"
+                     Background="Black"
                      BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
@@ -86,7 +85,7 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border x:Name="Border" 
-                                            Background="{Binding BackgroundColor}"
+                                            Background="Black"
                                             BorderBrush="Transparent"
                                             BorderThickness="0">
                                         <ContentPresenter />
@@ -106,13 +105,17 @@
                             </Grid.ColumnDefinitions>
                             
                             <!-- Icon -->
-                            <Image Grid.Column="0" 
+                            <imaging:CrispImage Grid.Column="0" 
                                    Source="{Binding IconSource}" 
-                                   Width="16" Height="16" 
-                                   Margin="4,0,4,0"
+                                   UseLayoutRounding="True"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                                
+                                   Width="16" 
+                                   Height="16" 
+                                   Margin="5,0,5,0"
                                    VerticalAlignment="Center"
                                    Visibility="{Binding ShowIcon, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            
+
                             <!-- Name and Type -->
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding DisplayName}" 
@@ -187,4 +190,4 @@
             </Grid>
         </Grid>
     </Border>
-</platformui:DialogWindow>
+</Window>

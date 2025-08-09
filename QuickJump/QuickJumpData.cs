@@ -62,7 +62,7 @@ public partial class QuickJumpData {
         // Initialize KnownMonikerService
         Instance.MonikerService = new KnownMonikerService(package);
         await Instance.MonikerService.InitializeAsync();
-        await Instance.MonikerService.PreloadCommonIconsAsync((int)generalOptions.ItemFont.Size);
+        await Instance.MonikerService.PreloadCommonIconsAsync();
         
         Instance.DteEvents.OnBeginShutdown += new _dispDTEEvents_OnBeginShutdownEventHandler(DTEEvents_OnBeginShutdown);
     }
