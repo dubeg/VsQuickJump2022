@@ -53,7 +53,7 @@ public static class DocumentExtensions {
         if (windowFrame != null) {
             // Set preview mode
             windowFrame.SetProperty((int)__VSFPROPID5.VSFPROPID_IsProvisional, true);
-            windowFrame.ShowNoActivate();
+            windowFrame.Show();
         }
     }
 }

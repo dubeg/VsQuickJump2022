@@ -81,10 +81,6 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         TextOptions.SetTextFormattingMode(this, TextFormattingMode.Ideal);
         TextOptions.SetTextRenderingMode(this, TextRenderingMode.Auto);
         TextOptions.SetTextHintingMode(this, TextHintingMode.Auto);
-        Deactivated += (s, e) => {
-            //try { Close(); } catch { }
-        };
-        
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e) {
@@ -179,7 +175,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             e.Handled = true;
         }
         else if (e.Key == Key.Return) {
-            _ = GoToItemAsync(); // Fire and forget for UI responsiveness
+            _ = GoToItemAsync(true); // Fire and forget for UI responsiveness
             Close();
             e.Handled = true;
         }
@@ -224,14 +220,14 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         }
     }
 
-    private async Task GoToItemAsync() {
+    private async Task GoToItemAsync(bool commit = false) {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
             // Marshal the navigation call to VS UI thread
             await ThreadHelper.JoinableTaskFactory.RunAsync(async delegate {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 var listItem = selectedItem.Item;
-                if (listItem is ListItemFile file) { file.ProjectItem.GoToLine(file.Line); }
+                if (listItem is ListItemFile file) { file.ProjectItem.GoToLine(file.Line, commit); }
                 if (listItem is ListItemSymbol symbol) { symbol.Document.GoToLine(symbol.Line); }
             });
         }
@@ -240,7 +236,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     private void lstItems_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
         var item = (e.OriginalSource as FrameworkElement)?.DataContext as ListItemViewModel;
         if (item != null) {
-            _ = GoToItemAsync(); // Fire and forget
+            _ = GoToItemAsync(true); // Fire and forget
             Close();
         }
     }
@@ -250,17 +246,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         txtSearch.SelectionStart = txtSearch.Text.Length;
     }
 
-    private static Color ToMediaColor(System.Drawing.Color color) {
-        return Color.FromArgb(color.A, color.R, color.G, color.B);
-    }
-
-    private static uint ColorToUInt32(Color color) {
-        return (uint)((color.A << 24) | (color.R << 16) | (color.G << 8) | color.B);
-    }
-
+    private static Color ToMediaColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
     public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

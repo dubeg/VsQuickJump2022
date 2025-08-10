@@ -9,10 +9,10 @@
         xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
         xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
         xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
-                         
         mc:Ignorable="d"
         Title="QuickJump Search" 
-        Height="190" Width="700"
+        Height="190" 
+        Width="700"
         WindowStartupLocation="CenterOwner"
         BorderThickness="0"
         WindowStyle="None"
@@ -22,6 +22,7 @@
         Loaded="Window_Loaded"
         Focusable="True"
         ShowActivated="True"
+        theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBackgroundColorKey}}"
         >
     <Border BorderBrush="CornflowerBlue" BorderThickness="2" Background="Black">
         <Grid>
@@ -30,7 +31,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+
             <!-- Search TextBox -->
             <TextBox x:Name="txtSearch" 
                      Grid.Row="0"
@@ -52,7 +53,7 @@
                     </Style>
                 </TextBox.Resources>
             </TextBox>
-            
+
             <!-- Items ListBox -->
             <ListBox x:Name="lstItems" 
                      Grid.Row="1"
@@ -103,13 +104,13 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            
+
                             <!-- Icon -->
-                            <imaging:CrispImage Grid.Column="0" 
-                                   Source="{Binding IconSource}" 
+                            <imaging:CrispImage 
+                                    Grid.Column="0" 
+                                    Source="{Binding IconSource}" 
                                    UseLayoutRounding="True"
                                    RenderOptions.BitmapScalingMode="HighQuality"
-                                                
                                    Width="16" 
                                    Height="16" 
                                    Margin="5,0,5,0"
@@ -129,7 +130,7 @@
                                            Foreground="{Binding TypeForeground}"
                                            Margin="0,0,5,0"/>
                             </StackPanel>
-                            
+
                             <!-- Description -->
                             <TextBlock Grid.Column="2" 
                                        Text="{Binding DescriptionText}" 
@@ -138,7 +139,7 @@
                                        Foreground="{Binding DescriptionForeground}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,5,0"/>
-                            
+
                             <!-- Separator Line -->
                             <Rectangle Grid.ColumnSpan="3" 
                                        Height="1" 
@@ -148,7 +149,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            
+
             <!-- Status Panel -->
             <Grid x:Name="pnlStatus" 
                   Grid.Row="2" 
@@ -160,7 +161,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <TextBlock Grid.Column="0" 
                            Text="Results:" 
                            FontFamily="Consolas" 
@@ -168,7 +169,7 @@
                            Foreground="#FF91C7FF"
                            VerticalAlignment="Center"
                            Margin="5,0,5,0"/>
-                
+
                 <TextBlock x:Name="lblCountValue" 
                            Grid.Column="1" 
                            Text="0" 
@@ -177,7 +178,7 @@
                            Foreground="#FF91C7FF"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0"/>
-                
+
                 <TextBlock x:Name="lblSolutionName" 
                            Grid.Column="2" 
                            FontFamily="Consolas" 

@@ -48,15 +48,9 @@
     <Compile Include="Commands\ShowAllSearchForm.cs" />
     <Compile Include="Commands\ShowFileSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
-    <Compile Include="Commands\ShowMonikerTestDialogCommand.cs" />
-    <Compile Include="Commands\ShowAllSearchFormDualWindow.cs" />
-    <Compile Include="Commands\ShowSearchToolWindow.cs" />
+    <Compile Include="Commands\ShowMonikerTestDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuickJump.Data\Enums.cs" />
-    <Compile Include="QuickJump.Forms\SearchToolWindow.cs" />
-    <Compile Include="QuickJump.Forms\SearchToolWindowControl.xaml.cs">
-      <DependentUpon>SearchToolWindowControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="QuickJump.Models\ListViewItemModel.cs" />
     <Compile Include="QuickJump.Tools\WindowUtils.cs" />
     <Compile Include="VSCommandTable.cs">
@@ -70,20 +64,6 @@
     </Page>
     <Compile Include="QuickJump.Forms\SearchFormWpf.xaml.cs">
       <DependentUpon>SearchFormWpf.xaml</DependentUpon>
-    </Compile>
-    <Page Include="QuickJump.Forms\InputCaptureWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Compile Include="QuickJump.Forms\InputCaptureWindow.xaml.cs">
-      <DependentUpon>InputCaptureWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="QuickJump.Forms\MainSearchWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Compile Include="QuickJump.Forms\MainSearchWindow.xaml.cs">
-      <DependentUpon>MainSearchWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="QuickJump.Forms\MonikerTestDialog.xaml">
       <SubType>Designer</SubType>
@@ -113,10 +93,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
-    <Page Include="QuickJump.Forms\SearchToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
