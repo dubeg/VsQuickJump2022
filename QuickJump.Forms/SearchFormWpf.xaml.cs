@@ -30,6 +30,7 @@ using Window = System.Windows.Window;
 namespace QuickJump2022.Forms;
 
 public partial class SearchFormWpf : Window, INotifyPropertyChanged {
+    public int PageSize => 10;
     public SearchController SearchController { get; init; }
     private ObservableCollection<ListItemViewModel> _items;
     private GeneralOptionsPage _options;
@@ -94,6 +95,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             RefreshList();
             if (Items.Count > 0) {
                 lstItems.SelectedIndex = 0;
+                EnsureSelectedItemIsVisible();
             }
             await Dispatcher.BeginInvoke(
                 new Action(() => {
@@ -161,6 +163,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         RefreshList();
         if (Items.Count > 0) {
             lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
         }
     }
 
@@ -184,6 +187,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         else if (e.Key == Key.Up) {
             if (lstItems.SelectedIndex > 0) {
                 lstItems.SelectedIndex--;
+                EnsureSelectedItemIsVisible();
             }
             _ = GoToItemAsync(); // Fire and forget
             e.Handled = true;
@@ -191,23 +195,26 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         else if (e.Key == Key.Down) {
             if (lstItems.SelectedIndex < Items.Count - 1) {
                 lstItems.SelectedIndex++;
+                EnsureSelectedItemIsVisible();
             }
             _ = GoToItemAsync(); // Fire and forget
             e.Handled = true;
         }
         if (e.Key == Key.PageUp) {
-            if (lstItems.SelectedIndex >= 10)
-                lstItems.SelectedIndex -= 10;
+            if (lstItems.SelectedIndex >= PageSize)
+                lstItems.SelectedIndex -= PageSize;
             else
                 lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
             _ = GoToItemAsync(); // Fire and forget
             e.Handled = true;
         }
         else if (e.Key == Key.PageDown) {
-            if (lstItems.SelectedIndex < Items.Count - 10)
-                lstItems.SelectedIndex += 10;
+            if (lstItems.SelectedIndex < Items.Count - PageSize)
+                lstItems.SelectedIndex += PageSize;
             else
                 lstItems.SelectedIndex = Items.Count - 1;
+            EnsureSelectedItemIsVisible();
             _ = GoToItemAsync(); // Fire and forget
             e.Handled = true;
         }
@@ -227,6 +234,12 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
                 if (listItem is ListItemFile file) { file.ProjectItem.GoToLine(file.Line, commit); }
                 if (listItem is ListItemSymbol symbol) { symbol.Document.GoToLine(symbol.Line); }
             });
+        }
+    }
+
+    private void EnsureSelectedItemIsVisible() {
+        if (lstItems.SelectedItem != null) {
+            lstItems.ScrollIntoView(lstItems.SelectedItem);
         }
     }
 
