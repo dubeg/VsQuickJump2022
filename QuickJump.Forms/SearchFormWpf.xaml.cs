@@ -116,13 +116,10 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             foreach (var item in results) {
                 var viewModel = new ListItemViewModel(item, _options);
                 Items.Add(viewModel);
-                
-                // Load icon asynchronously
                 _ = LoadIconAsync(viewModel, item);
             }
-            lblCountValue.Text = Items.Count.ToString();
-            var itemHeight = _options.ItemFont.Height + 6;
-            Height = Utilities.Clamp(Items.Count * itemHeight + 56, 100, _options.MaxHeight);
+            // TODO: adjust height based on the number of items display, for a maximum of 10 items (length of a page).
+            // Height = Utilities.Clamp(Items.Count * itemHeight + 56, 100, _options.MaxHeight);
         }
         catch (Exception ex) {
             System.Windows.MessageBox.Show(ex.ToString());
