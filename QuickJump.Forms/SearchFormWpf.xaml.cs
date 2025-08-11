@@ -13,12 +13,14 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using EnvDTE;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Data;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
@@ -26,11 +28,12 @@ using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Tools;
 using Utilities = QuickJump2022.Tools.Utilities;
 using Window = System.Windows.Window;
+using Rect = System.Windows.Rect;
 
 namespace QuickJump2022.Forms;
 
 public partial class SearchFormWpf : Window, INotifyPropertyChanged {
-    public int PageSize => 10;
+    public int PageSize => 20; // TODO: make it configurable
     public SearchController SearchController { get; init; }
     private ObservableCollection<ListItemViewModel> _items;
     private GeneralOptionsPage _options;
@@ -50,13 +53,38 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     public double ItemFontSize => _options.ItemFont.Size * 96.0 / 72.0;
 
     public static void ShowNonBlockingModal(SearchController searchController) {
+        var vsWindowHandle = IntPtr.Zero;
+        var vsWindowRect = new Rect();
+        ThreadHelper.JoinableTaskFactory.Run(async delegate {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            vsWindowHandle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
+            var vsWindow = QuickJumpData.Instance.Dte.MainWindow;
+            vsWindowRect = new Rect(vsWindow.Left, vsWindow.Top, vsWindow.Width, vsWindow.Height);
+            var activeDocWindow = QuickJumpData.Instance.Dte.ActiveDocument?.ActiveWindow;
+            if (activeDocWindow is not null) {
+
+                vsWindowRect = new Rect(activeDocWindow.Left, activeDocWindow.Top, activeDocWindow.Width, activeDocWindow.Height);
+                vsWindowRect = Application.Current.MainWindow.DeviceToLogicalRect(vsWindowRect);
+            }
+        });
+
         var thread = new System.Threading.Thread(() => {
             try {
                 SynchronizationContext.SetSynchronizationContext(
                     new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher)
                 );
                 var dialog = new SearchFormWpf(searchController);
+                
+                // Set VS main window as owner
+                if (vsWindowHandle != IntPtr.Zero) {
+                    var interopHelper = new WindowInteropHelper(dialog);
+                    interopHelper.Owner = vsWindowHandle;
+                }
+                
                 dialog.Closed += (s, e) => Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
+                dialog.WindowStartupLocation = WindowStartupLocation.Manual;
+                dialog.Top = vsWindowRect.Y + 100; // TODO: use y-offset from options
+                dialog.Left = vsWindowRect.X + (vsWindowRect.Width / 2) - (dialog.Width / 2);
                 dialog.Show();
                 dialog.Activate();
                 Dispatcher.Run();
@@ -85,11 +113,6 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e) {
-        Width = _options.Width;
-        var screenWidth = SystemParameters.PrimaryScreenWidth;
-        var screenHeight = SystemParameters.PrimaryScreenHeight;
-        Left = (screenWidth - Width) / 2 + _options.OffsetLeft;
-        Top = (screenHeight - Height) / 2 + _options.OffsetTop;
         try {
             await SearchController.LoadDataThreadSafeAsync();
             RefreshList();
@@ -120,8 +143,6 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
                 Items.Add(viewModel);
                 _ = LoadIconAsync(viewModel, item);
             }
-            // TODO: adjust height based on the number of items display, for a maximum of 10 items (length of a page).
-            // Height = Utilities.Clamp(Items.Count * itemHeight + 56, 100, _options.MaxHeight);
         }
         catch (Exception ex) {
             System.Windows.MessageBox.Show(ex.ToString());
@@ -134,10 +155,6 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             if (monikerService == null) return;
 
             BitmapSource iconBitmap = null;
-            
-            // Optional: Convert the list background color to ARGB format for exact matching
-            // var listBgColor = ColorToUInt32(Colors.DimGray); // or use _options color
-            
             if (item is ListItemFile fileItem) {
                 var extension = System.IO.Path.GetExtension(fileItem.FullPath);
                 iconBitmap = await monikerService.GetFileIconAsync(extension);

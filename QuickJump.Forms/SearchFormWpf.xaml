@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QuickJump2022.Behaviors"
         xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
@@ -12,9 +13,8 @@
         xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
         mc:Ignorable="d"
         Title="QuickJump Search" 
-        Height="190" 
         Width="700"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="Manual"
         BorderThickness="0"
         WindowStyle="None"
         Background="Black"
@@ -23,7 +23,7 @@
         Loaded="Window_Loaded"
         Focusable="True"
         ShowActivated="True"
-        theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBackgroundColorKey}}"
+        SizeToContent="Height"
         toolkit:Themes.UseVsTheme="True"
         >
     <Border  
@@ -53,6 +53,7 @@
             <!-- Items ListBox -->
             <ListBox x:Name="lstItems" 
                      Grid.Row="1"
+                     local:ListViewBehaviors.MaxVisibleItems="{Binding PageSize}"
                      ItemsSource="{Binding Items}"
                      BorderThickness="0"
                      BorderBrush="Transparent"
@@ -80,15 +81,6 @@
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                        <!--<Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <Border>
-                                        <ContentPresenter />
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>-->
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
