@@ -40,8 +40,6 @@ public partial class QuickJumpData {
     public QuickJump2022Package Package {  get; private set; }
 
     private VisualStudioWorkspace _workspace;
-    
-    public KnownMonikerService MonikerService { get; private set; }
 
     public static async Task CreateAsync(QuickJump2022Package package, GeneralOptionsPage generalOptions) {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -58,11 +56,6 @@ public partial class QuickJumpData {
         Instance.DteEvents = Instance.Dte.Events.DTEEvents;
         Instance.GeneralOptions = generalOptions;
         Instance.LoadSettings();
-        
-        // Initialize KnownMonikerService
-        Instance.MonikerService = new KnownMonikerService();
-        await Instance.MonikerService.PreloadCommonIconsAsync();
-        
         Instance.DteEvents.OnBeginShutdown += new _dispDTEEvents_OnBeginShutdownEventHandler(DTEEvents_OnBeginShutdown);
     }
 

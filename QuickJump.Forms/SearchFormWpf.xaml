@@ -17,7 +17,7 @@
     Title="QuickJump Search" 
     Width="700"
     BorderThickness="1"
-    BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}"
+    BorderBrush="{DynamicResource {x:Static platform:ThemedDialogColors.WindowBorderBrushKey}}"
     WindowStyle="None"
     Background="Transparent"
     ShowInTaskbar="False"
@@ -29,6 +29,7 @@
     toolkit:Themes.UseVsTheme="True"
     Deactivated="DialogWindow_Deactivated"
     HasDialogFrame="False"
+    theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:ThemedDialogColors.WindowPanelColorKey}}"
     >
     <Grid>
         <Grid.RowDefinitions>

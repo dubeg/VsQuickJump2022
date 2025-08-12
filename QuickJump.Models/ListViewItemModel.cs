@@ -100,12 +100,12 @@ public class ListItemViewModel : INotifyPropertyChanged {
         if (item is ListItemSymbol symbol) {
             TypeSuffix = !string.IsNullOrEmpty(symbol.Type) ? $" -> {symbol.Type}" : "";
             DescriptionText = $"{item.Description}:{item.Line}";
-            IconMoniker = KnownMonikerService.GetCodeMoniker(symbol.BindType);
+            IconMoniker = KnownMonikerUtils.GetCodeMoniker(symbol.BindType);
         }
         else if (item is ListItemFile file) {
             TypeSuffix = "";
             DescriptionText = item.Description ?? "";
-            IconMoniker = KnownMonikerService.GetFileMoniker(file.FullPath);
+            IconMoniker = KnownMonikerUtils.GetFileMoniker(file.FullPath);
         }
     }
 
