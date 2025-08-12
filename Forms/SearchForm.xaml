@@ -1,5 +1,5 @@
 ﻿<platform:DialogWindow 
-    x:Class="QuickJump2022.Forms.SearchFormWpf"
+    x:Class="QuickJump2022.Forms.SearchForm"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -22,7 +22,6 @@
     Background="Transparent"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
-    Loaded="Window_Loaded"
     platform:FocusHelper.EnableActivationSynchronization="True"
     platform:FocusHelper.FocusTarget="{Binding ElementName=txtSearch}"
     SizeToContent="Height"
@@ -92,7 +91,7 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type localm:ListItemViewModel}">
-                    <Grid Background="Transparent">
+                    <Grid x:Name="ItemGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -113,13 +112,15 @@
 
                         <!-- Name and Type -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding DisplayName}" 
+                            <TextBlock x:Name="NameText" 
+                                           Text="{Binding Name}" 
                                            Foreground="{Binding NameForeground}"
                                            FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            TextTrimming="CharacterEllipsis"
                                            />
-                            <TextBlock Text="{Binding TypeSuffix}" 
+                            <TextBlock x:Name="TypeText" 
+                                           Text="{Binding Type}" 
                                            Foreground="{Binding TypeForeground}"
                                            FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
@@ -127,14 +128,22 @@
                         </StackPanel>
 
                         <!-- Description -->
-                        <TextBlock Grid.Column="2" 
-                                       Text="{Binding DescriptionText}" 
+                        <TextBlock x:Name="DescriptionText" 
+                                       Grid.Column="2" 
+                                       Text="{Binding Description}" 
                                        Foreground="{Binding DescriptionForeground}"
                                        FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                        FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,5,0"/>
                     </Grid>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                            <Setter TargetName="NameText" Property="Foreground" Value="{Binding NameForegroundSelected}"/>
+                            <Setter TargetName="TypeText" Property="Foreground" Value="{Binding TypeForegroundSelected}"/>
+                            <Setter TargetName="DescriptionText" Property="Foreground" Value="{Binding DescriptionForegroundSelected}"/>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Language.StandardClassification;
-using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Formatting;
 
-namespace QuickJump2022.QuickJump.Tools;
-public static class ClassificationHelper {
+namespace QuickJump2022.Tools;
 
+public class ClassificationService(IServiceProvider serviceProvider) {
     /// <summary>
     /// Get the styles defined for a token/symbol type.
     /// </summary>
@@ -44,10 +35,8 @@ public static class ClassificationHelper {
     /// * identifier
     /// ...
     /// </remarks>
-    public static TextFormattingRunProperties GetClassificationFormat(string classificationTypeName, string appearanceCategory = "text") {
-        var componentModel =
-            QuickJumpData.Instance.Package.GetService<SComponentModel, IComponentModel>();
-        // (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+    public TextFormattingRunProperties GetClassificationFormat(string classificationTypeName, string appearanceCategory = "text") {
+        var componentModel = serviceProvider.GetService<SComponentModel, IComponentModel>();
         var registryService = componentModel.GetService<IClassificationTypeRegistryService>();
         var classificationFormatService = componentModel.GetService<IClassificationFormatMapService>();
         var classificationFormatMap = classificationFormatService.GetClassificationFormatMap(category: appearanceCategory);

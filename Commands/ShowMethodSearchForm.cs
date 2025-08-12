@@ -1,8 +1,7 @@
-﻿using System.IO;
-using EnvDTE;
-using QuickJump2022.Data;
+﻿using EnvDTE;
 using QuickJump2022.Forms;
-using QuickJump2022.Tools;
+using QuickJump2022.Models;
+using QuickJump2022.Services;
 
 namespace QuickJump2022;
 
@@ -10,18 +9,6 @@ namespace QuickJump2022;
 internal sealed class ShowMethodSearchForm : BaseCommand<ShowMethodSearchForm> {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        if (QuickJumpData.Instance.Dte.ActiveWindow?.Document is null) return; // No active document.
-        var path = QuickJumpData.Instance.Dte.ActiveWindow.Document.ProjectItem.TryGetProperty<string>("FullPath");
-        if (string.IsNullOrEmpty(path)) {
-            // Unsaved document (?)
-            await VS.MessageBox.ShowWarningAsync(nameof(ShowMethodSearchForm), "The active document doesn't have a path.");
-            return;
-        }
-        var file = new FileInfo(path);
-        var isCsharp = !string.IsNullOrEmpty(file.Extension) && file.Extension.Equals(".cs", StringComparison.InvariantCultureIgnoreCase);
-        if (!isCsharp) return;
-        var searchType = Enums.ESearchType.Methods;
-        var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
-        SearchFormWpf.ShowModal(searchController);
+        await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.ESearchType.Methods);
     }
 }

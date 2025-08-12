@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
-using QuickJump2022.Data;
+using QuickJump2022.Models;
 
 namespace QuickJump2022.Tools;
 

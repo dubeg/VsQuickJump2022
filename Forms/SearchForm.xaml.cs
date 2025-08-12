@@ -11,43 +11,56 @@ using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
 using QuickJump2022.QuickJump.Tools;
+using QuickJump2022.Services;
 using QuickJump2022.Tools;
+using static QuickJump2022.Models.Enums;
 using Rect = System.Windows.Rect;
 
 namespace QuickJump2022.Forms;
 
-public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
+public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public int PageSize => 20; // TODO: make it configurable
-    public SearchController SearchController { get; init; }
+    public SearchInstance SearchInstance { get; init; }
+    public GoToService GoToService { get; init; }
     private ObservableCollection<ListItemViewModel> _items;
-    private GeneralOptionsPage _options;
+    public GeneralOptionsPage Options { get; init; }
     public ObservableCollection<ListItemViewModel> Items {
         get => _items;
         set { _items = value; OnPropertyChanged(); }
     }
 
-    public static void ShowModal(SearchController searchController) {
-        ThreadHelper.ThrowIfNotOnUIThread();
+    public static async Task ShowModalAsync(QuickJumpPackage package, ESearchType searchType) {
         var vsWindowRect = new Rect();
-        var vsWindow = QuickJumpData.Instance.Dte.MainWindow;
+        var vsWindow = package.Dte.MainWindow;
         vsWindowRect = vsWindow.WindowState == EnvDTE.vsWindowState.vsWindowStateMaximize 
             ? WindowUtils.GetMaximizedWindowBounds(vsWindow.HWnd)
             : new Rect(vsWindow.Left, vsWindow.Top, vsWindow.Width, vsWindow.Height);
-        var activeDocWindow = QuickJumpData.Instance.Dte.ActiveDocument?.ActiveWindow;
+        var activeDocWindow = package.Dte.ActiveDocument?.ActiveWindow;
         if (activeDocWindow is not null) {
             vsWindowRect = new Rect(activeDocWindow.Left, activeDocWindow.Top, activeDocWindow.Width, activeDocWindow.Height);
         }
         vsWindowRect = Application.Current.MainWindow.DeviceToLogicalRect(vsWindowRect);
-        var dialog = new SearchFormWpf(searchController);
+        var searchInstance = new SearchInstance(
+            package.ProjectFileService,
+            package.SymbolService,
+            searchType,
+            package.GeneralOptions.FileSortType,
+            package.GeneralOptions.CSharpSortType,
+            package.GeneralOptions.MixedSortType
+        );
+        var dialog = new SearchForm(searchInstance) { 
+            Options = package.GeneralOptions,
+            GoToService = package.GoToService,
+        };
         dialog.WindowStartupLocation = WindowStartupLocation.Manual;
         dialog.Top = vsWindowRect.Y + 100; // TODO: use y-offset from options
         dialog.Left = vsWindowRect.X + (vsWindowRect.Width / 2) - (dialog.Width / 2);
+        await dialog.LoadDataAsync();
         dialog.ShowModal();
     }
 
-    public SearchFormWpf(SearchController type) {
-        SearchController = type;
-        _options = QuickJumpData.Instance.GeneralOptions;
+    public SearchForm(SearchInstance searchInstance) {
+        SearchInstance = searchInstance;
         Items = new ObservableCollection<ListItemViewModel>();
         InitializeComponent();
         // --
@@ -56,36 +69,26 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
         FontSize = fontSize + 2; // TODO: configure via options?
     }
 
-    private async void Window_Loaded(object sender, RoutedEventArgs e) {
-        try {
-            await SearchController.LoadDataThreadSafeAsync();
-            RefreshList();
-            if (Items.Count > 0) {
-                lstItems.SelectedIndex = 0;
-                EnsureSelectedItemIsVisible();
-            }
-        }
-        catch (Exception ex) {
-            System.Windows.MessageBox.Show(ex.ToString());
+    public async Task LoadDataAsync() {
+        await SearchInstance.LoadDataAsync();
+        RefreshList();
+        if (Items.Count > 0) {
+            lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
         }
     }
 
     private void RefreshList() {
-        try {
-            var searchText = txtSearch.Text;
-            Items.Clear();
-            var results = SearchController.Search(searchText);
-            foreach (var item in results) {
-                // TODO:
-                // Use ClassificationHelper.GetClassificationFormat( eg. "Comment")
-                // to color a symbol item according to its defined color in texteditor.
-                // Alternatively, use FontsAndColorsHelper.GetTextEditorInfos() -> Plain text, Comment, etc.
-                var viewModel = new ListItemViewModel(item, _options);
-                Items.Add(viewModel);
-            }
-        }
-        catch (Exception ex) {
-            System.Windows.MessageBox.Show(ex.ToString());
+        var searchText = txtSearch.Text;
+        Items.Clear();
+        var results = SearchInstance.Search(searchText);
+        foreach (var item in results) {
+            // TODO:
+            // Use ClassificationHelper.GetClassificationFormat( eg. "Comment")
+            // to color a symbol item according to its defined color in texteditor.
+            // Alternatively, use FontsAndColorsHelper.GetTextEditorInfos() -> Plain text, Comment, etc.
+            var viewModel = new ListItemViewModel(item, Options);
+            Items.Add(viewModel);
         }
     }
 
@@ -154,12 +157,12 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
         }
     }
 
-    private void GoToItem(bool commit = false) {
+    private async Task GoToItem(bool commit = false) {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
             var listItem = selectedItem.Item;
-            if (listItem is ListItemFile file) { file.ProjectItem.GoToLine(file.Line, commit); }
-            if (listItem is ListItemSymbol symbol) { symbol.Document.GoToLine(symbol.Line); }
+            if (listItem is ListItemFile file) await GoToService.GoToFileAsync(file);
+            else if (listItem is ListItemSymbol symbol) await GoToService.GoToSymbolAsync(symbol);
         }
     }
 
@@ -181,11 +184,9 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
         txtSearch.Focus();
         txtSearch.SelectionStart = txtSearch.Text.Length;
     }
-
-    private static Color ToMediaColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
+    
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
     private void DialogWindow_Deactivated(object sender, EventArgs e) {
         try { this.Close(); } catch { }
     }

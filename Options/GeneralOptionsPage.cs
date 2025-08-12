@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using QuickJump2022.Data;
+using QuickJump2022.Models;
 
 namespace QuickJump2022.Options;
 

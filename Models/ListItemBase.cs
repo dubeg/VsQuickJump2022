@@ -6,10 +6,9 @@ namespace QuickJump2022.Models;
 public abstract class ListItemBase : IComparable {
     public int Weight;
     public BitmapSource IconBitmapSource;
-    public string Name;
-    public string Type;
-    public string Description;
-    public int Line = 1;
+    public virtual string Name => string.Empty;
+    public virtual string Type => string.Empty;
+    public virtual string Description => string.Empty;
 
     public int CompareTo(object obj) {
         var item = (ListItemBase)obj;

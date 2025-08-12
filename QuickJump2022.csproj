@@ -48,42 +48,44 @@
     <Compile Include="Commands\ShowAllSearchForm.cs" />
     <Compile Include="Commands\ShowFileSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
+    <Compile Include="Models\FileItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuickJump.Behaviors\ListViewBehaviors.cs" />
-    <Compile Include="QuickJump.Data\Enums.cs" />
-    <Compile Include="QuickJump.Models\ListViewItemModel.cs" />
-    <Compile Include="QuickJump.Tools\ClassificationHelper.cs" />
-    <Compile Include="QuickJump.Tools\FontsAndColorsHelper.cs" />
-    <Compile Include="QuickJump.Tools\UnsafeNativeMethods.cs" />
-    <Compile Include="QuickJump.Tools\WindowUtils.cs" />
+    <Compile Include="Behaviors\ListViewBehaviors.cs" />
+    <Compile Include="Models\Enums.cs" />
+    <Compile Include="Models\ListViewItemModel.cs" />
+    <Compile Include="Services\GoToService.cs" />
+    <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="Services\ClassificationService.cs" />
+    <Compile Include="Tools\FontsAndColorsHelper.cs" />
+    <Compile Include="Interop\UnsafeNativeMethods.cs" />
+    <Compile Include="Interop\WindowUtils.cs" />
+    <Compile Include="Services\FileService.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
-    <Page Include="QuickJump.Forms\SearchFormWpf.xaml">
+    <Page Include="Forms\SearchForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="QuickJump.Forms\SearchFormWpf.xaml.cs">
-      <DependentUpon>SearchFormWpf.xaml</DependentUpon>
+    <Compile Include="Forms\SearchForm.xaml.cs">
+      <DependentUpon>SearchForm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="QuickJump.Models\CodeItem.cs" />
-    <Compile Include="QuickJump.Models\ListItemBase.cs" />
-    <Compile Include="QuickJump.Models\ListItemSymbol.cs" />
-    <Compile Include="QuickJump.Models\ListItemFile.cs" />
-    <Compile Include="QuickJump.Options\GeneralOptionsPage.cs">
+    <Compile Include="Models\CodeItem.cs" />
+    <Compile Include="Models\ListItemBase.cs" />
+    <Compile Include="Models\ListItemSymbol.cs" />
+    <Compile Include="Models\ListItemFile.cs" />
+    <Compile Include="Options\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="QuickJump.Tools\DocumentExtensions.cs" />
-    <Compile Include="QuickJump.Tools\KnownMonikerUtils.cs" />
-    <Compile Include="QuickJump.Tools\SearchController.cs" />
-    <Compile Include="QuickJump.Tools\Sort.cs" />
-    <Compile Include="QuickJump.Tools\Utilities.cs" />
-    <Compile Include="QuickJump.Tools\FuzzySearch.cs" />
-    <Compile Include="QuickJump2022Package.cs" />
-    <Compile Include="QuickJump\QuickJumpData.cs" />
-    <Compile Include="QuickJump\QuickJumpData_RoslynWorkspace.cs" />
+    <Compile Include="Tools\KnownMonikerUtils.cs" />
+    <Compile Include="Services\SearchInstance.cs" />
+    <Compile Include="Tools\Sort.cs" />
+    <Compile Include="Tools\Utilities.cs" />
+    <Compile Include="Tools\FuzzySearch.cs" />
+    <Compile Include="QuickJumpPackage.cs" />
+    <Compile Include="Services\SymbolService.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -1,4 +1,5 @@
-﻿using QuickJump2022.Models;
+﻿using System.Runtime.InteropServices.WindowsRuntime;
+using QuickJump2022.Models;
 
 namespace QuickJump2022.Tools;
 
@@ -12,11 +13,15 @@ public static class Sort {
     }
 
     public static int LineNumber(ListItemBase b1, ListItemBase b2) {
-        return b1.Line.CompareTo(b2.Line);
+        if (b1 is ListItemSymbol s1 && b2 is ListItemSymbol s2)
+            return s1.Line.CompareTo(s2.Line);
+        return 0;
     }
 
     public static int LineNumberReverse(ListItemBase b1, ListItemBase b2) {
-        return b2.Line.CompareTo(b1.Line);
+        if (b1 is ListItemSymbol s1 && b2 is ListItemSymbol s2)
+            return s2.Line.CompareTo(s1.Line);
+        return 0;
     }
 
     public static int Weight(ListItemBase b1, ListItemBase b2) {
