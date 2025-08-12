@@ -1,38 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using EnvDTE;
-using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
-using QuickJump2022.Data;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Tools;
-using Utilities = QuickJump2022.Tools.Utilities;
-using Window = System.Windows.Window;
 using Rect = System.Windows.Rect;
 
 namespace QuickJump2022.Forms;
 
-public partial class SearchFormWpf : Window, INotifyPropertyChanged {
+public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
     public int PageSize => 20; // TODO: make it configurable
     public SearchController SearchController { get; init; }
     private ObservableCollection<ListItemViewModel> _items;
@@ -52,51 +35,23 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     public string ItemFontFamily => _options.ItemFont.FontFamily.Name;
     public double ItemFontSize => _options.ItemFont.Size * 96.0 / 72.0;
 
-    public static void ShowNonBlockingModal(SearchController searchController) {
-        var vsWindowHandle = IntPtr.Zero;
+    public static void ShowModal(SearchController searchController) {
+        ThreadHelper.ThrowIfNotOnUIThread();
         var vsWindowRect = new Rect();
-        ThreadHelper.JoinableTaskFactory.Run(async delegate {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            vsWindowHandle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
-            var vsWindow = QuickJumpData.Instance.Dte.MainWindow;
-            vsWindowRect = new Rect(vsWindow.Left, vsWindow.Top, vsWindow.Width, vsWindow.Height);
-            var activeDocWindow = QuickJumpData.Instance.Dte.ActiveDocument?.ActiveWindow;
-            if (activeDocWindow is not null) {
-
-                vsWindowRect = new Rect(activeDocWindow.Left, activeDocWindow.Top, activeDocWindow.Width, activeDocWindow.Height);
-                vsWindowRect = Application.Current.MainWindow.DeviceToLogicalRect(vsWindowRect);
-            }
-        });
-
-        var thread = new System.Threading.Thread(() => {
-            try {
-                SynchronizationContext.SetSynchronizationContext(
-                    new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher)
-                );
-                var dialog = new SearchFormWpf(searchController);
-                
-                // Set VS main window as owner
-                if (vsWindowHandle != IntPtr.Zero) {
-                    var interopHelper = new WindowInteropHelper(dialog);
-                    interopHelper.Owner = vsWindowHandle;
-                }
-                
-                dialog.Closed += (s, e) => Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
-                dialog.WindowStartupLocation = WindowStartupLocation.Manual;
-                dialog.Top = vsWindowRect.Y + 100; // TODO: use y-offset from options
-                dialog.Left = vsWindowRect.X + (vsWindowRect.Width / 2) - (dialog.Width / 2);
-                dialog.Show();
-                dialog.Activate();
-                Dispatcher.Run();
-            }
-            catch (Exception ex) {
-                ex.Log();
-                Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
-            }
+        var vsWindow = QuickJumpData.Instance.Dte.MainWindow;
+        vsWindowRect = vsWindow.WindowState == EnvDTE.vsWindowState.vsWindowStateMaximize 
+            ? WindowUtils.GetMaximizedWindowBounds(vsWindow.HWnd)
+            : new Rect(vsWindow.Left, vsWindow.Top, vsWindow.Width, vsWindow.Height);
+        var activeDocWindow = QuickJumpData.Instance.Dte.ActiveDocument?.ActiveWindow;
+        if (activeDocWindow is not null) {
+            vsWindowRect = new Rect(activeDocWindow.Left, activeDocWindow.Top, activeDocWindow.Width, activeDocWindow.Height);
         }
-        );
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
+        vsWindowRect = Application.Current.MainWindow.DeviceToLogicalRect(vsWindowRect);
+        var dialog = new SearchFormWpf(searchController);
+        dialog.WindowStartupLocation = WindowStartupLocation.Manual;
+        dialog.Top = vsWindowRect.Y + 100; // TODO: use y-offset from options
+        dialog.Left = vsWindowRect.X + (vsWindowRect.Width / 2) - (dialog.Width / 2);
+        dialog.ShowModal();
     }
 
     public SearchFormWpf(SearchController type) {
@@ -120,13 +75,6 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
                 lstItems.SelectedIndex = 0;
                 EnsureSelectedItemIsVisible();
             }
-            await Dispatcher.BeginInvoke(
-                new Action(() => {
-                    txtSearch.Focus();
-                    Keyboard.Focus(txtSearch);
-                }), 
-                DispatcherPriority.Loaded
-            );
         }
         catch (Exception ex) {
             System.Windows.MessageBox.Show(ex.ToString());
@@ -141,38 +89,10 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             foreach (var item in results) {
                 var viewModel = new ListItemViewModel(item, _options);
                 Items.Add(viewModel);
-                _ = LoadIconAsync(viewModel, item);
             }
         }
         catch (Exception ex) {
             System.Windows.MessageBox.Show(ex.ToString());
-        }
-    }
-
-    private async Task LoadIconAsync(ListItemViewModel viewModel, ListItemBase item) {
-        try {
-            var monikerService = QuickJumpData.Instance.MonikerService;
-            if (monikerService == null) return;
-
-            BitmapSource iconBitmap = null;
-            if (item is ListItemFile fileItem) {
-                var extension = System.IO.Path.GetExtension(fileItem.FullPath);
-                iconBitmap = await monikerService.GetFileIconAsync(extension);
-            }
-            else if (item is ListItemSymbol symbolItem) {
-                iconBitmap = await monikerService.GetCodeIconAsync(symbolItem.BindType);
-            }
-
-            if (iconBitmap != null) {
-                // Update the icon on the UI thread
-                await Dispatcher.InvokeAsync(() => {
-                    viewModel.UpdateIcon(iconBitmap);
-                });
-            }
-        }
-        catch (Exception ex) {
-            // Log but don't crash on icon loading errors
-            ex.Log();
         }
     }
 
@@ -192,7 +112,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             e.Handled = true;
         }
         else if (e.Key == Key.Return) {
-            _ = GoToItemAsync(true); // Fire and forget for UI responsiveness
+            GoToItem(true); // Fire and forget for UI responsiveness
             Close();
             e.Handled = true;
         }
@@ -206,7 +126,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
                 lstItems.SelectedIndex--;
                 EnsureSelectedItemIsVisible();
             }
-            _ = GoToItemAsync(); // Fire and forget
+            GoToItem();
             e.Handled = true;
         }
         else if (e.Key == Key.Down) {
@@ -214,7 +134,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
                 lstItems.SelectedIndex++;
                 EnsureSelectedItemIsVisible();
             }
-            _ = GoToItemAsync(); // Fire and forget
+            GoToItem();
             e.Handled = true;
         }
         if (e.Key == Key.PageUp) {
@@ -223,7 +143,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             else
                 lstItems.SelectedIndex = 0;
             EnsureSelectedItemIsVisible();
-            _ = GoToItemAsync(); // Fire and forget
+            GoToItem();
             e.Handled = true;
         }
         else if (e.Key == Key.PageDown) {
@@ -232,7 +152,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
             else
                 lstItems.SelectedIndex = Items.Count - 1;
             EnsureSelectedItemIsVisible();
-            _ = GoToItemAsync(); // Fire and forget
+            GoToItem();
             e.Handled = true;
         }
         else if (e.Key == Key.Back && Keyboard.Modifiers == ModifierKeys.Control) {
@@ -241,16 +161,12 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
         }
     }
 
-    private async Task GoToItemAsync(bool commit = false) {
+    private void GoToItem(bool commit = false) {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
-            // Marshal the navigation call to VS UI thread
-            await ThreadHelper.JoinableTaskFactory.RunAsync(async delegate {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var listItem = selectedItem.Item;
-                if (listItem is ListItemFile file) { file.ProjectItem.GoToLine(file.Line, commit); }
-                if (listItem is ListItemSymbol symbol) { symbol.Document.GoToLine(symbol.Line); }
-            });
+            var listItem = selectedItem.Item;
+            if (listItem is ListItemFile file) { file.ProjectItem.GoToLine(file.Line, commit); }
+            if (listItem is ListItemSymbol symbol) { symbol.Document.GoToLine(symbol.Line); }
         }
     }
 
@@ -263,7 +179,7 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     private void lstItems_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
         var item = (e.OriginalSource as FrameworkElement)?.DataContext as ListItemViewModel;
         if (item != null) {
-            _ = GoToItemAsync(true); // Fire and forget
+            GoToItem(true); // Fire and forget
             Close();
         }
     }
@@ -276,4 +192,8 @@ public partial class SearchFormWpf : Window, INotifyPropertyChanged {
     private static Color ToMediaColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private void DialogWindow_Deactivated(object sender, EventArgs e) {
+        try { this.Close(); } catch { }
+    }
 }

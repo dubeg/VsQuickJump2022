@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.Imaging;
+﻿using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using QuickJump2022.Data;
 using System.Collections.Generic;
@@ -27,6 +27,7 @@ public class KnownMonikerService {
         return bindType switch {
             Enums.EBindType.Namespace => KnownMonikers.Namespace,
             Enums.EBindType.Class => KnownMonikers.Class,
+            Enums.EBindType.Constructor => KnownMonikers.Method,
             Enums.EBindType.Method => KnownMonikers.Method,
             Enums.EBindType.Property => KnownMonikers.Property,
             Enums.EBindType.Field => KnownMonikers.Field,

@@ -19,7 +19,7 @@ internal sealed class ShowAllSearchForm : BaseCommand<ShowAllSearchForm> {
         }
         var searchType = isCSharp ? Enums.ESearchType.All : Enums.ESearchType.Files;
         var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
-        SearchFormWpf.ShowNonBlockingModal(searchController);
+        SearchFormWpf.ShowModal(searchController);
     }
 }
 

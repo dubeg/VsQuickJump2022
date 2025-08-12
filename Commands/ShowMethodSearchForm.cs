@@ -22,6 +22,6 @@ internal sealed class ShowMethodSearchForm : BaseCommand<ShowMethodSearchForm> {
         if (!isCsharp) return;
         var searchType = Enums.ESearchType.Methods;
         var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
-        SearchFormWpf.ShowNonBlockingModal(searchController);
+        SearchFormWpf.ShowModal(searchController);
     }
 }

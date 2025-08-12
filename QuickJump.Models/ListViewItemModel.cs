@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
+using QuickJump2022.Tools;
 
 namespace QuickJump2022.Models;
 
@@ -15,10 +16,9 @@ public class ListItemViewModel : INotifyPropertyChanged {
 
     public ListItemBase Item { get; }
 
-    public double ItemHeight => _options.ItemFont.Height + 6;
     public string ItemFontFamily => _options.ItemFont.FontFamily.Name;
     public double ItemFontSize => _options.ItemFont.Size * 96.0 / 72.0;
-    public bool ShowIcon => ItemHeight >= 20 && _options.ShowIcons;
+    public bool ShowIcon => _options.ShowIcons;
 
     public string DisplayName => Item.Name;
     public string DescriptionText { get; }
@@ -93,40 +93,23 @@ public class ListItemViewModel : INotifyPropertyChanged {
     public Brush SeparatorColor => new SolidColorBrush(ToMediaColor(_options.ItemSeparatorColor));
 
     public ImageMoniker IconMoniker { get; set; }
-    public BitmapSource IconSource {
-        get {
-            if (!ShowIcon) return null;
-            if (Item.IconBitmapSource != null) return Item.IconBitmapSource;
-            return null;
-        }
-    }
 
     public ListItemViewModel(ListItemBase item, GeneralOptionsPage options) {
         Item = item;
         _options = options;
-
-        // Set text properties based on item type
-        if (item is ListItemSymbol csharpItem) {
-            TypeSuffix = !string.IsNullOrEmpty(csharpItem.Type) ? $" -> {csharpItem.Type}" : "";
+        if (item is ListItemSymbol symbol) {
+            TypeSuffix = !string.IsNullOrEmpty(symbol.Type) ? $" -> {symbol.Type}" : "";
             DescriptionText = $"{item.Description}:{item.Line}";
+            IconMoniker = KnownMonikerService.GetCodeMoniker(symbol.BindType);
         }
-        else {
+        else if (item is ListItemFile file) {
             TypeSuffix = "";
             DescriptionText = item.Description ?? "";
+            IconMoniker = KnownMonikerService.GetFileMoniker(file.FullPath);
         }
     }
 
     private static Color ToMediaColor(System.Drawing.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    public void UpdateIcon(BitmapSource iconBitmapSource) {
-        Item.IconBitmapSource = iconBitmapSource;
-        OnPropertyChanged(nameof(IconSource));
-    }
-
-    public void UpdateIcon(ImageMoniker imageMoniker) {
-        IconMoniker = imageMoniker;
-        OnPropertyChanged(nameof(IconMoniker));
-    }
 }

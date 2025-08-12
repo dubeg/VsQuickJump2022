@@ -1,44 +1,44 @@
-﻿<Window x:Class="QuickJump2022.Forms.SearchFormWpf"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:QuickJump2022.Behaviors"
-        xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
-        xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
-        xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
-        xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
-        xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
-        xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
-        xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
-        mc:Ignorable="d"
-        Title="QuickJump Search" 
-        Width="700"
-        WindowStartupLocation="Manual"
-        BorderThickness="0"
-        WindowStyle="None"
-        Background="Black"
-        ShowInTaskbar="False"
-        ResizeMode="NoResize"
-        Loaded="Window_Loaded"
-        Focusable="True"
-        ShowActivated="True"
-        SizeToContent="Height"
-        toolkit:Themes.UseVsTheme="True"
-        >
-    <Border  
-        BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}"
-        BorderThickness="1"
-        >
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+﻿<platform:DialogWindow 
+    x:Class="QuickJump2022.Forms.SearchFormWpf"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localb="clr-namespace:QuickJump2022.Behaviors"
+    xmlns:localm="clr-namespace:QuickJump2022.Models"
+    xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    mc:Ignorable="d"
+    Title="QuickJump Search" 
+    Width="700"
+    BorderThickness="1"
+    BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}"
+    WindowStyle="None"
+    Background="Transparent"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
+    Loaded="Window_Loaded"
+    platform:FocusHelper.EnableActivationSynchronization="True"
+    platform:FocusHelper.FocusTarget="{Binding ElementName=txtSearch}"
+    SizeToContent="Height"
+    toolkit:Themes.UseVsTheme="True"
+    Deactivated="DialogWindow_Deactivated"
+    HasDialogFrame="False"
+    >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <!-- Search TextBox -->
-            <TextBox x:Name="txtSearch" 
+        <!-- Search TextBox -->
+        <TextBox x:Name="txtSearch" 
                      Grid.Row="0"
                      BorderThickness="0"
                      FontFamily="{Binding SearchFontFamily}"
@@ -46,14 +46,13 @@
                      VerticalContentAlignment="Center"
                      TextChanged="txtSearch_TextChanged"
                      PreviewKeyDown="txtSearch_PreviewKeyDown"
-                     Focusable="True"
                      >
-            </TextBox>
+        </TextBox>
 
-            <!-- Items ListBox -->
-            <ListBox x:Name="lstItems" 
+        <!-- Items ListBox -->
+        <ListBox x:Name="lstItems" 
                      Grid.Row="1"
-                     local:ListViewBehaviors.MaxVisibleItems="{Binding PageSize}"
+                     localb:ListViewBehaviors.MaxVisibleItems="{Binding PageSize}"
                      ItemsSource="{Binding Items}"
                      BorderThickness="0"
                      BorderBrush="Transparent"
@@ -68,34 +67,34 @@
                      VirtualizingStackPanel.CacheLengthUnit="Item"
                      PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
                      PreviewKeyUp="lstItems_PreviewKeyUp">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="BorderBrush" Value="Transparent"/>
-                        <Setter Property="Padding" Value="0,2"/>
-                        <Setter Property="Margin" Value="0"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Height="{Binding ItemHeight}" Background="Transparent">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="Padding" Value="0,2"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type localm:ListItemViewModel}">
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                            <!-- Icon -->
-                            <imaging:CrispImage 
+                        <!-- Icon -->
+                        <imaging:CrispImage 
                                    Grid.Column="0" 
-                                   Source="{Binding IconSource}" 
+                                   Moniker="{Binding IconMoniker}" 
                                    UseLayoutRounding="True"
                                    RenderOptions.BitmapScalingMode="HighQuality"
                                    Width="16" 
@@ -104,33 +103,32 @@
                                    VerticalAlignment="Center"
                                    Visibility="{Binding ShowIcon, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                            <!-- Name and Type -->
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding DisplayName}" 
+                        <!-- Name and Type -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DisplayName}" 
                                            FontFamily="{Binding ItemFontFamily}"
                                            FontSize="{Binding ItemFontSize}"
                                            Foreground="{Binding NameForeground}"
                                            TextTrimming="CharacterEllipsis"
                                            />
-                                <TextBlock Text="{Binding TypeSuffix}" 
+                            <TextBlock Text="{Binding TypeSuffix}" 
                                            FontFamily="{Binding ItemFontFamily}"
                                            FontSize="{Binding ItemFontSize}"
                                            Foreground="{Binding TypeForeground}"
                                            Margin="0,0,5,0"/>
-                            </StackPanel>
+                        </StackPanel>
 
-                            <!-- Description -->
-                            <TextBlock Grid.Column="2" 
+                        <!-- Description -->
+                        <TextBlock Grid.Column="2" 
                                        Text="{Binding DescriptionText}" 
                                        FontFamily="{Binding ItemFontFamily}"
                                        FontSize="{Binding ItemFontSize}"
                                        Foreground="{Binding DescriptionForeground}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,5,0"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
-    </Border>
-</Window>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</platform:DialogWindow>

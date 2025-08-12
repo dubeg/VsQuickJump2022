@@ -17,6 +17,6 @@ internal sealed class ShowFileSearchForm : BaseCommand<ShowFileSearchForm> {
 
         var searchType = Enums.ESearchType.Files;
         var searchController = new SearchController(QuickJumpData.Instance.Package, searchType);
-        SearchFormWpf.ShowNonBlockingModal(searchController);
+        SearchFormWpf.ShowModal(searchController);
     }
 }

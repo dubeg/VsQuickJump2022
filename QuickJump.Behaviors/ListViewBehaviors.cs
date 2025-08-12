@@ -46,7 +46,7 @@ public static class ListViewBehaviors {
         if (itemHeight > 0) {
             var visibleItems = Math.Min(listView.Items.Count, maxVisibleItems);
             var totalHeight = visibleItems * itemHeight;
-            listView.Height = totalHeight;
+            listView.Height = totalHeight + 2; // TODO: why 2?
         }
     }
 
