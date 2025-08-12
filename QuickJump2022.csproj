@@ -52,6 +52,9 @@
     <Compile Include="QuickJump.Behaviors\ListViewBehaviors.cs" />
     <Compile Include="QuickJump.Data\Enums.cs" />
     <Compile Include="QuickJump.Models\ListViewItemModel.cs" />
+    <Compile Include="QuickJump.Tools\ClassificationHelper.cs" />
+    <Compile Include="QuickJump.Tools\FontsAndColorsHelper.cs" />
+    <Compile Include="QuickJump.Tools\UnsafeNativeMethods.cs" />
     <Compile Include="QuickJump.Tools\WindowUtils.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>

@@ -64,12 +64,6 @@ public partial class QuickJumpData {
     private void LoadSettings() {
         var userSettingsStore = new ShellSettingsManager((IServiceProvider)(object)Package).GetReadOnlySettingsStore((SettingsScope)2);
         if (userSettingsStore.CollectionExists("General")) {
-            if (userSettingsStore.PropertyExists("General", "ItemSeparatorColor")) {
-                Instance.GeneralOptions.ItemSeparatorColor = Color.FromName(userSettingsStore.GetString("General", "ItemSeparatorColor"));
-            }
-            if (userSettingsStore.PropertyExists("General", "ShowStatusBar")) {
-                Instance.GeneralOptions.ShowStatusBar = userSettingsStore.GetBoolean("General", "ShowStatusBar");
-            }
             if (userSettingsStore.PropertyExists("General", "ShowIcons")) {
                 Instance.GeneralOptions.ShowIcons = userSettingsStore.GetBoolean("General", "ShowIcons");
             }
@@ -110,24 +104,6 @@ public partial class QuickJumpData {
                 Instance.GeneralOptions.CodeSelectedForegroundColor = Color.FromName(userSettingsStore.GetString("General", "CodeSelectedForegroundColor"));
             }
             FontConverter fontConverter = new FontConverter();
-            if (userSettingsStore.PropertyExists("General", "ItemFont")) {
-                Instance.GeneralOptions.ItemFont = (Font)fontConverter.ConvertFromInvariantString(userSettingsStore.GetString("General", "ItemFont"));
-            }
-            if (userSettingsStore.PropertyExists("General", "SearchFont")) {
-                Instance.GeneralOptions.SearchFont = (Font)fontConverter.ConvertFromInvariantString(userSettingsStore.GetString("General", "SearchFont"));
-            }
-            if (userSettingsStore.PropertyExists("General", "OffsetTop")) {
-                Instance.GeneralOptions.OffsetTop = userSettingsStore.GetInt32("General", "OffsetTop");
-            }
-            if (userSettingsStore.PropertyExists("General", "OffsetLeft")) {
-                Instance.GeneralOptions.OffsetLeft = userSettingsStore.GetInt32("General", "OffsetLeft");
-            }
-            if (userSettingsStore.PropertyExists("General", "Width")) {
-                Instance.GeneralOptions.Width = userSettingsStore.GetInt32("General", "Width");
-            }
-            if (userSettingsStore.PropertyExists("General", "MaxHeight")) {
-                Instance.GeneralOptions.MaxHeight = userSettingsStore.GetInt32("General", "MaxHeight");
-            }
             if (userSettingsStore.PropertyExists("General", "FileSortType")) {
                 Instance.GeneralOptions.FileSortType = (Enums.SortType)userSettingsStore.GetInt32("General", "FileSortType");
             }
@@ -146,16 +122,11 @@ public partial class QuickJumpData {
             else {
                 Instance.GeneralOptions.MixedSortType = Enums.SortType.Alphabetical;
             }
-            if (userSettingsStore.PropertyExists("General", "BorderColor")) {
-                Instance.GeneralOptions.BorderColor = Color.FromName(userSettingsStore.GetString("General", "BorderColor"));
-            }
         }
     }
 
     private void SaveSettings() {
         WritableSettingsStore writableSettingsStore = ((SettingsManager)new ShellSettingsManager((IServiceProvider)(object)Package)).GetWritableSettingsStore((SettingsScope)2);
-        writableSettingsStore.SetString("General", "ItemSeparatorColor", Instance.GeneralOptions.ItemSeparatorColor.Name);
-        writableSettingsStore.SetBoolean("General", "ShowStatusBar", Instance.GeneralOptions.ShowStatusBar);
         writableSettingsStore.SetBoolean("General", "ShowIcons", Instance.GeneralOptions.ShowIcons);
         writableSettingsStore.SetString("General", "FileBackgroundColor", Instance.GeneralOptions.FileBackgroundColor.Name);
         writableSettingsStore.SetString("General", "FileDescriptionForegroundColor", Instance.GeneralOptions.FileDescriptionForegroundColor.Name);
@@ -169,14 +140,7 @@ public partial class QuickJumpData {
         writableSettingsStore.SetString("General", "CodeSelectedBackgroundColor", Instance.GeneralOptions.CodeSelectedBackgroundColor.Name);
         writableSettingsStore.SetString("General", "CodeSelectedDescriptionForegroundColor", Instance.GeneralOptions.CodeSelectedDescriptionForegroundColor.Name);
         writableSettingsStore.SetString("General", "CodeSelectedForegroundColor", Instance.GeneralOptions.CodeSelectedForegroundColor.Name);
-        writableSettingsStore.SetString("General", "BorderColor", Instance.GeneralOptions.BorderColor.Name);
         var fontConverter = new FontConverter();
-        writableSettingsStore.SetString("General", "ItemFont", fontConverter.ConvertToInvariantString(Instance.GeneralOptions.ItemFont));
-        writableSettingsStore.SetString("General", "SearchFont", fontConverter.ConvertToInvariantString(Instance.GeneralOptions.SearchFont));
-        writableSettingsStore.SetInt32("General", "OffsetTop", Instance.GeneralOptions.OffsetTop);
-        writableSettingsStore.SetInt32("General", "OffsetLeft", Instance.GeneralOptions.OffsetLeft);
-        writableSettingsStore.SetInt32("General", "Width", Instance.GeneralOptions.Width);
-        writableSettingsStore.SetInt32("General", "MaxHeight", Instance.GeneralOptions.MaxHeight);
         writableSettingsStore.SetInt32("General", "FileSortType", (int)Instance.GeneralOptions.FileSortType);
         writableSettingsStore.SetInt32("General", "CSharpSortType", (int)Instance.GeneralOptions.CSharpSortType);
         writableSettingsStore.SetInt32("General", "MixedSortType", (int)Instance.GeneralOptions.MixedSortType);

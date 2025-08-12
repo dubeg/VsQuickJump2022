@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
@@ -24,16 +25,6 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
         get => _items;
         set { _items = value; OnPropertyChanged(); }
     }
-
-    // Binding properties for UI
-    public Brush BorderColor => new SolidColorBrush(ToMediaColor(_options.BorderColor));
-    public Brush BackgroundColor => new SolidColorBrush(Colors.Black);
-    public Brush StatusBackgroundColor => new SolidColorBrush(ToMediaColor(_options.StatusBackgroundColor));
-    public bool ShowStatusBar => _options.ShowStatusBar;
-    public string SearchFontFamily => _options.SearchFont.FontFamily.Name;
-    public double SearchFontSize => _options.SearchFont.Size * 96.0 / 72.0; // Convert points to WPF units
-    public string ItemFontFamily => _options.ItemFont.FontFamily.Name;
-    public double ItemFontSize => _options.ItemFont.Size * 96.0 / 72.0;
 
     public static void ShowModal(SearchController searchController) {
         ThreadHelper.ThrowIfNotOnUIThread();
@@ -58,13 +49,11 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
         SearchController = type;
         _options = QuickJumpData.Instance.GeneralOptions;
         Items = new ObservableCollection<ListItemViewModel>();
-        SetValue(RenderOptions.BitmapScalingModeProperty, BitmapScalingMode.NearestNeighbor);
-        SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
         InitializeComponent();
-        DataContext = this;
-        TextOptions.SetTextFormattingMode(this, TextFormattingMode.Ideal);
-        TextOptions.SetTextRenderingMode(this, TextRenderingMode.Auto);
-        TextOptions.SetTextHintingMode(this, TextHintingMode.Auto);
+        // --
+        var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
+        FontFamily = fontFamily;
+        FontSize = fontSize + 2; // TODO: configure via options?
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e) {
@@ -87,6 +76,10 @@ public partial class SearchFormWpf : DialogWindow, INotifyPropertyChanged {
             Items.Clear();
             var results = SearchController.Search(searchText);
             foreach (var item in results) {
+                // TODO:
+                // Use ClassificationHelper.GetClassificationFormat( eg. "Comment")
+                // to color a symbol item according to its defined color in texteditor.
+                // Alternatively, use FontsAndColorsHelper.GetTextEditorInfos() -> Plain text, Comment, etc.
                 var viewModel = new ListItemViewModel(item, _options);
                 Items.Add(viewModel);
             }

@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
-using QuickJump2022.Models;
 using QuickJump2022.Options;
 using QuickJump2022.Tools;
 
@@ -15,9 +12,6 @@ public class ListItemViewModel : INotifyPropertyChanged {
     private bool _isSelected;
 
     public ListItemBase Item { get; }
-
-    public string ItemFontFamily => _options.ItemFont.FontFamily.Name;
-    public double ItemFontSize => _options.ItemFont.Size * 96.0 / 72.0;
     public bool ShowIcon => _options.ShowIcons;
 
     public string DisplayName => Item.Name;
@@ -90,8 +84,6 @@ public class ListItemViewModel : INotifyPropertyChanged {
         }
     }
 
-    public Brush SeparatorColor => new SolidColorBrush(ToMediaColor(_options.ItemSeparatorColor));
-
     public ImageMoniker IconMoniker { get; set; }
 
     public ListItemViewModel(ListItemBase item, GeneralOptionsPage options) {
@@ -105,7 +97,8 @@ public class ListItemViewModel : INotifyPropertyChanged {
         else if (item is ListItemFile file) {
             TypeSuffix = "";
             DescriptionText = item.Description ?? "";
-            IconMoniker = KnownMonikerUtils.GetFileMoniker(file.FullPath);
+            var fileExt = System.IO.Path.GetExtension(file.FullPath);
+            IconMoniker = KnownMonikerUtils.GetFileMoniker(fileExt);
         }
     }
 

@@ -17,6 +17,8 @@ public static class DocumentExtensions {
         ThreadHelper.ThrowIfNotOnUIThread();
         if (!commit) {
             projectItem.PreviewFile();
+            // TODO: try this api:
+            //VS.Documents.OpenInPreviewTabAsync(projectItem.Name)
         }
         else {
             var fullPath = projectItem.TryGetProperty<string>("FullPath");

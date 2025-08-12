@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using QuickJump2022.Data;
-using FontStyle = System.Drawing.FontStyle;
 
 namespace QuickJump2022.Options;
 
@@ -69,30 +68,10 @@ public class GeneralOptionsPage : DialogPage {
     [Category("File")]
     public Color FileSelectedDescriptionForegroundColor { get; set; } = Color.Black;
 
-    [LocDisplayName("Separator Color")]
-    [Description("Color for the lines separating the items")]
-    [Category("Miscellaneous")]
-    public Color ItemSeparatorColor { get; set; } = Color.DarkGray;
-
-    [LocDisplayName("Border Color")]
-    [Description("Color for the border around the search form")]
-    [Category("Miscellaneous")]
-    public Color BorderColor { get; set; } = Color.FromArgb(0, 122, 204);
-
-    [LocDisplayName("Status Background Color")]
-    [Description("Background color for the status panel at the bottom")]
-    [Category("Miscellaneous")]
-    public Color StatusBackgroundColor { get; set; } = Color.FromArgb(90, 90, 90);
-
     [LocDisplayName("Show Icons")]
     [Description("If icons for file types and code types should be shown.")]
     [Category("Miscellaneous")]
     public bool ShowIcons { get; set; } = true;
-
-    [LocDisplayName("Show Status Bar")]
-    [Description("Shows the QuickJump status bar")]
-    [Category("Miscellaneous")]
-    public bool ShowStatusBar { get; set; } = true;
 
     [LocDisplayName("File Sort Type")]
     [Description("Choose the way QuickJump sorts when searching files.")]
@@ -108,34 +87,4 @@ public class GeneralOptionsPage : DialogPage {
     [Description("Choose the way QuickJump sorts when searching mixed.")]
     [Category("Sort")]
     public Enums.SortType MixedSortType { get; set; } = Enums.SortType.Alphabetical;
-
-    [LocDisplayName("Top")]
-    [Description("Adjust the vertical placement of the list. Negative moves it upwards.")]
-    [Category("Layout (Offset)")]
-    public int OffsetTop { get; set; } = -200;
-
-    [LocDisplayName("Left")]
-    [Description("Adjust the horizontal placement of the list. Negative moves it left.")]
-    [Category("Layout (Offset)")]
-    public int OffsetLeft { get; set; }
-
-    [LocDisplayName("Width")]
-    [Description("Adjust the width of the QuickJump display.")]
-    [Category("Layout")]
-    public int Width { get; set; } = 700;
-
-    [LocDisplayName("Height (Maximum)")]
-    [Description("The maximum height of the QuickJump display.")]
-    [Category("Layout")]
-    public int MaxHeight { get; set; } = 600;
-
-    [LocDisplayName("Search Text Font")]
-    [Description("The font of the search text.")]
-    [Category("Font")]
-    public Font SearchFont { get; set; } = new Font("Consolas", 14f, FontStyle.Regular, GraphicsUnit.Pixel, 0);
-
-    [LocDisplayName("Item Text Font")]
-    [Description("The font of the items in the list. NOTE: At small font sizes the icons will be hidden!")]
-    [Category("Font")]
-    public Font ItemFont { get; set; } = new Font("Consolas", 12f, FontStyle.Regular, GraphicsUnit.Pixel, 0);
 }

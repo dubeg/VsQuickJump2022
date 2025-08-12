@@ -30,6 +30,12 @@
     Deactivated="DialogWindow_Deactivated"
     HasDialogFrame="False"
     theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:ThemedDialogColors.WindowPanelColorKey}}"
+    RenderOptions.BitmapScalingMode="HighQuality"
+    RenderOptions.ClearTypeHint="Auto"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextHintingMode="Auto"
+    TextOptions.TextRenderingMode="Auto"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -39,35 +45,36 @@
         </Grid.RowDefinitions>
 
         <!-- Search TextBox -->
-        <TextBox x:Name="txtSearch" 
-                     Grid.Row="0"
-                     BorderThickness="0"
-                     FontFamily="{Binding SearchFontFamily}"
-                     FontSize="{Binding SearchFontSize}"
-                     VerticalContentAlignment="Center"
-                     TextChanged="txtSearch_TextChanged"
-                     PreviewKeyDown="txtSearch_PreviewKeyDown"
-                     >
-        </TextBox>
+        <TextBox 
+            x:Name="txtSearch" 
+            Grid.Row="0"
+            BorderThickness="0"
+            FontFamily="{Binding FontFamily}"
+            FontSize="{Binding FontSize}"
+            VerticalContentAlignment="Center"
+            TextChanged="txtSearch_TextChanged"
+            PreviewKeyDown="txtSearch_PreviewKeyDown"
+            />
 
         <!-- Items ListBox -->
-        <ListBox x:Name="lstItems" 
-                     Grid.Row="1"
-                     localb:ListViewBehaviors.MaxVisibleItems="{Binding PageSize}"
-                     ItemsSource="{Binding Items}"
-                     BorderThickness="0"
-                     BorderBrush="Transparent"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     ScrollViewer.IsDeferredScrollingEnabled="True"
-                     ScrollViewer.CanContentScroll="True"
-                     VirtualizingStackPanel.IsVirtualizing="True"
-                     VirtualizingStackPanel.VirtualizationMode="Recycling"
-                     VirtualizingStackPanel.ScrollUnit="Pixel"
-                     VirtualizingStackPanel.CacheLength="20"
-                     VirtualizingStackPanel.CacheLengthUnit="Item"
-                     PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
-                     PreviewKeyUp="lstItems_PreviewKeyUp">
+        <ListBox 
+            x:Name="lstItems" 
+            Grid.Row="1"
+            localb:ListViewBehaviors.MaxVisibleItems="{Binding PageSize}"
+            ItemsSource="{Binding Items}"
+            BorderThickness="0"
+            BorderBrush="Transparent"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ScrollViewer.IsDeferredScrollingEnabled="True"
+            ScrollViewer.CanContentScroll="True"
+            VirtualizingStackPanel.IsVirtualizing="True"
+            VirtualizingStackPanel.VirtualizationMode="Recycling"
+            VirtualizingStackPanel.ScrollUnit="Pixel"
+            VirtualizingStackPanel.CacheLength="20"
+            VirtualizingStackPanel.CacheLengthUnit="Item"
+            PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
+            PreviewKeyUp="lstItems_PreviewKeyUp">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />
@@ -80,7 +87,7 @@
                     <Setter Property="Padding" Value="0,2"/>
                     <Setter Property="Margin" Value="0"/>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
@@ -107,24 +114,24 @@
                         <!-- Name and Type -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding DisplayName}" 
-                                           FontFamily="{Binding ItemFontFamily}"
-                                           FontSize="{Binding ItemFontSize}"
                                            Foreground="{Binding NameForeground}"
+                                           FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
+                                           FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            TextTrimming="CharacterEllipsis"
                                            />
                             <TextBlock Text="{Binding TypeSuffix}" 
-                                           FontFamily="{Binding ItemFontFamily}"
-                                           FontSize="{Binding ItemFontSize}"
                                            Foreground="{Binding TypeForeground}"
+                                           FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
+                                           FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            Margin="0,0,5,0"/>
                         </StackPanel>
 
                         <!-- Description -->
                         <TextBlock Grid.Column="2" 
                                        Text="{Binding DescriptionText}" 
-                                       FontFamily="{Binding ItemFontFamily}"
-                                       FontSize="{Binding ItemFontSize}"
                                        Foreground="{Binding DescriptionForeground}"
+                                       FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
+                                       FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,5,0"/>
                     </Grid>
