@@ -52,7 +52,7 @@
 				<Icon guid="ImageCatalogGuid" id="TestApplication" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>Test Moniker Icons</ButtonText>
+					<ButtonText>Moniker Icons</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowMonikerTestDialog</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowMonikerTestDialog</CanonicalName>
 				</Strings>
@@ -64,7 +64,7 @@
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>Search all (Dual Window)</ButtonText>
+					<ButtonText>Search (input capture)</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowAllSearchFormDualWindow</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowAllSearchFormDualWindow</CanonicalName>
 				</Strings>
@@ -76,7 +76,7 @@
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>Show search tool window</ButtonText>
+					<ButtonText>Search (tool window)</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowSearchToolWindow</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowSearchToolWindow</CanonicalName>
 				</Strings>

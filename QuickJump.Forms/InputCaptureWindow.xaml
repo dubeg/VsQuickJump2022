@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="InputCapture" 
-        Height="30" Width="700"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -13,22 +12,23 @@
         ResizeMode="NoResize"
         Focusable="True"
         ShowActivated="True"
-    >
+        BorderBrush="Transparent"
+        BorderThickness="0"
+        >
     <!-- Single TextBox for capturing keyboard input -->
-    <TextBox x:Name="txtInput" 
-                Height="26"
-                Background="Red"
-                Foreground="Black"
-                BorderBrush="Red"
-                BorderThickness="1"
-                VerticalContentAlignment="Center"
-                PreviewKeyDown="txtInput_PreviewKeyDown"
-                TextChanged="txtInput_TextChanged"
-                Focusable="True">
-        <TextBox.Resources>
-            <Style TargetType="{x:Type Border}">
-                <Setter Property="CornerRadius" Value="0"/>
-            </Style>
-        </TextBox.Resources>
-    </TextBox>
+    <TextBox 
+        x:Name="txtInput" 
+        Background="Black"
+        Foreground="White"
+        BorderThickness="0"
+        BorderBrush="Transparent"
+        Padding="5,0,0,0"
+        VerticalContentAlignment="Center"
+        PreviewKeyDown="txtInput_PreviewKeyDown"
+        TextChanged="txtInput_TextChanged"
+        Focusable="True" 
+        FontFamily="{Binding SearchFontFamily}"
+        FontSize="{Binding SearchFontSize}"
+        />
+
 </Window>

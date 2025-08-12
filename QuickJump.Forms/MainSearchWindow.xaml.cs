@@ -62,7 +62,6 @@ namespace QuickJump2022.Forms {
             SearchController = searchController;
             _options = QuickJumpData.Instance.GeneralOptions;
             Items = new ObservableCollection<ListItemViewModel>();
-
             // SetValue(RenderOptions.BitmapScalingModeProperty, BitmapScalingMode.NearestNeighbor);
             // SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
 
@@ -100,16 +99,24 @@ namespace QuickJump2022.Forms {
         }
 
         private void CreateInputCaptureWindow() {
-            var mainHandle = new WindowInteropHelper(this).Handle;
+            var mainHandle = new WindowInteropHelper(this).Handle; // WindowHelper.GetDialogOwnerHandle();
+
+            var left = Left + BorderThickness.Left;
+            var top = Top + BorderThickness.Top;
+            var width = txtSearchDisplay.ActualWidth;
+            var height = txtSearchDisplay.ActualHeight;
+            var rect = new Rect(left, top, width, height);
+
             _inputWindowThread = new Thread(() => {
                 try {
                     SynchronizationContext.SetSynchronizationContext(
                         new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher)
                     );
                     _inputWindow = new InputCaptureWindow(this);
+                    _inputWindow.UpdateRectangle(rect);
                     _inputWindow.Show();
-                    // var child = new WindowInteropHelper(_inputWindow);
-                    // child.Owner = mainHandle;
+                    var child = new WindowInteropHelper(_inputWindow);
+                    child.Owner = mainHandle; 
                     Dispatcher.Run();
                 }
                 catch (Exception ex) {
@@ -123,9 +130,12 @@ namespace QuickJump2022.Forms {
 
         private void UpdateInputWindowPositionThreadSafe() {
             if (!_inputWindowLoaded) return;
-            var left = Left;
-            var top = Top + 2; // Account for border
-            _inputWindow.Dispatcher.BeginInvoke(() => _inputWindow.UpdatePosition(left, top));
+            var left = Left + BorderThickness.Left;
+            var top = Top + BorderThickness.Top;
+            var width = txtSearchDisplay.ActualWidth;
+            var height = txtSearchDisplay.ActualHeight;
+            var rect = new Rect(left, top, width, height);
+            _inputWindow.Dispatcher.BeginInvoke(() => _inputWindow.UpdateRectangle(rect));
         }
 
         // ----------------------------------------------

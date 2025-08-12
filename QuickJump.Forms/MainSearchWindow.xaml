@@ -8,13 +8,12 @@
         xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
         xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
         xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
-        xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
-                         
+        xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"                 
         mc:Ignorable="d"
         Title="QuickJump Search" 
-        Height="190" Width="700"
+        Height="190" 
+        Width="700"
         WindowStartupLocation="CenterOwner"
-        BorderThickness="0"
         WindowStyle="None"
         Background="Black"
         ShowInTaskbar="False"
@@ -23,32 +22,28 @@
         Focusable="False"
         ShowActivated="True"
         theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBackgroundColorKey}}"
-        platform:FocusHelper.EnableActivationSynchronization="True"
+        BorderThickness="1"
+        BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}"
+        toolkit:Themes.UseVsTheme="True"
+        UseLayoutRounding="true"
         >
-    <Border BorderBrush="CornflowerBlue" BorderThickness="2" Background="Black">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            
-            <!-- Placeholder for search box area (the actual input is in InputCaptureWindow) -->
-            <Border Grid.Row="0"
-                    Height="26"
-                    Background="Black"
-                    BorderBrush="#FF3C3C3C"
-                    BorderThickness="1">
-                <TextBlock x:Name="txtSearchDisplay" 
-                           Foreground="White"
-                           FontFamily="{Binding SearchFontFamily}"
-                           FontSize="{Binding SearchFontSize}"
-                           VerticalAlignment="Center"
-                           Margin="5,0,0,0"/>
-            </Border>
-            
-            <!-- Items ListBox -->
-            <ListBox x:Name="lstItems" 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Placeholder for search box area (the actual input is in InputCaptureWindow) -->
+        <TextBox x:Name="txtSearchDisplay" 
+                        FontFamily="{Binding SearchFontFamily}"
+                        FontSize="{Binding SearchFontSize}"
+                        VerticalAlignment="Center"
+                        Foreground="Transparent"
+                        Margin="0,0,0,0"/>
+
+        <!-- Items ListBox -->
+        <ListBox x:Name="lstItems" 
                      Grid.Row="1"
                      ItemsSource="{Binding Items}"
                      Background="Black"
@@ -64,42 +59,42 @@
                      VirtualizingStackPanel.CacheLengthUnit="Item"
                      PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
                      Focusable="False">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="0"/>
-                        <Setter Property="Margin" Value="0"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <Border x:Name="Border" 
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="Border" 
                                             Background="Black"
                                             BorderBrush="Transparent"
                                             BorderThickness="0">
-                                        <ContentPresenter />
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Height="{Binding ItemHeight}" Background="Transparent">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            <!-- Icon -->
-                            <imaging:CrispImage Grid.Column="0" 
+                                    <ContentPresenter />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="{Binding ItemHeight}" Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Icon -->
+                        <imaging:CrispImage Grid.Column="0" 
                                    Moniker="{Binding IconMoniker}" 
                                     UseLayoutRounding="True"
                                     RenderOptions.BitmapScalingMode="HighQuality"
@@ -110,60 +105,60 @@
                                    VerticalAlignment="Center"
                                    Visibility="{Binding ShowIcon, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                            <!-- Name and Type -->
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding DisplayName}" 
+                        <!-- Name and Type -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DisplayName}" 
                                            FontFamily="{Binding ItemFontFamily}"
                                            FontSize="{Binding ItemFontSize}"
                                            Foreground="{Binding NameForeground}"
                                            TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding TypeSuffix}" 
+                            <TextBlock Text="{Binding TypeSuffix}" 
                                            FontFamily="{Binding ItemFontFamily}"
                                            FontSize="{Binding ItemFontSize}"
                                            Foreground="{Binding TypeForeground}"
                                            Margin="0,0,5,0"/>
-                            </StackPanel>
-                            
-                            <!-- Description -->
-                            <TextBlock Grid.Column="2" 
+                        </StackPanel>
+
+                        <!-- Description -->
+                        <TextBlock Grid.Column="2" 
                                        Text="{Binding DescriptionText}" 
                                        FontFamily="{Binding ItemFontFamily}"
                                        FontSize="{Binding ItemFontSize}"
                                        Foreground="{Binding DescriptionForeground}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,5,0"/>
-                            
-                            <!-- Separator Line -->
-                            <Rectangle Grid.ColumnSpan="3" 
+
+                        <!-- Separator Line -->
+                        <Rectangle Grid.ColumnSpan="3" 
                                        Height="1" 
                                        Fill="{Binding SeparatorColor}"
                                        VerticalAlignment="Top"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            
-            <!-- Status Panel -->
-            <Grid x:Name="pnlStatus" 
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Status Panel -->
+        <Grid x:Name="pnlStatus" 
                   Grid.Row="2" 
                   Height="21"
                   Background="{Binding StatusBackgroundColor}"
                   Visibility="{Binding ShowStatusBar, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock Grid.Column="0" 
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" 
                            Text="Results:" 
                            FontFamily="Consolas" 
                            FontSize="12"
                            Foreground="#FF91C7FF"
                            VerticalAlignment="Center"
                            Margin="5,0,5,0"/>
-                
-                <TextBlock x:Name="lblCountValue" 
+
+            <TextBlock x:Name="lblCountValue" 
                            Grid.Column="1" 
                            Text="0" 
                            FontFamily="Consolas" 
@@ -171,8 +166,8 @@
                            Foreground="#FF91C7FF"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0"/>
-                
-                <TextBlock x:Name="lblSolutionName" 
+
+            <TextBlock x:Name="lblSolutionName" 
                            Grid.Column="2" 
                            FontFamily="Consolas" 
                            FontSize="12"
@@ -181,7 +176,6 @@
                            VerticalAlignment="Center"
                            Margin="0,0,5,0"
                            TextTrimming="CharacterEllipsis"/>
-            </Grid>
         </Grid>
-    </Border>
+    </Grid>
 </Window>
