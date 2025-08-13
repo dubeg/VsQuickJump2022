@@ -15,11 +15,11 @@ public class ListItemViewModel : INotifyPropertyChanged {
         IconMoniker =
             item is ListItemSymbol symbol ? IconMoniker = KnownMonikerUtils.GetCodeMoniker(symbol.Item.BindType)
             : item is ListItemFile file ? IconMoniker = KnownMonikerUtils.GetFileMoniker(file.FileExtension)
+            : item is ListItemCommand cmd ? IconMoniker = KnownMonikers.Settings // Run // RunOutline // Settings // ?
             : KnownMonikers.None;
     }
 
     public ListItemBase Item { get; init; }
-    public bool ShowIcon { get; init; }
     public string Name => Item.Name;
     public string Description => Item.Description;
     public string Type => Item.Type;

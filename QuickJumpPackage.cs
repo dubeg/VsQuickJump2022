@@ -28,6 +28,7 @@ public sealed class QuickJumpPackage : ToolkitPackage {
     public SettingsService SettingsService { get; private set; }
     public GoToService GoToService { get; private set; }
     public ClassificationService ClassificationService { get; set; }
+    public CommandService CommandService { get; private set; }
 
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
         await this.RegisterCommandsAsync();
@@ -44,9 +45,11 @@ public sealed class QuickJumpPackage : ToolkitPackage {
         GoToService = new();
         GeneralOptions = generalOptions;
         ClassificationService = new(this);
+        CommandService = new(Dte);
         // --
         SettingsService.LoadSettings();
         ClassificationService.PreloadCommonBrushes();
+        CommandService.PreloadCommands();
         dte.Events.DTEEvents.OnBeginShutdown += () => SettingsService.SaveSettings();
     }
 }

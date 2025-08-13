@@ -1,0 +1,55 @@
+﻿using EnvDTE;
+using QuickJump2022.Models;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace QuickJump2022.Services;
+
+public class CommandService(DTE Dte) {
+    private List<CommandItem> _commands = new();
+
+    public void PreloadCommands() => _commands = GetCommands();
+    
+    public List<CommandItem> GetCachedCommands() {
+        if (_commands.Count == 0) PreloadCommands();
+        return _commands;
+    }
+
+    public void Execute(CommandItem commandItem) {
+        var cmd = Dte.Commands.Item(commandItem.Name);
+        try {
+            if (cmd != null && cmd.IsAvailable) {
+                Dte.Commands.Raise(cmd.Guid, cmd.ID, null, null);
+                Dte.StatusBar.Clear();
+            }
+            else {
+                Dte.StatusBar.Text = $"The command '{cmd.Name}' is not available in the current context";
+            }
+        }
+        catch (Exception) {
+            Dte.StatusBar.Text = $"The command '{cmd.Name}' is not available in the current context";
+        }
+    }
+
+    public List<CommandItem> GetCommands() {
+        var results = new List<CommandItem>();
+        foreach (Command command in Dte.Commands) {
+            if (string.IsNullOrEmpty(command.Name)) continue;
+            var result = new CommandItem() { 
+                Name = command.Name,
+                Guid = command.Guid,
+                ID = command.ID,
+                Shortcuts = GetBindings(command.Bindings as object[])
+            };
+            results.Add(result);
+        }
+        return results.OrderBy(c => c.Name).ToList(); ;
+    }
+
+    private static List<string> GetBindings(IEnumerable<object> bindings) {
+        IEnumerable<string> result = bindings.Select(binding => binding.ToString().IndexOf("::") >= 0
+            ? binding.ToString().Substring(binding.ToString().IndexOf("::") + 2)
+            : binding.ToString()).Distinct();
+        return result.ToList();
+    }
+}

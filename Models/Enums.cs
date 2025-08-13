@@ -5,6 +5,7 @@ public static class Enums {
         None,
         Files,
         Methods,
+        Commands,
         All
     }
 

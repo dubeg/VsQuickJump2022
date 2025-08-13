@@ -23,6 +23,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public int PageSize => 20; // TODO: make it configurable
     public SearchInstance SearchInstance { get; init; }
     public GoToService GoToService { get; init; }
+    public CommandService CommandService { get; init; }
     public ClassificationService ClassificationService { get; init; }
     private bool _useSymbolColors = false;
     private DTE _dte;
@@ -43,6 +44,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
             package.SymbolService,
+            package.CommandService,
             searchType,
             package.GeneralOptions.FileSortType,
             package.GeneralOptions.CSharpSortType,
@@ -50,6 +52,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         );
         SearchInstance = searchInstance;
         GoToService = package.GoToService;
+        CommandService = package.CommandService;
         ClassificationService = package.ClassificationService;
         _dte = package.Dte;
         _useSymbolColors = package.GeneralOptions.UseSymbolColors;
@@ -124,7 +127,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             e.Handled = true;
         }
         else if (e.Key == Key.Return) {
-            GoToItem();
+            GoToItem(true);
             Close();
             e.Handled = true;
         }
@@ -173,12 +176,25 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
     }
 
-    private async Task GoToItem() {
+    /// <summary>
+    /// Go to selected item.
+    /// </summary>
+    /// <param name="commit">
+    /// False => Go to item without closing the dialog.
+    /// True => Go to item and close the dialog.
+    /// If the item is a command, it will be executed only on commit.
+    /// If the item is a file or symbol, it will always be navigated to.
+    /// </param>
+    /// <returns></returns>
+    private async Task GoToItem(bool commit = false) {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
             var listItem = selectedItem.Item;
             if (listItem is ListItemFile file) await GoToService.GoToFileAsync(file);
             else if (listItem is ListItemSymbol symbol) await GoToService.GoToSymbolAsync(symbol);
+            else if (listItem is ListItemCommand command) {
+                if (commit) CommandService.Execute(command.Item);
+            }
         }
     }
 
@@ -191,7 +207,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private void lstItems_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
         var item = (e.OriginalSource as FrameworkElement)?.DataContext as ListItemViewModel;
         if (item != null) {
-            GoToItem();
+            GoToItem(true);
             Close();
         }
     }
