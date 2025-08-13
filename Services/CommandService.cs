@@ -1,5 +1,6 @@
 ﻿using EnvDTE;
 using QuickJump2022.Models;
+using QuickJump2022.Tools;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,8 +8,18 @@ namespace QuickJump2022.Services;
 
 public class CommandService(DTE Dte) {
     private List<CommandItem> _commands = new();
+    private string[] _exclusions = {
+        "TeamFoundation",
+        "OtherContextMenu",
+        "Image",
+        "ClassViewContextMenu",
+        "Tfs"
+    };
 
-    public void PreloadCommands() => _commands = GetCommands();
+    public void PreloadCommands() {
+        var commands = GetCommands();
+        _commands = commands.Where(x => x.Name.IsNotIn(_exclusions, (a, b) => a.StartsWith(b))).ToList();
+    }
     
     public List<CommandItem> GetCachedCommands() {
         if (_commands.Count == 0) PreloadCommands();

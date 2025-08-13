@@ -75,7 +75,7 @@ public class SearchInstance(
             
             // Fast
             results.Sort((a, b) => {
-                if (a.Weight != b.Weight) return a.Weight.CompareTo(b.Weight);
+                if (a.Weight != b.Weight) return Tools.Sort.WeightReverse(a, b);
                 return Tools.Sort.Alphabetical(a, b);
             });
         }
