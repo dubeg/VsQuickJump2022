@@ -130,7 +130,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
         else if (e.Key == Key.Return) {
             GoToItem(true);
-            Close();
             e.Handled = true;
         }
         else if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control) {
@@ -191,11 +190,17 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private async Task GoToItem(bool commit = false) {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
+            if (commit) Close();
             var listItem = selectedItem.Item;
             if (listItem is ListItemFile file) await GoToService.GoToFileAsync(file);
             else if (listItem is ListItemSymbol symbol) await GoToService.GoToSymbolAsync(symbol);
             else if (listItem is ListItemCommand command) {
-                if (commit) CommandService.Execute(command.Item);
+                if (commit) {
+                    // The dialog must be closed before executing a command
+                    // in case the command opens another modal dialog.
+                    CommandService.Execute(command.Item);
+                    return;
+                }
             }
         }
     }
@@ -210,7 +215,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         var item = (e.OriginalSource as FrameworkElement)?.DataContext as ListItemViewModel;
         if (item != null) {
             GoToItem(true);
-            Close();
         }
     }
 
