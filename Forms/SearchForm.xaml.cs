@@ -25,6 +25,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public SearchInstance SearchInstance { get; init; }
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
+    public CommandBarService CommandBarService { get; init; }
     public ClassificationService ClassificationService { get; init; }
     private bool _useSymbolColors = false;
     private DTE _dte;
@@ -46,6 +47,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             package.ProjectFileService,
             package.SymbolService,
             package.CommandService,
+            package.CommandBarService,
             searchType,
             package.GeneralOptions.FileSortType,
             package.GeneralOptions.CSharpSortType,
@@ -54,6 +56,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         SearchInstance = searchInstance;
         GoToService = package.GoToService;
         CommandService = package.CommandService;
+        CommandBarService = package.CommandBarService;
         ClassificationService = package.ClassificationService;
         _dte = package.Dte;
         _useSymbolColors = package.GeneralOptions.UseSymbolColors;
@@ -199,6 +202,14 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                     // The dialog must be closed before executing a command
                     // in case the command opens another modal dialog.
                     CommandService.Execute(command.Item);
+                    return;
+                }
+            }
+            else if (listItem is ListItemCommandBar commandBar) {
+                if (commit) {
+                    // The dialog must be closed before executing a command bar button
+                    // in case it opens another modal dialog.
+                    CommandBarService.Execute(commandBar.Item);
                     return;
                 }
             }

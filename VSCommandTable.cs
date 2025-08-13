@@ -27,6 +27,7 @@ namespace QuickJump2022
         public const int ShowFileSearchForm = 0x0200;
         public const int ShowAllSearchForm = 0x0300;
         public const int ShowCommandSearchForm = 0x0400;
-        public const int TestCommand = 0x0500;
+        public const int ShowCommandBarSearchForm = 0x0500;
+        public const int TestCommand = 0x0600;
     }
 }

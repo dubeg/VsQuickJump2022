@@ -6,6 +6,7 @@ public static class Enums {
         Files,
         Methods,
         Commands,
+        CommandBars,
         All
     }
 

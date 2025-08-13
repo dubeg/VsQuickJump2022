@@ -14,6 +14,7 @@ public class SearchInstance(
     ProjectFileService projectFileService,
     SymbolService symbolService,
     CommandService commandService,
+    CommandBarService commandBarService,
     Enums.ESearchType SearchType,
     Enums.SortType FileSortType,
     Enums.SortType CSharpSortType,
@@ -22,6 +23,7 @@ public class SearchInstance(
     public List<ListItemFile> Files { get; set; } = new();
     public List<ListItemSymbol> Symbols { get; set; } = new();
     public List<ListItemCommand> Commands { get; set; } = new();
+    public List<ListItemCommandBar> CommandBars { get; set; } = new();
 
     public async Task LoadDataAsync() {
         // -----------
@@ -45,6 +47,13 @@ public class SearchInstance(
             var items = commandService.GetCachedCommands();
             Commands = items.Select(x => ListItemCommand.FromCommandItem(x)).ToList();
         }
+        // -----------
+        // Command Bars
+        // -----------
+        if (SearchType is Enums.ESearchType.CommandBars or Enums.ESearchType.All) {
+            var items = commandBarService.GetCachedCommands();
+            CommandBars = items.Select(x => ListItemCommandBar.FromCommandBarButtonInfo(x)).ToList();
+        }
     }
 
     public List<ListItemBase> Search(string searchText) {
@@ -65,6 +74,7 @@ public class SearchInstance(
         if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All) FilterItems(Files);
         if (SearchType is Enums.ESearchType.Methods or Enums.ESearchType.All) FilterItems(Symbols);
         if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All) FilterItems(Commands);
+        if (SearchType is Enums.ESearchType.CommandBars or Enums.ESearchType.All) FilterItems(CommandBars);
 
         // -------------------
         // Fuzzy search
@@ -87,6 +97,7 @@ public class SearchInstance(
                 Enums.ESearchType.Files => FileSortType,
                 Enums.ESearchType.Methods => CSharpSortType,
                 Enums.ESearchType.Commands => Enums.SortType.Alphabetical,
+                Enums.ESearchType.CommandBars => Enums.SortType.Alphabetical,
                 Enums.ESearchType.All => MixedSortType,
                 _ => throw new NotImplementedException()
             });

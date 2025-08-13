@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
-using QuickJump2022.Options;
 using QuickJump2022.Tools;
 
 namespace QuickJump2022.Models;
@@ -13,10 +13,25 @@ public class ListItemViewModel : INotifyPropertyChanged {
     public ListItemViewModel(ListItemBase item) {
         Item = item;
         IconMoniker =
-            item is ListItemSymbol symbol ? IconMoniker = KnownMonikerUtils.GetCodeMoniker(symbol.Item.BindType)
-            : item is ListItemFile file ? IconMoniker = KnownMonikerUtils.GetFileMoniker(file.FileExtension)
-            : item is ListItemCommand cmd ? IconMoniker = KnownMonikers.Settings // Run // RunOutline // Settings // ?
+            item is ListItemSymbol symbol ? KnownMonikerUtils.GetCodeMoniker(symbol.Item.BindType)
+            : item is ListItemFile file ? KnownMonikerUtils.GetFileMoniker(file.FileExtension)
+            : item is ListItemCommand cmd ? KnownMonikers.Settings // Run // RunOutline // Settings // ?
             : KnownMonikers.None;
+        UseBitmapImage = item is ListItemCommandBar;
+        if (item is ListItemCommandBar cmdBar && cmdBar.Item.BitmapSource is not null) {
+            //var bgColor = ColorUtils.ToMediaColor(
+            //    VSColorTheme.GetThemedColor(
+            //        EnvironmentColors.ToolWindowBackgroundColorKey
+            //    )
+            //);
+            BitmapSource = cmdBar.Item.BitmapSource;
+            //BitmapSource = ImageThemingUtilities.GetOrCreateThemedBitmapSource(
+            //    cmdBar.Item.BitmapSource,
+            //    bgColor,
+            //    true,
+            //    bgColor
+            //);
+        }
     }
 
     public ListItemBase Item { get; init; }
@@ -24,6 +39,8 @@ public class ListItemViewModel : INotifyPropertyChanged {
     public string Description => Item.Description;
     public string Type => Item.Type;
     public ImageMoniker IconMoniker { get; init; }
+    public BitmapSource BitmapSource { get; init; }
+    public bool UseBitmapImage { get; init; }
     
     private bool _isSelected;
     public bool IsSelected { 

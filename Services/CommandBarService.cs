@@ -11,7 +11,38 @@ using QuickJump2022.Tools;
 namespace QuickJump2022.Services;
 
 public class CommandBarService(DTE Dte) {
-    public List<CommandBarButtonInfo> GetCommands() {
+    private List<CommandBarButtonInfo> _cachedCommands = new();
+    
+    public void PreloadCommands() {
+        _cachedCommands = GetCommands();
+    }
+    
+    public List<CommandBarButtonInfo> GetCachedCommands() {
+        if (_cachedCommands.Count == 0) PreloadCommands();
+        return _cachedCommands;
+    }
+    
+    public void Execute(CommandBarButtonInfo commandBarButton) {
+        try {
+            var commandBars = (CommandBars)Dte.Application.CommandBars;
+            var cmdBar = commandBars[commandBarButton.CommandBarName];
+            if (cmdBar is null) return;
+            
+            foreach (CommandBarControl ctrl in cmdBar.Controls) {
+                if (ctrl is CommandBarButton btn && btn.Caption == commandBarButton.Caption) {
+                    btn.Execute();
+                    Dte.StatusBar.Clear();
+                    return;
+                }
+            }
+            Dte.StatusBar.Text = $"The command bar button '{commandBarButton.Caption}' is not available";
+        }
+        catch (Exception ex) {
+            Dte.StatusBar.Text = $"Error executing command bar button: {ex.Message}";
+        }
+    }
+    
+    private List<CommandBarButtonInfo> GetCommands() {
         var commandInfos = new List<CommandBarButtonInfo>();
         var commandBars = (CommandBars)Dte.Application.CommandBars;
         foreach (CommandBar cmdBar in commandBars) {
@@ -20,14 +51,17 @@ public class CommandBarService(DTE Dte) {
                 if (!(ctrl is CommandBarButton btn)) continue;
                 var caption = btn.Caption;
                 var pic = btn.Picture;
-                var picType = pic.Type;
-                // StdPicture type
-                // 0: empty
-                // 1: Bitmap
-                // 2: metafile
-                // 3: icon => Icon.FromHandle()
-                // 4: enhanced metafile
-                var bitmap = picType == 1 ? OlePictureConverter.ConvertStdPictureToBitmapSource(pic) : null;
+                BitmapSource bitmap = null;
+                if (pic is not null) {
+                    var picType = pic.Type;
+                    // StdPicture type
+                    // 0: empty
+                    // 1: Bitmap
+                    // 2: metafile
+                    // 3: icon => Icon.FromHandle()
+                    // 4: enhanced metafile
+                    bitmap = picType == 1 ? OlePictureConverter.ConvertStdPictureToBitmapSource(pic) : null;
+                }
                 commandInfos.Add(new CommandBarButtonInfo() {
                     Caption = caption,
                     CommandBarID = cmdBar.Id,
