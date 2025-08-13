@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
@@ -22,24 +23,23 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public int PageSize => 20; // TODO: make it configurable
     public SearchInstance SearchInstance { get; init; }
     public GoToService GoToService { get; init; }
-    private ObservableCollection<ListItemViewModel> _items;
-    public GeneralOptionsPage Options { get; init; }
+    public ClassificationService ClassificationService { get; init; }
+    private bool _useSymbolColors = false;
+    private DTE _dte;
+    private ObservableCollection<ListItemViewModel> _items = new();
     public ObservableCollection<ListItemViewModel> Items {
         get => _items;
         set { _items = value; OnPropertyChanged(); }
     }
 
     public static async Task ShowModalAsync(QuickJumpPackage package, ESearchType searchType) {
-        var vsWindowRect = new Rect();
-        var vsWindow = package.Dte.MainWindow;
-        vsWindowRect = vsWindow.WindowState == EnvDTE.vsWindowState.vsWindowStateMaximize 
-            ? WindowUtils.GetMaximizedWindowBounds(vsWindow.HWnd)
-            : new Rect(vsWindow.Left, vsWindow.Top, vsWindow.Width, vsWindow.Height);
-        var activeDocWindow = package.Dte.ActiveDocument?.ActiveWindow;
-        if (activeDocWindow is not null) {
-            vsWindowRect = new Rect(activeDocWindow.Left, activeDocWindow.Top, activeDocWindow.Width, activeDocWindow.Height);
-        }
-        vsWindowRect = Application.Current.MainWindow.DeviceToLogicalRect(vsWindowRect);
+        var dialog = new SearchForm(package, searchType);
+        await dialog.LoadDataAsync();
+        dialog.ShowModal();
+    }
+
+    protected SearchForm(QuickJumpPackage package, ESearchType searchType) {
+        InitializeComponent();
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
             package.SymbolService,
@@ -48,25 +48,40 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             package.GeneralOptions.CSharpSortType,
             package.GeneralOptions.MixedSortType
         );
-        var dialog = new SearchForm(searchInstance) { 
-            Options = package.GeneralOptions,
-            GoToService = package.GoToService,
-        };
-        dialog.WindowStartupLocation = WindowStartupLocation.Manual;
-        dialog.Top = vsWindowRect.Y + 100; // TODO: use y-offset from options
-        dialog.Left = vsWindowRect.X + (vsWindowRect.Width / 2) - (dialog.Width / 2);
-        await dialog.LoadDataAsync();
-        dialog.ShowModal();
-    }
-
-    public SearchForm(SearchInstance searchInstance) {
         SearchInstance = searchInstance;
-        Items = new ObservableCollection<ListItemViewModel>();
-        InitializeComponent();
+        GoToService = package.GoToService;
+        ClassificationService = package.ClassificationService;
+        _dte = package.Dte;
+        _useSymbolColors = package.GeneralOptions.UseSymbolColors;
+        // --
+        WindowStartupLocation = WindowStartupLocation.Manual;
+        // Application.Current.MainWindow.SizeChanged += (s, e) => { AdjustPosition(); }; // TODO: remove event handler when dialog is closed.
+        // Application.Current.MainWindow.LocationChanged += (s, e) => { AdjustPosition(); }; // TODO: remove event handler when dialog is closed.
+        this.Loaded += (s, e) => AdjustPosition();
+        this.SizeChanged += (s, e) => AdjustPosition();
+        this.Deactivated += (s, e) => { try { Close(); } catch { } };
         // --
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;
-        FontSize = fontSize + 2; // TODO: configure via options?
+        FontSize = fontSize + 2; // TODO: configure via options (?)
+        Width = 600; // TODO: configure via options
+    }
+
+    private void AdjustPosition() {
+        var vsWindowRect = new Rect();
+        var vsWindow = _dte.MainWindow;
+        vsWindowRect = vsWindow.WindowState == EnvDTE.vsWindowState.vsWindowStateMaximize
+            ? WindowUtils.GetMaximizedWindowBounds(vsWindow.HWnd)
+            : new Rect(vsWindow.Left, vsWindow.Top, vsWindow.Width, vsWindow.Height);
+        var activeDocWindow = _dte.ActiveDocument?.ActiveWindow;
+        if (activeDocWindow is not null) {
+            vsWindowRect = new Rect(activeDocWindow.Left, activeDocWindow.Top, activeDocWindow.Width, activeDocWindow.Height);
+        }
+        vsWindowRect = Application.Current.MainWindow.DeviceToLogicalRect(vsWindowRect);
+        this.Top = vsWindowRect.Top + 75; // TODO: make configurable in options
+        this.Left = vsWindowRect.Left
+            + (vsWindowRect.Width / 2.0)
+            - (ActualWidth / 2.0);
     }
 
     public async Task LoadDataAsync() {
@@ -83,11 +98,12 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         Items.Clear();
         var results = SearchInstance.Search(searchText);
         foreach (var item in results) {
-            // TODO:
-            // Use ClassificationHelper.GetClassificationFormat( eg. "Comment")
-            // to color a symbol item according to its defined color in texteditor.
-            // Alternatively, use FontsAndColorsHelper.GetTextEditorInfos() -> Plain text, Comment, etc.
-            var viewModel = new ListItemViewModel(item, Options);
+            var viewModel = new ListItemViewModel(item);
+            if (item is ListItemSymbol symbol && _useSymbolColors) {
+                var fgBrush = ClassificationService.GetFgColorForClassification(symbol.Item.BindType);
+                viewModel.NameForeground = fgBrush;
+                viewModel.UseCustomForeground = true;
+            }
             Items.Add(viewModel);
         }
     }
@@ -108,7 +124,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             e.Handled = true;
         }
         else if (e.Key == Key.Return) {
-            GoToItem(true); // Fire and forget for UI responsiveness
+            GoToItem();
             Close();
             e.Handled = true;
         }
@@ -157,7 +173,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
     }
 
-    private async Task GoToItem(bool commit = false) {
+    private async Task GoToItem() {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
             var listItem = selectedItem.Item;
@@ -175,7 +191,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private void lstItems_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
         var item = (e.OriginalSource as FrameworkElement)?.DataContext as ListItemViewModel;
         if (item != null) {
-            GoToItem(true); // Fire and forget
+            GoToItem();
             Close();
         }
     }
@@ -187,7 +203,4 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    private void DialogWindow_Deactivated(object sender, EventArgs e) {
-        try { this.Close(); } catch { }
-    }
 }

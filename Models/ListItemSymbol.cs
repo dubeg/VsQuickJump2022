@@ -5,7 +5,7 @@ namespace QuickJump2022.Models;
 public class ListItemSymbol : ListItemBase {
     public CodeItem Item { get; init; }
     
-    public override string Name => Item.Name;
+    public override string Name => Item.NameOnly;
     public override string Description => $"{FormatAccessType(Item.AccessType)} {Item.BindType}";
     public override string Type => !string.IsNullOrEmpty(Item.Type) ? $" -> {Item.Type}" : "";
     public int Line => Item.Line;

@@ -15,7 +15,6 @@
     xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
     mc:Ignorable="d"
     Title="QuickJump Search" 
-    Width="700"
     BorderThickness="1"
     BorderBrush="{DynamicResource {x:Static platform:ThemedDialogColors.WindowBorderBrushKey}}"
     WindowStyle="None"
@@ -26,7 +25,6 @@
     platform:FocusHelper.FocusTarget="{Binding ElementName=txtSearch}"
     SizeToContent="Height"
     toolkit:Themes.UseVsTheme="True"
-    Deactivated="DialogWindow_Deactivated"
     HasDialogFrame="False"
     theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:ThemedDialogColors.WindowPanelColorKey}}"
     RenderOptions.BitmapScalingMode="HighQuality"
@@ -100,28 +98,27 @@
 
                         <!-- Icon -->
                         <imaging:CrispImage 
-                                   Grid.Column="0" 
-                                   Moniker="{Binding IconMoniker}" 
-                                   UseLayoutRounding="True"
-                                   RenderOptions.BitmapScalingMode="HighQuality"
-                                   Width="16" 
-                                   Height="16" 
-                                   Margin="5,0,5,0"
-                                   VerticalAlignment="Center"
-                                   Visibility="{Binding ShowIcon, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            Grid.Column="0" 
+                            Moniker="{Binding IconMoniker}" 
+                            UseLayoutRounding="True"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Width="16" 
+                            Height="16" 
+                            Margin="5,0,5,0"
+                            VerticalAlignment="Center"
+                            />
 
                         <!-- Name and Type -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock x:Name="NameText" 
                                            Text="{Binding Name}" 
-                                           Foreground="{Binding NameForeground}"
                                            FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            TextTrimming="CharacterEllipsis"
                                            />
                             <TextBlock x:Name="TypeText" 
                                            Text="{Binding Type}" 
-                                           Foreground="{Binding TypeForeground}"
+                                           Foreground="{DynamicResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
                                            FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                            Margin="0,0,5,0"/>
@@ -131,17 +128,26 @@
                         <TextBlock x:Name="DescriptionText" 
                                        Grid.Column="2" 
                                        Text="{Binding Description}" 
-                                       Foreground="{Binding DescriptionForeground}"
+                                       Foreground="{DynamicResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
                                        FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                        FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,5,0"/>
                     </Grid>
                     <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding UseCustomForeground}" Value="True">
+                            <Setter TargetName="NameText" Property="Foreground" Value="{Binding NameForeground}"/>
+                        </DataTrigger>
+
                         <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                            <Setter TargetName="NameText" Property="Foreground" Value="{Binding NameForegroundSelected}"/>
-                            <Setter TargetName="TypeText" Property="Foreground" Value="{Binding TypeForegroundSelected}"/>
-                            <Setter TargetName="DescriptionText" Property="Foreground" Value="{Binding DescriptionForegroundSelected}"/>
+                            <Setter TargetName="TypeText" 
+                                    Property="Foreground" 
+                                    Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
+                                    />
+                            <Setter TargetName="DescriptionText" 
+                                    Property="Foreground"
+                                    Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
+                                    />
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>

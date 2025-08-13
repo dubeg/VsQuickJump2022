@@ -46,48 +46,19 @@ public class SettingsService(GeneralOptionsPage GeneralOptions, IServiceProvider
                     throw new NotSupportedException($"Type {propertyType} is not supported for settings storage");
             }
             propertyInfo.SetValue(GeneralOptions, value);
-        }
-
-        // Boolean properties
-        LoadAndAssign(x => x.ShowIcons);
-        
-        // Color properties
-        LoadAndAssign(x => x.FileBackgroundColor);
-        LoadAndAssign(x => x.FileDescriptionForegroundColor);
-        LoadAndAssign(x => x.FileForegroundColor);
-        LoadAndAssign(x => x.FileSelectedBackgroundColor);
-        LoadAndAssign(x => x.FileSelectedDescriptionForegroundColor);
-        LoadAndAssign(x => x.FileSelectedForegroundColor);
-        LoadAndAssign(x => x.CodeBackgroundColor);
-        LoadAndAssign(x => x.CodeDescriptionForegroundColor);
-        LoadAndAssign(x => x.CodeForegroundColor);
-        LoadAndAssign(x => x.CodeSelectedBackgroundColor);
-        LoadAndAssign(x => x.CodeSelectedDescriptionForegroundColor);
-        LoadAndAssign(x => x.CodeSelectedForegroundColor);
-        
+        }        
         // Enum properties
         LoadAndAssign(x => x.FileSortType);
         LoadAndAssign(x => x.CSharpSortType);
         LoadAndAssign(x => x.MixedSortType);
+        LoadAndAssign(x => x.UseSymbolColors);
     }
 
     public void SaveSettings() {
         var store = GetWriteStore();
-        store.SetBoolean(Category, "ShowIcons", GeneralOptions.ShowIcons);
-        store.SetString(Category, "FileBackgroundColor", GeneralOptions.FileBackgroundColor.Name);
-        store.SetString(Category, "FileDescriptionForegroundColor", GeneralOptions.FileDescriptionForegroundColor.Name);
-        store.SetString(Category, "FileForegroundColor", GeneralOptions.FileForegroundColor.Name);
-        store.SetString(Category, "FileSelectedBackgroundColor", GeneralOptions.FileSelectedBackgroundColor.Name);
-        store.SetString(Category, "FileSelectedDescriptionForegroundColor", GeneralOptions.FileSelectedDescriptionForegroundColor.Name);
-        store.SetString(Category, "FileSelectedForegroundColor", GeneralOptions.FileSelectedForegroundColor.Name);
-        store.SetString(Category, "CodeBackgroundColor", GeneralOptions.CodeBackgroundColor.Name);
-        store.SetString(Category, "CodeDescriptionForegroundColor", GeneralOptions.CodeDescriptionForegroundColor.Name);
-        store.SetString(Category, "CodeForegroundColor", GeneralOptions.CodeForegroundColor.Name);
-        store.SetString(Category, "CodeSelectedBackgroundColor", GeneralOptions.CodeSelectedBackgroundColor.Name);
-        store.SetString(Category, "CodeSelectedDescriptionForegroundColor", GeneralOptions.CodeSelectedDescriptionForegroundColor.Name);
-        store.SetString(Category, "CodeSelectedForegroundColor", GeneralOptions.CodeSelectedForegroundColor.Name);
-        store.SetInt32(Category, "FileSortType", (int)GeneralOptions.FileSortType);
-        store.SetInt32(Category, "CSharpSortType", (int)GeneralOptions.CSharpSortType);
-        store.SetInt32(Category, "MixedSortType", (int)GeneralOptions.MixedSortType);
+        store.SetInt32(Category, nameof(GeneralOptions.FileSortType), (int)GeneralOptions.FileSortType);
+        store.SetInt32(Category, nameof(GeneralOptions.CSharpSortType), (int)GeneralOptions.CSharpSortType);
+        store.SetInt32(Category, nameof(GeneralOptions.MixedSortType), (int)GeneralOptions.MixedSortType);
+        store.SetBoolean(Category, nameof(GeneralOptions.UseSymbolColors), GeneralOptions.UseSymbolColors);
     }
 }

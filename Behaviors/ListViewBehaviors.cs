@@ -39,11 +39,10 @@ public static class ListViewBehaviors {
 
     private static void UpdateListViewHeight(ListBox listView) {
         if (listView.Items.Count == 0) return;
-
         var maxVisibleItems = GetMaxVisibleItems(listView);
-        var itemHeight = GetItemHeight(listView);
-
-        if (itemHeight > 0) {
+        if (listView.Items.Count > maxVisibleItems) {
+            var itemHeight = GetItemHeight(listView);
+            if (itemHeight == 0) return;
             var visibleItems = Math.Min(listView.Items.Count, maxVisibleItems);
             var totalHeight = visibleItems * itemHeight;
             listView.Height = totalHeight + 2; // TODO: why 2?
