@@ -13,5 +13,14 @@ public class FileItem {
     public string ProjectName { get; set; }
     public string ProjectPath { get; set; }
     public string ProjectRelativePath { get; set; }
+    
+    /// <summary>
+    /// Excludes the project root folder.
+    /// </summary>
     public string ProjectRelativeFolderPath { get; set; }
+    
+    /// <summary>
+    /// Include the project root folder.
+    /// </summary>
+    public string ProjectFolderPath { get; set; } 
 }

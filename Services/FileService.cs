@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using QuickJump2022.Models;
@@ -48,6 +49,10 @@ public class ProjectFileService() {
                     ProjectPath = projectMetadata.ProjectFolderPath,
                     ProjectRelativePath = projectRelativePath,
                     ProjectRelativeFolderPath = GetFolderPath(projectRelativePath),
+                    ProjectFolderPath = Path.Combine(
+                        Path.GetFileName(projectMetadata.ProjectFolderPath),
+                        GetFolderPath(projectRelativePath)
+                    )
                 };
                 results.Add(fileItem);
             }

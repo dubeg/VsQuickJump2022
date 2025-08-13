@@ -69,7 +69,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         FontFamily = fontFamily;
         FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
         HintFontSize = Math.Min(8, fontSize - 2);
-        Width = 600; // TODO: configure via options
+        Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options
     }
 
     private void AdjustPosition() {

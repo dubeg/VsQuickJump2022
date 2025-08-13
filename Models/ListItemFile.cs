@@ -6,7 +6,7 @@ public class ListItemFile : ListItemBase {
     private FileItem _item;
 
     public override string Name => _item.FileName;
-    public override string Description => _item.ProjectRelativeFolderPath;
+    public override string Description => _item.ProjectFolderPath;
     public string FileExtension => _item.FileExtension;
     public string FilePath => _item.FullPath;
 
