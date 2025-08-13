@@ -70,10 +70,14 @@ public class SearchInstance(
         // Fuzzy search
         // -------------------
         if (!string.IsNullOrEmpty(searchText)) {
-            // A bit slow: FuzzySearch.SortByFuzzyScore(results, searchText, x => x.Name, true);
+            // A bit slow:
+            // FuzzySearch.SortByFuzzyScore(results, searchText, x => x.Name, true);
             
             // Fast
-            results.Sort(Tools.Sort.WeightReverse);
+            results.Sort((a, b) => {
+                if (a.Weight != b.Weight) return a.Weight.CompareTo(b.Weight);
+                return Tools.Sort.Alphabetical(a, b);
+            });
         }
         else {
             // -------------------
