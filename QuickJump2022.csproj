@@ -49,6 +49,7 @@
     <Compile Include="Commands\ShowFileSearchForm.cs" />
     <Compile Include="Commands\ShowCommandSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
+    <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Models\FileItem.cs" />
     <Compile Include="Models\CommandItem.cs" />
     <Compile Include="Models\ListItemCommand.cs" />
@@ -61,11 +62,13 @@
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\ClassificationService.cs" />
     <Compile Include="Tools\ColorUtils.cs" />
+    <Compile Include="Tools\CommandNameExtensions.cs" />
     <Compile Include="Tools\FontsAndColorsHelper.cs" />
     <Compile Include="Interop\UnsafeNativeMethods.cs" />
     <Compile Include="Interop\WindowUtils.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Tools\FuzzySearch2.cs" />
+    <Compile Include="Tools\OlePictureConverter.cs" />
     <Compile Include="Tools\StringExtensions.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
