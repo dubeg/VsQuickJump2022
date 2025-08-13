@@ -6,8 +6,8 @@ public class ListItemFile : ListItemBase {
     private FileItem _item;
 
     public override string Name => _item.FileName;
-    public override string Description => _item.FolderPath;
-    public string FileExtension => System.IO.Path.GetExtension(_item.FullPath);
+    public override string Description => _item.ProjectRelativeFolderPath;
+    public string FileExtension => _item.FileExtension;
     public string FilePath => _item.FullPath;
 
     public static ListItemFile FromFileItem(FileItem item) 

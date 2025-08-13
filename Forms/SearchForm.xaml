@@ -93,7 +93,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <!-- Icon -->
@@ -125,14 +125,17 @@
                         </StackPanel>
 
                         <!-- Description -->
-                        <TextBlock x:Name="DescriptionText" 
-                                       Grid.Column="2" 
-                                       Text="{Binding Description}" 
-                                       Foreground="{DynamicResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
-                                       FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                                       FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,5,0"/>
+                        <TextBlock 
+                            x:Name="DescriptionText" 
+                            Grid.Column="2" 
+                            Text="{Binding Description}" 
+                            Foreground="{DynamicResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
+                            FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
+                            FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
+                            VerticalAlignment="Center"
+                            Margin="0,0,5,0"
+                            TextTrimming="CharacterEllipsis"
+                            />
                     </Grid>
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding UseCustomForeground}" Value="True">

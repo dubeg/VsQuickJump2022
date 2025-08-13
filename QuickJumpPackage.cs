@@ -40,7 +40,7 @@ public sealed class QuickJumpPackage : ToolkitPackage {
         var workspace = componentModel.GetService<VisualStudioWorkspace>();
         Dte = dte;
         SymbolService = new(workspace);
-        ProjectFileService = new(dte);
+        ProjectFileService = new();
         SettingsService = new(generalOptions, this);
         GoToService = new();
         GeneralOptions = generalOptions;

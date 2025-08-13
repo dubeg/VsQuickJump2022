@@ -6,7 +6,7 @@ public static class Utilities {
     public static T TryGetProperty<T>(this ProjectItem projectItem, string property) {
         ThreadHelper.ThrowIfNotOnUIThread("TryGetProperty");
         try {
-            return (T)projectItem.Properties.Item((object)property).Value;
+            return (T)projectItem?.Properties.Item((object)property).Value ?? default(T);
         }
         catch (Exception) {
             return default(T);

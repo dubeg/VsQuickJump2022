@@ -13,7 +13,8 @@ public class CommandService(DTE Dte) {
         "OtherContextMenu",
         "Image",
         "ClassViewContextMenu",
-        "Tfs"
+        "Tfs",
+        "SSDT",
     };
 
     public void PreloadCommands() {

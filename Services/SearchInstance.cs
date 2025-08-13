@@ -28,7 +28,7 @@ public class SearchInstance(
         // Files
         // -----------
         if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All) {
-            var items = projectFileService.GetFilesInSolution();
+            var items = await projectFileService.GetFilesInSolutionAsync();
             Files = items.Select(x => ListItemFile.FromFileItem(x)).ToList();
         }
         // -----------

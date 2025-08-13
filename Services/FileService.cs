@@ -1,60 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using EnvDTE;
 using QuickJump2022.Models;
-using QuickJump2022.Tools;
-using Project = EnvDTE.Project;
 
 namespace QuickJump2022.Services;
 
-public class ProjectFileService(DTE Dte) {
-    public List<FileItem> GetFilesInSolution() {
+public class ProjectFileService() {
+
+    record ProjectMetadata(
+        string ProjectName,
+        string ProjectFolderPath
+    );
+
+    public async Task<List<FileItem>> GetFilesInSolutionAsync(bool activeProjectOnly = false) {
         // --
-        string GetFolderPath(string fullPath) {
-            if (string.IsNullOrEmpty(fullPath)) return string.Empty;
-            var lastSlashIdx = fullPath.LastIndexOf('\\');
-            return lastSlashIdx >= 0 ? fullPath.Remove(lastSlashIdx).TrimEnd('\\') : string.Empty;
+        static async Task<IEnumerable<Project>> GetActiveProjectAsync() { 
+            var project = await VS.Solutions.GetActiveProjectAsync();
+            return [project];
         }
         // --
-        var items = GetProjectItems();
-        var fileItems = new List<FileItem>();
-        foreach (var (item, path) in items) {
-            var fileItem = new FileItem {
-                FileName = item.Name,
-                FullPath = path,
-                FolderPath = GetFolderPath(path),
-            };
-            fileItems.Add(fileItem);
+        var results = new List<FileItem>();
+        var projects = activeProjectOnly 
+            ? await GetActiveProjectAsync()
+            : await VS.Solutions.GetAllProjectsAsync();
+        foreach (var project in projects) {
+            if (!project.IsLoaded) continue;
+            var projectName = project.Name;
+            var projectPath = project.FullPath;
+            var projectFolderPath = GetFolderPath(projectPath);
+            var projectMetadata = new ProjectMetadata(projectName, projectFolderPath);
+            InternalGetProjectItems(projectMetadata, project.Children, results);
         }
-        return fileItems;
+        return results;
     }
 
-    private List<(ProjectItem item, string path)> GetProjectItems() {
-        ThreadHelper.ThrowIfNotOnUIThread(nameof(GetProjectItems));
-        var list = new List<(ProjectItem, string path)>();
-        foreach (Project project in Dte.Solution.Projects) {
-            InternalGetProjectItems(project.ProjectItems, list);
+    private void InternalGetProjectItems(ProjectMetadata projectMetadata, IEnumerable<SolutionItem> projectItems, List<FileItem> results) {
+        foreach (var item in projectItems) {
+            if (item.Type == SolutionItemType.PhysicalFile) {
+                var projectRelativePath = item.FullPath
+                        .Remove(0, projectMetadata.ProjectFolderPath.Length)
+                        .TrimStart('\\');
+                var fileItem = new FileItem {
+                    FileName = item.Text, // or Path.GetFileName(item.FullPath)
+                    FullPath = item.FullPath,
+                    FolderPath = GetFolderPath(item.FullPath),
+                    ProjectName = projectMetadata.ProjectName,
+                    ProjectPath = projectMetadata.ProjectFolderPath,
+                    ProjectRelativePath = projectRelativePath,
+                    ProjectRelativeFolderPath = GetFolderPath(projectRelativePath),
+                };
+                results.Add(fileItem);
+            }
+            else if (item.Children.Any()) {
+                InternalGetProjectItems(projectMetadata, item.Children, results);
+            }
         }
-        return list;
     }
 
-    private void InternalGetProjectItems(ProjectItems projItems, List<(ProjectItem, string path)> list) {
-        ThreadHelper.ThrowIfNotOnUIThread(nameof(InternalGetProjectItems));
-        if (projItems is null) {
-            return;
-        }
-        foreach (ProjectItem projItem in projItems) {
-            if (projItem.ProjectItems != null && projItem.ProjectItems.Count > 0) {
-                InternalGetProjectItems(projItem.ProjectItems, list);
-            }
-            var path = projItem.TryGetProperty<string>("FullPath");
-            if (projItem.Name.Contains(".") && !string.IsNullOrEmpty(path) && File.Exists(path)) {
-                list.Add((projItem, path));
-            }
-        }
+    // --
+
+    static string GetFolderPath(string fullPath) {
+        if (string.IsNullOrEmpty(fullPath)) return string.Empty;
+        var lastSlashIdx = fullPath.LastIndexOf('\\');
+        return lastSlashIdx >= 0 ? fullPath.Remove(lastSlashIdx).TrimEnd('\\') : string.Empty;
     }
 }
