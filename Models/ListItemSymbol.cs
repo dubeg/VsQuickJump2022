@@ -7,7 +7,7 @@ public class ListItemSymbol : ListItemBase {
     
     public override string Name => Item.NameOnly;
     public override string Description => $"{FormatAccessType(Item.AccessType)} {Item.BindType}";
-    public override string Type => !string.IsNullOrEmpty(Item.Type) ? $" -> {Item.Type}" : "";
+    public override string Type => !string.IsNullOrEmpty(Item.Type) ? $" → {Item.Type}" : "";
     public int Line => Item.Line;
 
     public static ListItemSymbol FromCodeItem(CodeItem item) 
