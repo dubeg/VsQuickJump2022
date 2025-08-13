@@ -49,68 +49,36 @@ public class SearchInstance(
 
     public List<ListItemBase> Search(string searchText) {
         var results = new List<ListItemBase>(20);
-        
-        bool FuzzyMatch(string str, string srcStr) {
-            if (srcStr.Length > 0) {
-                return FuzzySearch.IsMatch(str, srcStr);
-            }
-            return true;
-        }
 
-        if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All && Files.Count > 0) {
-            foreach (var file in Files) {
-                if (FuzzyMatch(file.Name, searchText)) {
-                    results.Add(file);
+        void FilterItems<T>(List<T> items) where T : ListItemBase {
+            if (string.IsNullOrEmpty(searchText)) results.AddRange(items);
+            else {
+                foreach (var item in items) {
+                    if (Fts.FuzzyMatch(searchText, item.Name, out var score)) {
+                        item.Weight = score;
+                        results.Add(item);
+                    }
                 }
             }
         }
 
-        if (SearchType is Enums.ESearchType.Methods or Enums.ESearchType.All && Symbols.Count > 0) {
-            foreach (var symbol in Symbols) {
-                if (FuzzyMatch(symbol.Name, searchText)) {
-                    results.Add(symbol);
-                }
-            }
-        }
-
-        if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All && Commands.Count > 0) {
-            foreach (var cmd in Commands) {
-                if (FuzzyMatch(cmd.Name, searchText)) {
-                    results.Add(cmd);
-                }
-            }
-        }
+        if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All) FilterItems(Files);
+        if (SearchType is Enums.ESearchType.Methods or Enums.ESearchType.All) FilterItems(Symbols);
+        if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All) FilterItems(Commands);
 
         // -------------------
         // Fuzzy search
         // -------------------
         if (!string.IsNullOrEmpty(searchText)) {
-            foreach (var item in results) {
-                var fuzzyScore = FuzzySearch.ScoreFuzzy(item.Name, searchText);
-                item.Weight = fuzzyScore.Score;
-            }
-
-            results.Sort((a, b) => {
-                if (a.Weight != b.Weight) {
-                    return b.Weight.CompareTo(a.Weight);
-                }
-                var sortType = SearchType switch {
-                    Enums.ESearchType.Files => FileSortType,
-                    Enums.ESearchType.Methods => CSharpSortType,
-                    Enums.ESearchType.Commands => Enums.SortType.Alphabetical,
-                    Enums.ESearchType.All => MixedSortType,
-                    _ => throw new NotImplementedException()
-                };
-                return Compare(a, b, sortType);
-            });
+            // A bit slow: FuzzySearch.SortByFuzzyScore(results, searchText, x => x.Name, true);
+            
+            // Fast
+            results.Sort(Tools.Sort.WeightReverse);
         }
         else {
             // -------------------
             // Standard search
             // -------------------
-            foreach (var result in results) {
-                result.Weight = result.Name.Length - searchText.Length;
-            }
             Sort(results, SearchType switch {
                 Enums.ESearchType.Files => FileSortType,
                 Enums.ESearchType.Methods => CSharpSortType,

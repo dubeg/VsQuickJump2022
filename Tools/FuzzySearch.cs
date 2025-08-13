@@ -296,4 +296,18 @@ public static class FuzzySearch
             return string.Compare(nameSelector(a), nameSelector(b), StringComparison.OrdinalIgnoreCase);
         });
     }
+
+    public static void SortByFuzzyScore(List<Models.ListItemBase> items, string query, bool allowNonContiguousMatches = true) {
+        if (string.IsNullOrEmpty(query)) {
+            return; // No sorting needed for empty query
+        }
+        items.Sort((a, b) => {
+            var scoreA = GetScore(a.Name, query, allowNonContiguousMatches);
+            var scoreB = GetScore(b.Name, query, allowNonContiguousMatches);
+            if (scoreA != scoreB) {
+                return scoreB.CompareTo(scoreA);
+            }
+            return string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase);
+        });
+    }
 }

@@ -31,10 +31,11 @@ public class CommandService(DTE Dte) {
         }
     }
 
-    public List<CommandItem> GetCommands() {
+    public List<CommandItem> GetCommands(bool availableOnly = false) {
         var results = new List<CommandItem>();
         foreach (Command command in Dte.Commands) {
             if (string.IsNullOrEmpty(command.Name)) continue;
+            if (availableOnly && !command.IsAvailable) continue;
             var result = new CommandItem() { 
                 Name = command.Name,
                 Guid = command.Guid,
@@ -43,7 +44,7 @@ public class CommandService(DTE Dte) {
             };
             results.Add(result);
         }
-        return results.OrderBy(c => c.Name).ToList(); ;
+        return results;
     }
 
     private static List<string> GetBindings(IEnumerable<object> bindings) {
