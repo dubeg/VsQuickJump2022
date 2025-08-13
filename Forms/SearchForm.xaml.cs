@@ -21,6 +21,7 @@ namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public int PageSize => 20; // TODO: make it configurable
+    private double HintFontSize;
     public SearchInstance SearchInstance { get; init; }
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
@@ -66,7 +67,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // --
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;
-        FontSize = fontSize + 2; // TODO: configure via options (?)
+        FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
+        HintFontSize = Math.Min(8, fontSize - 2);
         Width = 600; // TODO: configure via options
     }
 

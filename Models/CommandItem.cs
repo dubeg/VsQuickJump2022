@@ -12,5 +12,4 @@ public class CommandItem {
     public int ID { get; set; }
     public int Index { get; set; }
     public List<string> Shortcuts { get; set; } = new();
-    public string ShortcutsAsString => string.Join(" | ", Shortcuts);
 };
