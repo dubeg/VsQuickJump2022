@@ -73,6 +73,7 @@
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Tools\FuzzySearch2.cs" />
     <Compile Include="Tools\OlePictureConverter.cs" />
+    <Compile Include="Tools\PathExtensions.cs" />
     <Compile Include="Tools\StringExtensions.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
