@@ -47,7 +47,7 @@
 				</Strings>
 			</Button>
 
-			<Button guid="QuickJump2022" id="ShowCommandBarSearchForm" priority="0x0100" type="Button">
+			<!--<Button guid="QuickJump2022" id="ShowCommandBarSearchForm" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
@@ -56,20 +56,9 @@
 					<LocCanonicalName>.QuickJump.ShowCommandBarSearchForm</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowCommandBarSearchForm</CanonicalName>
 				</Strings>
-			</Button>
-
-			<Button guid="QuickJump2022" id="ShowAllSearchForm" priority="0x0100" type="Button">
-				<Parent guid="QuickJump2022" id="MainCmdGroup" />
-				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
-				<CommandFlag>IconIsMoniker</CommandFlag>
-				<Strings>
-					<ButtonText>Search all</ButtonText>
-					<LocCanonicalName>.QuickJump.ShowAllSearchForm</LocCanonicalName>
-					<CanonicalName>.QuickJump.ShowAllSearchForm</CanonicalName>
-				</Strings>
-			</Button>
+			</Button>-->
 			
-			<Button guid="QuickJump2022" id="TestCommand" priority="0x0100" type="Button">
+			<!--<Button guid="QuickJump2022" id="TestCommand" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
@@ -78,9 +67,9 @@
 					<LocCanonicalName>.QuickJump.TestCommand</LocCanonicalName>
 					<CanonicalName>.QuickJump.TestCommand</CanonicalName>
 				</Strings>
-			</Button>
+			</Button>-->
 			
-			<Button guid="QuickJump2022" id="RefreshPreloadedData" priority="0x0100" type="Button">
+			<!--<Button guid="QuickJump2022" id="RefreshPreloadedData" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="Refresh" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
@@ -89,7 +78,7 @@
 					<LocCanonicalName>.QuickJump.RefreshPreloadedData</LocCanonicalName>
 					<CanonicalName>.QuickJump.RefreshPreloadedData</CanonicalName>
 				</Strings>
-			</Button>
+			</Button>-->
     </Buttons>
   </Commands>
 
