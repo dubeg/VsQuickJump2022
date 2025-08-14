@@ -63,7 +63,7 @@
             BorderBrush="Transparent"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
-            ScrollViewer.IsDeferredScrollingEnabled="True"
+            ScrollViewer.IsDeferredScrollingEnabled="False"
             ScrollViewer.CanContentScroll="True"
             VirtualizingStackPanel.IsVirtualizing="True"
             VirtualizingStackPanel.VirtualizationMode="Recycling"
