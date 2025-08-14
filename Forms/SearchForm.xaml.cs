@@ -66,7 +66,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // Application.Current.MainWindow.LocationChanged += (s, e) => { AdjustPosition(); }; // TODO: remove event handler when dialog is closed.
         this.Loaded += (s, e) => AdjustPosition();
         this.SizeChanged += (s, e) => AdjustPosition();
-        this.Deactivated += (s, e) => { try { Close(); } catch { } };
+        this.Deactivated += (s, e) => { 
+            // try { Close(); } catch { } 
+        };
         // --
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;

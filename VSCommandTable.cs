@@ -29,5 +29,6 @@ namespace QuickJump2022
         public const int ShowCommandSearchForm = 0x0400;
         public const int ShowCommandBarSearchForm = 0x0500;
         public const int TestCommand = 0x0600;
+        public const int RefreshPreloadedData = 0x0700;
     }
 }

@@ -8,14 +8,25 @@ namespace QuickJump2022.Services;
 
 public class CommandService(DTE Dte) {
     private List<CommandItem> _commands = new();
-    private string[] _exclusions = {
+    private string[] _exclusions => [
         "TeamFoundation",
-        "OtherContextMenu",
+        "OtherContextMenus.",
+        "ClassViewContextMenus.",
+        "DebuggerContextMenus.",
+        "EditorContextMenus.",
+        "ProjectandSolutionContextMenus.",
+        "File.Tfs",
         "Image",
-        "ClassViewContextMenu",
         "Tfs",
         "SSDT",
-    };
+        "DSLTools.",
+        "LiveShare.",
+        "QueryDesigner.",
+        "Table.",
+        "TableDesigner.",
+        "XsdDesigner.",
+        "SQLTableDesigner.",
+    ];
 
     public void PreloadCommands() {
         var commands = GetCommands();

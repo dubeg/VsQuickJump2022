@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\RefreshPreloadedDataCommand.cs" />
     <Compile Include="Commands\ShowAllSearchForm.cs" />
     <Compile Include="Commands\ShowCommandBarSearchForm.cs" />
     <Compile Include="Commands\ShowFileSearchForm.cs" />
