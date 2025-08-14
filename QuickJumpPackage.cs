@@ -52,7 +52,7 @@ public sealed class QuickJumpPackage : ToolkitPackage {
         SettingsService.LoadSettings();
         ClassificationService.PreloadCommonBrushes();
         CommandService.PreloadCommands();
-        CommandBarService.PreloadCommands();
+        // CommandBarService.PreloadCommands();
         dte.Events.DTEEvents.OnBeginShutdown += () => SettingsService.SaveSettings();
     }
 }

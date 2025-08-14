@@ -13,6 +13,7 @@
     xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    x:Name="dialogWnd"
     mc:Ignorable="d"
     Title="QuickJump Search" 
     BorderThickness="1"
@@ -58,7 +59,6 @@
             x:Name="lstItems" 
             Grid.Row="1"
             localb:ListViewBehaviors.MaxVisibleItems="{Binding PageSize}"
-            ItemsSource="{Binding Items}"
             BorderThickness="0"
             BorderBrush="Transparent"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -67,11 +67,12 @@
             ScrollViewer.CanContentScroll="True"
             VirtualizingStackPanel.IsVirtualizing="True"
             VirtualizingStackPanel.VirtualizationMode="Recycling"
-            VirtualizingStackPanel.ScrollUnit="Pixel"
-            VirtualizingStackPanel.CacheLength="20"
+            VirtualizingStackPanel.ScrollUnit="Item"
+            VirtualizingStackPanel.CacheLength="10,10"
             VirtualizingStackPanel.CacheLengthUnit="Item"
             PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
-            PreviewKeyUp="lstItems_PreviewKeyUp">
+            PreviewKeyUp="lstItems_PreviewKeyUp"
+            >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />
@@ -96,49 +97,37 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Icon -->
-                        <Grid Grid.Column="0">
-                            <!-- CrispImage for IconMoniker (default visible) -->
-                            <imaging:CrispImage 
-                                x:Name="IconMonikerImage"
-                                Moniker="{Binding IconMoniker}" 
-                                UseLayoutRounding="True"
-                                RenderOptions.BitmapScalingMode="HighQuality"
-                                Width="16" 
-                                Height="16" 
-                                Margin="5,0,5,0"
-                                VerticalAlignment="Center"
-                                Visibility="Visible"
-                                />
-                            
-                            <!-- Image for BitmapSource (default collapsed) -->
-                            <Image 
-                                x:Name="BitmapSourceImage"
-                                Source="{Binding BitmapSource}" 
-                                UseLayoutRounding="True"
-                                RenderOptions.BitmapScalingMode="HighQuality"
-                                Width="16" 
-                                Height="16" 
-                                Margin="5,0,5,0"
-                                VerticalAlignment="Center"
-                                Visibility="Collapsed"
-                                />
-                        </Grid>
+                        <imaging:CrispImage 
+                            Grid.Column="0"
+                            x:Name="IconMonikerImage"
+                            Moniker="{Binding IconMoniker}" 
+                            UseLayoutRounding="True"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Width="16" 
+                            Height="16" 
+                            Margin="5,0,5,0"
+                            VerticalAlignment="Center"
+                            Visibility="Visible"
+                            />
 
-                        <!-- Name and Type -->
+                            <!-- Name and Type -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock x:Name="NameText" 
-                                           Text="{Binding Name}" 
-                                           FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                                           FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                                           TextTrimming="CharacterEllipsis"
-                                           />
-                            <TextBlock x:Name="TypeText" 
-                                           Text="{Binding Type}" 
-                                           Foreground="{DynamicResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
-                                           FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                                           FontSize="{Binding HintFontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                                           Margin="0,0,5,0"/>
+                            <TextBlock 
+                                x:Name="NameText" 
+                                Text="{Binding Name}" 
+                                FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
+                                FontSize="{Binding ElementName=dialogWnd, Path=FontSize}"
+                                Foreground="{Binding NameForeground}"
+                                TextTrimming="CharacterEllipsis"
+                                />
+                            <TextBlock 
+                                x:Name="TypeText" 
+                                Text="{Binding Type}" 
+                                Foreground="{StaticResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
+                                FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
+                                FontSize="{Binding ElementName=dialogWnd, Path=HintFontSize}"
+                                Margin="0,0,5,0"
+                                />
                         </StackPanel>
 
                         <!-- Description -->
@@ -146,33 +135,23 @@
                             x:Name="DescriptionText" 
                             Grid.Column="2" 
                             Text="{Binding Description}" 
-                            Foreground="{DynamicResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
-                            FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
-                            FontSize="{Binding HintFontSize, RelativeSource={RelativeSource AncestorType=platform:DialogWindow}}"
+                            Foreground="{StaticResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
+                            FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
+                            FontSize="{Binding ElementName=dialogWnd, Path=HintFontSize}"
                             VerticalAlignment="Center"
                             Margin="0,0,5,0"
                             TextTrimming="CharacterEllipsis"
                             />
                     </Grid>
                     <DataTemplate.Triggers>
-                        <!-- When BitmapSource is available, show it and hide IconMoniker -->
-                        <DataTrigger Binding="{Binding UseBitmapImage}" Value="True">
-                            <Setter TargetName="BitmapSourceImage" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="IconMonikerImage" Property="Visibility" Value="Collapsed"/>
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding UseCustomForeground}" Value="True">
-                            <Setter TargetName="NameText" Property="Foreground" Value="{Binding NameForeground}"/>
-                        </DataTrigger>
-
                         <DataTrigger Binding="{Binding IsSelected}" Value="True">
                             <Setter TargetName="TypeText" 
                                     Property="Foreground" 
-                                    Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
+                                    Value="{StaticResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
                                     />
                             <Setter TargetName="DescriptionText" 
                                     Property="Foreground"
-                                    Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
+                                    Value="{StaticResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
                                     />
                         </DataTrigger>
                     </DataTemplate.Triggers>

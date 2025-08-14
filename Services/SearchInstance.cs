@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.Language.CodeCleanUp;
+using Newtonsoft.Json.Linq;
 using QuickJump2022.Models;
 using QuickJump2022.Tools;
 
@@ -63,10 +65,23 @@ public class SearchInstance(
             if (string.IsNullOrEmpty(searchText)) results.AddRange(items);
             else {
                 foreach (var item in items) {
+                    // Show
+                    //var match = FuzzySearch.ScoreFuzzy(item.Name, searchText, true);
+                    //if (match.MatchPositions.Length > 0) {
+                    //    item.Weight = match.Score;
+                    //    results.Add(item);
+                    //}
+
+                    // Fastest
                     if (Fts.FuzzyMatch(searchText, item.Name, out var score)) {
                         item.Weight = score;
                         results.Add(item);
                     }
+
+                    //if (item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0) {
+                    //    item.Weight = searchText.Length - item.Name.Length;
+                    //    results.Add(item);
+                    //}
                 }
             }
         }
@@ -80,10 +95,6 @@ public class SearchInstance(
         // Fuzzy search
         // -------------------
         if (!string.IsNullOrEmpty(searchText)) {
-            // A bit slow:
-            // FuzzySearch.SortByFuzzyScore(results, searchText, x => x.Name, true);
-            
-            // Fast
             results.Sort((a, b) => {
                 if (a.Weight != b.Weight) return Tools.Sort.WeightReverse(a, b);
                 return Tools.Sort.Alphabetical(a, b);

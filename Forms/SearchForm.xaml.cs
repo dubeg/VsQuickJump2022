@@ -1,11 +1,14 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
@@ -22,6 +25,7 @@ namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private DismissOnClickOutsideBounds _dismissOnClickOutsideBounds;
+    private DispatcherTimer _filterTimer;
     public int PageSize => 20; // TODO: make it configurable
     private double HintFontSize; // TODO: make it configurable
     public SearchInstance SearchInstance { get; init; }
@@ -31,11 +35,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public ClassificationService ClassificationService { get; init; }
     private bool _useSymbolColors = false;
     private DTE _dte;
-    private ObservableCollection<ListItemViewModel> _items = new();
-    public ObservableCollection<ListItemViewModel> Items {
-        get => _items;
-        set { _items = value; OnPropertyChanged(); }
-    }
+    private List<ListItemViewModel> Items = new();
 
     public static async Task ShowModalAsync(QuickJumpPackage package, ESearchType searchType) {
         var dialog = new SearchForm(package, searchType);
@@ -44,7 +44,18 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     protected SearchForm(QuickJumpPackage package, ESearchType searchType) {
-        InitializeComponent();
+        _filterTimer = new(DispatcherPriority.Render) { 
+            Interval = TimeSpan.FromMilliseconds(120)
+        };
+        _filterTimer.Tick += (_, _) => {
+            _filterTimer.Stop();
+            RefreshList();
+            if (Items.Count > 0) {
+                lstItems.SelectedIndex = 0;
+                EnsureSelectedItemIsVisible();
+            }
+        };
+        InitializeComponent();  
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
             package.SymbolService,
@@ -104,25 +115,26 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
 
     private void RefreshList() {
         var searchText = txtSearch.Text;
-        Items.Clear();
+        var listItems = new List<ListItemViewModel>();
         var results = SearchInstance.Search(searchText);
+        var brush = Application.Current.TryFindResource(ThemedDialogColors.ListBoxTextBrushKey) as System.Windows.Media.Brush;
         foreach (var item in results) {
             var viewModel = new ListItemViewModel(item);
             if (item is ListItemSymbol symbol && _useSymbolColors) {
                 var fgBrush = ClassificationService.GetFgColorForClassification(symbol.Item.BindType);
                 viewModel.NameForeground = fgBrush;
-                viewModel.UseCustomForeground = true;
             }
-            Items.Add(viewModel);
+            else {
+                viewModel.NameForeground = brush;
+            }
+            listItems.Add(viewModel);
         }
+        lstItems.ItemsSource = Items = listItems;
     }
 
     private void txtSearch_TextChanged(object sender, TextChangedEventArgs e) {
-        RefreshList();
-        if (Items.Count > 0) {
-            lstItems.SelectedIndex = 0;
-            EnsureSelectedItemIsVisible();
-        }
+        _filterTimer.Stop();
+        _filterTimer.Start();
     }
 
     private async void txtSearch_PreviewKeyDown(object sender, KeyEventArgs e) {

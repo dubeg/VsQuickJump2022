@@ -17,21 +17,6 @@ public class ListItemViewModel : INotifyPropertyChanged {
             : item is ListItemFile file ? KnownMonikerUtils.GetFileMoniker(file.FileExtension)
             : item is ListItemCommand cmd ? KnownMonikers.Settings // Run // RunOutline // Settings // ?
             : KnownMonikers.None;
-        UseBitmapImage = item is ListItemCommandBar;
-        if (item is ListItemCommandBar cmdBar && cmdBar.Item.BitmapSource is not null) {
-            //var bgColor = ColorUtils.ToMediaColor(
-            //    VSColorTheme.GetThemedColor(
-            //        EnvironmentColors.ToolWindowBackgroundColorKey
-            //    )
-            //);
-            BitmapSource = cmdBar.Item.BitmapSource;
-            //BitmapSource = ImageThemingUtilities.GetOrCreateThemedBitmapSource(
-            //    cmdBar.Item.BitmapSource,
-            //    bgColor,
-            //    true,
-            //    bgColor
-            //);
-        }
     }
 
     public ListItemBase Item { get; init; }
@@ -39,8 +24,6 @@ public class ListItemViewModel : INotifyPropertyChanged {
     public string Description => Item.Description;
     public string Type => Item.Type;
     public ImageMoniker IconMoniker { get; init; }
-    public BitmapSource BitmapSource { get; init; }
-    public bool UseBitmapImage { get; init; }
     
     private bool _isSelected;
     public bool IsSelected { 
@@ -52,7 +35,6 @@ public class ListItemViewModel : INotifyPropertyChanged {
             }
         }
     }
-    public bool UseCustomForeground { get; set; } = false;
     public Brush NameForeground { get; set; }
     public Brush TypeForeground { get; set; }
 

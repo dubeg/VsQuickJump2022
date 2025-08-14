@@ -29,9 +29,6 @@ public static class ListViewBehaviors {
     private static void OnMaxVisibleItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         if (d is ListBox listView) {
             listView.Loaded += (s, args) => UpdateListViewHeight(listView);
-            listView.ItemContainerGenerator.StatusChanged += (s, args) => UpdateListViewHeight(listView);
-
-            // Also listen to source collection changes
             var dpd = DependencyPropertyDescriptor.FromProperty(ItemsControl.ItemsSourceProperty, typeof(ListView));
             dpd.AddValueChanged(listView, (s, args) => UpdateListViewHeight(listView));
         }
@@ -45,7 +42,7 @@ public static class ListViewBehaviors {
             if (itemHeight == 0) return;
             var visibleItems = Math.Min(listView.Items.Count, maxVisibleItems);
             var totalHeight = visibleItems * itemHeight;
-            listView.Height = totalHeight + 2; // TODO: why 2?
+            listView.MaxHeight = totalHeight + 2; // TODO: why 2?
         }
     }
 
