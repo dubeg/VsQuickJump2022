@@ -12,12 +12,10 @@ I'm also trying to add few niceties to it, mostly using LLMs.
 ## Screenshots
 
 ### Search symbols
-<img width="700" height="350" alt="Symbols" src="https://github.com/user-attachments/assets/fb145039-0b7e-4194-953f-6606a02e16e7" />
-
+<img width="750" height="316" alt="Methods" src="https://github.com/user-attachments/assets/1493ee2d-5c0b-4461-adb4-f548d1444db5" />
 
 ### Search files
-<img width="700" height="329" alt="Files" src="https://github.com/user-attachments/assets/aa15de09-65aa-42e6-b98b-2f55b30a23ec" />
+<img width="1000" height="586" alt="Files" src="https://github.com/user-attachments/assets/057ce044-e152-4c21-83b8-dd5c688307a7" />
 
-
-### Options
-<img width="879" height="788" alt="Options" src="https://github.com/user-attachments/assets/ab03a342-d460-4965-9f67-95c0e01ab086" />
+### Search Commands
+<img width="750" height="586" alt="Commands" src="https://github.com/user-attachments/assets/5ae7c2e3-baa6-43c9-925a-d9f585931009" />
