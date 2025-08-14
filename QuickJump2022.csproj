@@ -52,7 +52,7 @@
     <Compile Include="Commands\ShowCommandSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
     <Compile Include="Commands\TestCommand.cs" />
-    <Compile Include="Forms\MouseCapturePreview.cs" />
+    <Compile Include="Forms\DismissOnClickOutsideBounds.cs" />
     <Compile Include="Models\FileItem.cs" />
     <Compile Include="Models\CommandItem.cs" />
     <Compile Include="Models\ListItemCommand.cs" />

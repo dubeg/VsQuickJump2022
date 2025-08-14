@@ -10,6 +10,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
+using QuickJump2022.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Services;
@@ -20,7 +21,7 @@ using Rect = System.Windows.Rect;
 namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
-    private EventHandler DeactivationHandler;
+    private DismissOnClickOutsideBounds _dismissOnClickOutsideBounds;
     public int PageSize => 20; // TODO: make it configurable
     private double HintFontSize; // TODO: make it configurable
     public SearchInstance SearchInstance { get; init; }
@@ -30,7 +31,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public ClassificationService ClassificationService { get; init; }
     private bool _useSymbolColors = false;
     private DTE _dte;
-    private HwndSource _hwndSource;
     private ObservableCollection<ListItemViewModel> _items = new();
     public ObservableCollection<ListItemViewModel> Items {
         get => _items;
@@ -64,64 +64,15 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         _useSymbolColors = package.GeneralOptions.UseSymbolColors;
         // --
         WindowStartupLocation = WindowStartupLocation.Manual;
-        // Application.Current.MainWindow.SizeChanged += (s, e) => { AdjustPosition(); }; // TODO: remove event handler when dialog is closed.
-        // Application.Current.MainWindow.LocationChanged += (s, e) => { AdjustPosition(); }; // TODO: remove event handler when dialog is closed.
-        DeactivationHandler = (s, e) => DetectClickOutsideBounds(this);
-        this.Deactivated += DeactivationHandler;
-        this.Loaded += (s, e) => {
-            AdjustPosition();
-        };
+        this.Loaded += (s, e) => AdjustPosition();
         this.SizeChanged += (s, e) => AdjustPosition();
+        _dismissOnClickOutsideBounds = new(this);
         // --
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;
         FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
         HintFontSize = Math.Min(8, fontSize - 2);
         Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options
-    }
-
-    protected override void OnClosing(CancelEventArgs e) {
-        Deactivated -= DeactivationHandler;
-
-        UnsafeNativeMethods.ReleaseCapture();
-        _hwndSource?.RemoveHook(HwndHook);
-        //_hwndSource?.Dispose();
-
-        base.OnClosing(e);
-    }
-
-    protected override void OnSourceInitialized(EventArgs e) {
-        base.OnSourceInitialized(e);
-        var helper = new WindowInteropHelper(this);
-        _hwndSource = HwndSource.FromHwnd(helper.Handle);
-        _hwndSource.AddHook(HwndHook);
-        UnsafeNativeMethods.SetCapture(helper.Handle);
-        this.Activated += (s, e) => UnsafeNativeMethods.SetCapture(helper.Handle);
-    }
-
-    private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) {
-        const int WM_LBUTTONDOWN = 0x0201;
-        const int WM_RBUTTONDOWN = 0x0204;
-        const int WM_MBUTTONDOWN = 0x0207;
-        if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN) {
-            DetectClickOutsideBounds(this);
-        }
-        return IntPtr.Zero;
-    }
-
-    private void DetectClickOutsideBounds(System.Windows.Window window) {
-        if (UnsafeNativeMethods.GetCursorPos(out var point)) {
-            var screenPoint = new Point(point.X, point.Y);
-            var logicalPoint = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(screenPoint);
-            var mainWindow = Application.Current.MainWindow;
-            var mainWindowBounds = new Rect(mainWindow.Left, mainWindow.Top, mainWindow.ActualWidth, mainWindow.ActualHeight);
-            var modalWindowBounds = new Rect(this.Left, this.Top, this.ActualWidth, this.ActualHeight);
-            var inMain = mainWindowBounds.Contains(logicalPoint);
-            var inModal = modalWindowBounds.Contains(logicalPoint);
-            if (inMain && !inModal) {
-                window.Close();
-            }
-        }
     }
 
     private void AdjustPosition() {
