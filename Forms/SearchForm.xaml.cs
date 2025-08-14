@@ -4,13 +4,10 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Models;
-using QuickJump2022.Options;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Services;
 using QuickJump2022.Tools;
@@ -21,7 +18,7 @@ namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public int PageSize => 20; // TODO: make it configurable
-    private double HintFontSize;
+    private double HintFontSize; // TODO: make it configurable
     public SearchInstance SearchInstance { get; init; }
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
