@@ -18,4 +18,19 @@ internal static class UnsafeNativeMethods {
 
     [DllImport("gdi32.dll")]
     internal static extern int GetDeviceCaps(IntPtr hDC, int index);
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr SetCapture(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    internal static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    internal static extern bool GetCursorPos(out POINT lpPoint);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct POINT {
+        public int X;
+        public int Y;
+    }
 }
