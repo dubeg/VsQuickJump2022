@@ -124,10 +124,13 @@ public static class WindowUtils {
             SetForegroundWindow(hwnd);
     }
 
-    public static Rect GetMaximizedWindowBounds(Window window) {
-        var windowHandle = new WindowInteropHelper(window).Handle;
+    public static Rect GetMaximizedWindowBounds2(Window window)
+        => GetMaximizedWindowBounds(new WindowInteropHelper(window).Handle);
+
+    public static Rect GetMaximizedWindowBounds2(IntPtr windowHandle) {
+        // The WorkingArea property provides the bounds of the screen,
+        // excluding the taskbar.
         var screen = Screen.FromHandle(windowHandle);
-        // The WorkingArea property provides the bounds of the screen, excluding the taskbar
         var workingArea = screen.WorkingArea;
         return new Rect(workingArea.Left, workingArea.Top, workingArea.Width, workingArea.Height);
     }
