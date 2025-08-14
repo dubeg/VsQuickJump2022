@@ -1,4 +1,6 @@
 # README
+A Visual Studio 2022 extension to mimick Sublime Text's command palette.
+
 [QuickJump](https://marketplace.visualstudio.com/items?itemName=ChristianSchubert.QuickJump) was initially an extension made by Christian Schubert, but it hasn't been updated since 2019. It seems that he disappeared from the online world.
 So I decompiled & recompiled it to support Visual Studio 2022.
 
