@@ -1,40 +1,49 @@
-﻿using Microsoft.VisualStudio.ComponentModelHost;
+﻿using System.Collections.Generic;
+using System.Windows.Media;
+using EnvDTE80;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.StandardClassification;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Formatting;
 using QuickJump2022.Models;
-using System.Collections.Generic;
-using System.Windows.Media;
 
 namespace QuickJump2022.Services;
 
-public class ClassificationService(IServiceProvider serviceProvider) {
+public class ClassificationService {
+    private IServiceProvider _serviceProvider;
     private Dictionary<Enums.EBindType, Brush> _cache = new();
     private Brush _defaultBrush;
+    private Dictionary<Enums.EBindType, string> _mappings = new Dictionary<Enums.EBindType, string> {
+        { Enums.EBindType.Class, "class name" },
+        { Enums.EBindType.Method, "method name" },
+        { Enums.EBindType.Property, "property name" },
+        { Enums.EBindType.Field, "field name" },
+        { Enums.EBindType.Enum, "enum name" },
+        { Enums.EBindType.Interface, "interface name" },
+        { Enums.EBindType.Struct, "struct name" },
+        { Enums.EBindType.Delegate, "delegate name" },
+        { Enums.EBindType.Constructor, "constructor name" },
+        // "event name"
+        // "operator"
+        // "property name"
+        // "record class name"
+        // "record struct name"
+        // "text"
+    };
+
+    public ClassificationService(IServiceProvider serviceProvider) {
+        _serviceProvider = serviceProvider;
+        VSColorTheme.ThemeChanged += (_) => PreloadCommonBrushes();
+    }
 
     public void PreloadCommonBrushes() {
-        var mappings = new Dictionary<Enums.EBindType, string> {
-            { Enums.EBindType.Class, "class name" },
-            { Enums.EBindType.Method, "method name" },
-            { Enums.EBindType.Property, "property name" },
-            { Enums.EBindType.Field, "field name" },
-            { Enums.EBindType.Enum, "enum name" },
-            { Enums.EBindType.Interface, "interface name" },
-            { Enums.EBindType.Struct, "struct name" },
-            { Enums.EBindType.Delegate, "delegate name" },
-            { Enums.EBindType.Constructor, "constructor name" },
-            // "event name"
-            // "operator"
-            // "property name"
-            // "record class name"
-            // "record struct name"
-            // "text"
-        };
-        var componentModel = serviceProvider.GetService<SComponentModel, IComponentModel>();
+        _mappings.Clear();
+        var componentModel = _serviceProvider.GetService<SComponentModel, IComponentModel>();
         var registryService = componentModel.GetService<IClassificationTypeRegistryService>();
         var classificationFormatService = componentModel.GetService<IClassificationFormatMapService>();
         var classificationFormatMap = classificationFormatService.GetClassificationFormatMap(category: "text");
-        foreach (var mapping in mappings) {
+        foreach (var mapping in _mappings) {
             var classificationType = registryService.GetClassificationType(mapping.Value);
             if (classificationType != null) {
                 var props = classificationFormatMap.GetTextProperties(classificationType);
@@ -82,7 +91,7 @@ public class ClassificationService(IServiceProvider serviceProvider) {
     /// ...
     /// </remarks>
     private TextFormattingRunProperties GetClassificationFormat(string classificationTypeName, string appearanceCategory = "text") {
-        var componentModel = serviceProvider.GetService<SComponentModel, IComponentModel>();
+        var componentModel = _serviceProvider.GetService<SComponentModel, IComponentModel>();
         var registryService = componentModel.GetService<IClassificationTypeRegistryService>();
         var classificationFormatService = componentModel.GetService<IClassificationFormatMapService>();
         var classificationFormatMap = classificationFormatService.GetClassificationFormatMap(category: appearanceCategory);

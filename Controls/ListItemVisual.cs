@@ -52,7 +52,7 @@ public class ListItemVisual : Control {
         base.OnRender(drawingContext);
         var useLRounding = UseLayoutRounding;
         if (ActualWidth <= 0 || ActualHeight <= 0) return;
-        var dpi = VisualTreeHelper.GetDpi(this);
+        var dpi = VisualTreeHelper.GetDpi(Application.Current.MainWindow);
         var pixelsPerDip = dpi.PixelsPerDip;
 
         var vm = _viewModel;
@@ -75,7 +75,7 @@ public class ListItemVisual : Control {
         var leftTextStartX = iconX + IconSize + IconRightMargin;
         var rightLimitX = ActualWidth - TextRightMargin;
 
-        // Right description
+        // Measure texts without constraints
         var descriptionText = vm.Description ?? string.Empty;
         var description = new FormattedText(
             descriptionText,
@@ -87,14 +87,6 @@ public class ListItemVisual : Control {
             pixelsPerDip
         ) { Trimming = TextTrimming.CharacterEllipsis };
 
-        // Max width allowed for description so that center area keeps at least some space
-        var maxDescWidth = Math.Max(0, rightLimitX - leftTextStartX - 20);
-        description.MaxTextWidth = maxDescWidth;
-        var descWidth = Math.Min(description.Width, maxDescWidth);
-        var descX = rightLimitX - descWidth;
-        var textBaselineY = (ActualHeight - Math.Max(IconSize, description.Height)) / 2.0;
-
-        // Center area: Name + Type
         var typeText = vm.Type ?? string.Empty;
         var type = new FormattedText(
             typeText,
@@ -104,9 +96,7 @@ public class ListItemVisual : Control {
             hintFontSize,
             auxBrush,
             pixelsPerDip
-        ) { Trimming = TextTrimming.None };
-        var availableCenterWidth = Math.Max(0, descX - leftTextStartX);
-        var nameAvailableWidth = Math.Max(0, availableCenterWidth - type.Width - SpacingBetweenNameAndType);
+        ) { Trimming = TextTrimming.CharacterEllipsis };
 
         var nameText = vm.Name ?? string.Empty;
         var name = new FormattedText(
@@ -117,10 +107,34 @@ public class ListItemVisual : Control {
             FontSize,
             nameBrush,
             pixelsPerDip
-        ) { 
-            Trimming = TextTrimming.CharacterEllipsis, 
-            MaxTextWidth = nameAvailableWidth 
-        };
+        ) { Trimming = TextTrimming.CharacterEllipsis };
+
+        var totalAvailable = Math.Max(0, rightLimitX - leftTextStartX);
+        var nameDesired = name.WidthIncludingTrailingWhitespace;
+        var typeDesired = type.WidthIncludingTrailingWhitespace;
+        var descDesired = description.WidthIncludingTrailingWhitespace;
+
+        // Allocate widths by priority: Name > Type > Desc
+        var nameWidth = Math.Min(nameDesired, totalAvailable);
+        var spaceAfterName = nameWidth > 0 && totalAvailable - nameWidth > 0 && typeDesired > 0 ? SpacingBetweenNameAndType : 0.0;
+        var remainingAfterName = Math.Max(0, totalAvailable - nameWidth - spaceAfterName);
+
+        var typeWidth = Math.Min(typeDesired, remainingAfterName);
+        var spaceAfterType = typeWidth > 0 && remainingAfterName - typeWidth > 0 && descDesired > 0 ? SpacingBetweenNameAndType : 0.0;
+        var remainingAfterType = Math.Max(0, remainingAfterName - typeWidth - spaceAfterType);
+
+        var descWidth = Math.Min(descDesired, remainingAfterType);
+
+        // Apply constraints so FormattedText computes trimmed glyphs
+        name.MaxTextWidth = Math.Max(0, nameWidth);
+        type.MaxTextWidth = Math.Max(0, typeWidth);
+        description.MaxTextWidth = Math.Max(0, descWidth);
+
+        // Compute positions (desc right-aligned)
+        var descX = rightLimitX - descWidth;
+        var typeX = leftTextStartX + nameWidth + (typeWidth > 0 ? spaceAfterName : 0.0);
+        var nameX = leftTextStartX;
+        var textBaselineY = (ActualHeight - Math.Max(IconSize, Math.Max(name.Height, Math.Max(type.Height, description.Height)))) / 2.0;
 
         // ---------------------
         // Icon
@@ -135,24 +149,13 @@ public class ListItemVisual : Control {
         }
 
         // ---------------------
-        // Name
+        // Draw texts with prioritized allocated widths
         // ---------------------
-        var nameX = leftTextStartX;
-        var nameY = textBaselineY;
-        drawingContext.DrawText(name, new Point(nameX, nameY));
-        
-        // ---------------------
-        // type
-        // ---------------------
-        var typeX = nameX + name.WidthIncludingTrailingWhitespace + SpacingBetweenNameAndType;
-        if (typeX < descX) {
+        drawingContext.DrawText(name, new Point(nameX, textBaselineY));
+        if (typeWidth > 0)
             drawingContext.DrawText(type, new Point(typeX, textBaselineY + (FontSize - hintFontSize)));
-        }
-
-        // ---------------------
-        // Description
-        // ---------------------
-        drawingContext.DrawText(description, new Point(descX, textBaselineY + (FontSize - hintFontSize)));
+        if (descWidth > 0)
+            drawingContext.DrawText(description, new Point(descX, textBaselineY + (FontSize - hintFontSize)));
     }
 
     protected override Size MeasureOverride(Size constraint) {

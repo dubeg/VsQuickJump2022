@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -20,9 +21,24 @@ public sealed class IconImageCacheService {
 	private IconImageCacheService() {
 		_cache = new MemoryCache(new MemoryCacheOptions());
 		VSColorTheme.ThemeChanged += (_) => Clear();
-	}
+        var mainWindow = Application.Current.MainWindow;
+        var mainWindowSource = PresentationSource.FromVisual(mainWindow) as HwndSource;
+        if (mainWindowSource != null) {
+            mainWindowSource.AddHook(WndProc);
+        }
+    }
 
-	public ImageSource Get(ImageMoniker moniker, int size, uint backgroundArgb, int dpi) {
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) {
+        const int WM_DPICHANGED = 0x02E0;
+        if (msg == WM_DPICHANGED) {
+            // Flush icon cache on DPI change
+            Clear();
+            VS.StatusBar.ShowMessageAsync($"DPI: changed {DateTime.Now}");
+        }
+        return IntPtr.Zero;
+    }
+
+    public ImageSource Get(ImageMoniker moniker, int size, uint backgroundArgb, int dpi) {
 		var key = CreateKey(moniker, size, backgroundArgb, dpi);
 		if (_cache.Get(key) is ImageSource cached) return cached;
 		lock (_lock) {
