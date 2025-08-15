@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controls\ListItemVisual.cs" />
     <Compile Include="Commands\RefreshPreloadedDataCommand.cs" />
     <Compile Include="Commands\ShowAllSearchForm.cs" />
     <Compile Include="Commands\ShowCommandBarSearchForm.cs" />
@@ -66,9 +67,11 @@
     <Compile Include="Services\GoToService.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
     <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="Services\IconImageCacheService.cs" />
     <Compile Include="Services\ClassificationService.cs" />
     <Compile Include="Tools\ColorUtils.cs" />
     <Compile Include="Tools\CommandNameExtensions.cs" />
+    <Compile Include="Tools\DoubleUtil.cs" />
     <Compile Include="Tools\FontsAndColorsHelper.cs" />
     <Compile Include="Interop\UnsafeNativeMethods.cs" />
     <Compile Include="Interop\WindowUtils.cs" />
@@ -146,6 +149,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
       <Version>4.14.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory">
+      <Version>9.0.8</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.LanguageServices">
       <Version>4.14.0</Version>

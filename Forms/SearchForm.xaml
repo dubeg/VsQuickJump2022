@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localb="clr-namespace:QuickJump2022.Behaviors"
     xmlns:localm="clr-namespace:QuickJump2022.Models"
+    xmlns:localc="clr-namespace:QuickJump2022.Controls"
     xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
@@ -90,71 +91,11 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type localm:ListItemViewModel}">
-                    <Grid x:Name="ItemGrid">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage 
-                            Grid.Column="0"
-                            x:Name="IconMonikerImage"
-                            Moniker="{Binding IconMoniker}" 
-                            UseLayoutRounding="True"
-                            RenderOptions.BitmapScalingMode="HighQuality"
-                            Width="16" 
-                            Height="16" 
-                            Margin="5,0,5,0"
-                            VerticalAlignment="Center"
-                            Visibility="Visible"
-                            />
-
-                            <!-- Name and Type -->
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock 
-                                x:Name="NameText" 
-                                Text="{Binding Name}" 
-                                FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
-                                FontSize="{Binding ElementName=dialogWnd, Path=FontSize}"
-                                Foreground="{Binding NameForeground}"
-                                TextTrimming="CharacterEllipsis"
-                                />
-                            <TextBlock 
-                                x:Name="TypeText" 
-                                Text="{Binding Type}" 
-                                Foreground="{StaticResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
-                                FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
-                                FontSize="{Binding ElementName=dialogWnd, Path=HintFontSize}"
-                                Margin="0,0,5,0"
-                                />
-                        </StackPanel>
-
-                        <!-- Description -->
-                        <TextBlock 
-                            x:Name="DescriptionText" 
-                            Grid.Column="2" 
-                            Text="{Binding Description}" 
-                            Foreground="{StaticResource {x:Static platform:ThemedDialogColors.ListItemDisabledTextBrushKey}}"
-                            FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
-                            FontSize="{Binding ElementName=dialogWnd, Path=HintFontSize}"
-                            VerticalAlignment="Center"
-                            Margin="0,0,5,0"
-                            TextTrimming="CharacterEllipsis"
-                            />
-                    </Grid>
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                            <Setter TargetName="TypeText" 
-                                    Property="Foreground" 
-                                    Value="{StaticResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
-                                    />
-                            <Setter TargetName="DescriptionText" 
-                                    Property="Foreground"
-                                    Value="{StaticResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}" 
-                                    />
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
+                    <localc:ListItemVisual 
+                        FontFamily="{Binding ElementName=dialogWnd, Path=FontFamily}"
+                        FontSize="{Binding ElementName=dialogWnd, Path=FontSize}"
+                        HintFontSize="{Binding ElementName=dialogWnd, Path=HintFontSize}"
+                        />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

@@ -25,9 +25,11 @@ namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private DismissOnClickOutsideBounds _dismissOnClickOutsideBounds;
-    private DispatcherTimer _filterTimer;
     public int PageSize => 20; // TODO: make it configurable
-    private double HintFontSize; // TODO: make it configurable
+    public static readonly DependencyProperty HintFontSizeProperty = DependencyProperty.Register(
+        nameof(HintFontSize), typeof(double), typeof(SearchForm), new PropertyMetadata(0d)
+    );
+    public double HintFontSize { get => (double)GetValue(HintFontSizeProperty); set => SetValue(HintFontSizeProperty, value); }
     public SearchInstance SearchInstance { get; init; }
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
@@ -45,17 +47,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     protected SearchForm(QuickJumpPackage package, ESearchType searchType) {
-        _filterTimer = new(DispatcherPriority.Render) { 
-            Interval = TimeSpan.FromMilliseconds(DebounceTimeMilliseconds)
-        };
-        _filterTimer.Tick += (_, _) => {
-            _filterTimer.Stop();
-            RefreshList();
-            if (Items.Count > 0) {
-                lstItems.SelectedIndex = 0;
-                EnsureSelectedItemIsVisible();
-            }
-        };
         InitializeComponent();  
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
@@ -83,7 +74,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;
         FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
-        HintFontSize = Math.Min(8, fontSize - 2);
+        HintFontSize = Math.Max(8, fontSize - 1);
         Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options
     }
 
@@ -135,8 +126,11 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private void txtSearch_TextChanged(object sender, TextChangedEventArgs e) {
-        _filterTimer.Stop();
-        _filterTimer.Start();
+        RefreshList();
+        if (Items.Count > 0) {
+            lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
+        }
     }
 
     private async void txtSearch_PreviewKeyDown(object sender, KeyEventArgs e) {
