@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="QuickJump2022.a942616b-4a01-4229-b391-d7cf0e1e64d0" Version="1.22" Language="en-US" Publisher="DUBEG" />
+        <Identity Id="QuickJump2022.a942616b-4a01-4229-b391-d7cf0e1e64d0" Version="1.23" Language="en-US" Publisher="DUBEG" />
         <DisplayName>QuickJump2022</DisplayName>
         <Description xml:space="preserve">Quick Jump 2022</Description>
         <Icon>Resources\Icon.png</Icon>
