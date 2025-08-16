@@ -18,10 +18,10 @@ namespace QuickJump2022.Controls;
 public class ListItemVisual : Control {
 
     private int IconSize => 16;
-    private const double IconLeftMargin = 5.0;
-    private const double IconRightMargin = 5.0;
-    private const double TextRightMargin = 5.0;
-    private const double SpacingBetweenNameAndType = 4.0;
+    private double IconLeftMargin => 5.0;
+    private double IconRightMargin => 5.0;
+    private double TextRightMargin => 5.0;
+    private double SpacingBetweenNameAndType => 0.0;
     
     private ListItemViewModel _viewModel;
     private ImageSource _cachedIconImage;
