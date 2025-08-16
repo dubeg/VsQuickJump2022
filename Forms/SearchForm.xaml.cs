@@ -38,7 +38,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private bool _useSymbolColors = false;
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
-    private int DebounceTimeMilliseconds = 0; // TODO: make it configurable.
 
     public static async Task ShowModalAsync(QuickJumpPackage package, ESearchType searchType) {
         var dialog = new SearchForm(package, searchType);
@@ -99,7 +98,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public async Task LoadDataAsync() {
         await SearchInstance.LoadDataAsync();
         RefreshList();
-        DebounceTimeMilliseconds = Items.Count > 100 ? 120 : 0;
         if (Items.Count > 0) {
             lstItems.SelectedIndex = 0;
             EnsureSelectedItemIsVisible();
