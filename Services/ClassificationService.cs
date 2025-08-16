@@ -23,7 +23,7 @@ public class ClassificationService {
         { Enums.EBindType.Interface, "interface name" },
         { Enums.EBindType.Struct, "struct name" },
         { Enums.EBindType.Delegate, "delegate name" },
-        { Enums.EBindType.Constructor, "constructor name" },
+        { Enums.EBindType.Constructor, "method name" }, // "constructor name"
         // "event name"
         // "operator"
         // "property name"
@@ -38,7 +38,7 @@ public class ClassificationService {
     }
 
     public void PreloadCommonBrushes() {
-        _mappings.Clear();
+        _cache.Clear();
         var componentModel = _serviceProvider.GetService<SComponentModel, IComponentModel>();
         var registryService = componentModel.GetService<IClassificationTypeRegistryService>();
         var classificationFormatService = componentModel.GetService<IClassificationFormatMapService>();
