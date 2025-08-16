@@ -187,7 +187,7 @@ public class SymbolService(VisualStudioWorkspace workspace) {
 
             var returnType = method.ReturnType;
             if (returnType.SpecialType == SpecialType.System_Void) {
-                return string.Empty; // Void methods don't show return type
+                return "void"; // Void methods don't show return type
             }
 
             return returnType.ToDisplayString(new SymbolDisplayFormat(
