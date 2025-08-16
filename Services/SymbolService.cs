@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EnvDTE;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.LanguageServices;
 using QuickJump2022.Models;
-using QuickJump2022.Tools;
-using Document = EnvDTE.Document;
 
 namespace QuickJump2022.Services;
 
@@ -57,6 +54,10 @@ public class SymbolService(VisualStudioWorkspace workspace) {
     }
 
     private CodeItem ConvertSymbolToCodeItem(ISymbol symbol, Guid documentId) {
+        // Ignore enum members (they are represented as fields in Roslyn)
+        if (symbol is IFieldSymbol fieldSymbol && fieldSymbol.ContainingType?.TypeKind == TypeKind.Enum) {
+            return null;
+        }
         var location = symbol.Locations.FirstOrDefault();
         if (location == null || !location.IsInSource) {
             return null;
