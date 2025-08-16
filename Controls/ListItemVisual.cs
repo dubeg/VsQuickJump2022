@@ -85,7 +85,10 @@ public class ListItemVisual : Control {
             hintFontSize,
             auxBrush,
             pixelsPerDip
-        ) { Trimming = TextTrimming.CharacterEllipsis };
+        ) { 
+            Trimming = TextTrimming.CharacterEllipsis,
+            MaxLineCount = 1,
+        };
 
         var typeText = vm.Type ?? string.Empty;
         var type = new FormattedText(
@@ -96,7 +99,10 @@ public class ListItemVisual : Control {
             hintFontSize,
             auxBrush,
             pixelsPerDip
-        ) { Trimming = TextTrimming.CharacterEllipsis };
+        ) { 
+            Trimming = TextTrimming.CharacterEllipsis,
+            MaxLineCount = 1,
+        };
 
         var nameText = vm.Name ?? string.Empty;
         var name = new FormattedText(
@@ -107,7 +113,10 @@ public class ListItemVisual : Control {
             FontSize,
             nameBrush,
             pixelsPerDip
-        ) { Trimming = TextTrimming.CharacterEllipsis };
+        ) { 
+            Trimming = TextTrimming.CharacterEllipsis,
+            MaxLineCount = 1,
+        };
 
         var totalAvailable = Math.Max(0, rightLimitX - leftTextStartX);
         var nameDesired = name.WidthIncludingTrailingWhitespace;
@@ -116,11 +125,11 @@ public class ListItemVisual : Control {
 
         // Allocate widths by priority: Name > Type > Desc
         var nameWidth = Math.Min(nameDesired, totalAvailable);
-        var spaceAfterName = nameWidth > 0 && totalAvailable - nameWidth > 0 && typeDesired > 0 ? SpacingBetweenNameAndType : 0.0;
+        var spaceAfterName = nameWidth > 0 && totalAvailable - nameWidth > SpacingBetweenNameAndType && typeDesired > 0 ? SpacingBetweenNameAndType : 0.0;
         var remainingAfterName = Math.Max(0, totalAvailable - nameWidth - spaceAfterName);
 
         var typeWidth = Math.Min(typeDesired, remainingAfterName);
-        var spaceAfterType = typeWidth > 0 && remainingAfterName - typeWidth > 0 && descDesired > 0 ? SpacingBetweenNameAndType : 0.0;
+        var spaceAfterType = typeWidth > 0 && remainingAfterName - typeWidth > SpacingBetweenNameAndType && descDesired > 0 ? SpacingBetweenNameAndType : 0.0;
         var remainingAfterType = Math.Max(0, remainingAfterName - typeWidth - spaceAfterType);
 
         var descWidth = Math.Min(descDesired, remainingAfterType);
