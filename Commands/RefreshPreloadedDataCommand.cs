@@ -24,11 +24,6 @@ internal sealed class RefreshPreloadedDataCommand : BaseCommand<RefreshPreloaded
                 package.CommandService.PreloadCommands();
             }
             
-            // Refresh CommandBarService preloaded commands
-            if (package.CommandBarService != null) {
-                package.CommandBarService.PreloadCommands();
-            }
-            
             await VS.StatusBar.ShowMessageAsync("Preloaded data refreshed successfully");
         }
         catch (Exception ex) {

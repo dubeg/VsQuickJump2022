@@ -47,16 +47,16 @@
 				</Strings>
 			</Button>
 
-			<!--<Button guid="QuickJump2022" id="ShowCommandBarSearchForm" priority="0x0100" type="Button">
+			<Button guid="QuickJump2022" id="ShowKnownCommandSearchForm" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>Search command bars</ButtonText>
-					<LocCanonicalName>.QuickJump.ShowCommandBarSearchForm</LocCanonicalName>
-					<CanonicalName>.QuickJump.ShowCommandBarSearchForm</CanonicalName>
+					<ButtonText>Search known commands</ButtonText>
+					<LocCanonicalName>.QuickJump.ShowKnownCommandSearchForm</LocCanonicalName>
+					<CanonicalName>.QuickJump.ShowKnownCommandSearchForm</CanonicalName>
 				</Strings>
-			</Button>-->
+			</Button>
 			
 			<!--<Button guid="QuickJump2022" id="TestCommand" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
@@ -89,7 +89,7 @@
 			<IDSymbol name="ShowFileSearchForm" value="0x0200" />
 			<IDSymbol name="ShowAllSearchForm" value="0x0300" />
 			<IDSymbol name="ShowCommandSearchForm" value="0x0400" />
-			<IDSymbol name="ShowCommandBarSearchForm" value="0x0500" />
+			<IDSymbol name="ShowKnownCommandSearchForm" value="0x0500" />
 			<IDSymbol name="TestCommand" value="0x0600" />
 			<IDSymbol name="RefreshPreloadedData" value="0x0700" />
 		</GuidSymbol> 

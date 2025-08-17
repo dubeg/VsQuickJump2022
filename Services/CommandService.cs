@@ -2,6 +2,7 @@
 using QuickJump2022.Models;
 using QuickJump2022.Tools;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 
 namespace QuickJump2022.Services;
@@ -51,6 +52,21 @@ public class CommandService(DTE Dte) {
         }
         catch (Exception) {
             Dte.StatusBar.Text = $"The command '{cmd.Name}' is not available in the current context";
+        }
+    }
+
+    public void Execute(CommandID cmd) {
+        try {
+            if (cmd != null) {
+                Dte.Commands.Raise(cmd.Guid.ToString(), cmd.ID, null, null);
+                Dte.StatusBar.Clear();
+            }
+            else {
+                Dte.StatusBar.Text = $"The command is null";
+            }
+        }
+        catch (Exception) {
+            Dte.StatusBar.Text = $"The command is not available in the current context";
         }
     }
 

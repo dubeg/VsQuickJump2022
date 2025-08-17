@@ -16,7 +16,6 @@ public class SearchInstance(
     ProjectFileService projectFileService,
     SymbolService symbolService,
     CommandService commandService,
-    CommandBarService commandBarService,
     Enums.ESearchType SearchType,
     Enums.SortType FileSortType,
     Enums.SortType CSharpSortType,
@@ -25,7 +24,7 @@ public class SearchInstance(
     public List<ListItemFile> Files { get; set; } = new();
     public List<ListItemSymbol> Symbols { get; set; } = new();
     public List<ListItemCommand> Commands { get; set; } = new();
-    public List<ListItemCommandBar> CommandBars { get; set; } = new();
+    public List<ListItemKnownCommand> KnownCommands { get; set; } = new();
 
     public async Task LoadDataAsync() {
         // -----------
@@ -50,11 +49,11 @@ public class SearchInstance(
             Commands = items.Select(x => ListItemCommand.FromCommandItem(x)).ToList();
         }
         // -----------
-        // Command Bars
+        // Known Commands
         // -----------
-        if (SearchType is Enums.ESearchType.CommandBars or Enums.ESearchType.All) {
-            var items = commandBarService.GetCachedCommands();
-            CommandBars = items.Select(x => ListItemCommandBar.FromCommandBarButtonInfo(x)).ToList();
+        if (SearchType is Enums.ESearchType.KnownCommands or Enums.ESearchType.All) {
+            var items = new KnownCommandService().GetCommands();
+            KnownCommands = items.Select(x => ListItemKnownCommand.FromKnownCommandMapping(x)).ToList();
         }
     }
 
@@ -89,7 +88,7 @@ public class SearchInstance(
         if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All) FilterItems(Files);
         if (SearchType is Enums.ESearchType.Methods or Enums.ESearchType.All) FilterItems(Symbols);
         if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All) FilterItems(Commands);
-        if (SearchType is Enums.ESearchType.CommandBars or Enums.ESearchType.All) FilterItems(CommandBars);
+        if (SearchType is Enums.ESearchType.KnownCommands or Enums.ESearchType.All) FilterItems(KnownCommands);
 
         // -------------------
         // Fuzzy search
@@ -108,7 +107,7 @@ public class SearchInstance(
                 Enums.ESearchType.Files => FileSortType,
                 Enums.ESearchType.Methods => CSharpSortType,
                 Enums.ESearchType.Commands => Enums.SortType.Alphabetical,
-                Enums.ESearchType.CommandBars => Enums.SortType.Alphabetical,
+                Enums.ESearchType.KnownCommands => Enums.SortType.Alphabetical,
                 Enums.ESearchType.All => MixedSortType,
                 _ => throw new NotImplementedException()
             });
