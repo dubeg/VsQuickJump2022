@@ -53,6 +53,7 @@
             VerticalContentAlignment="Center"
             TextChanged="txtSearch_TextChanged"
             PreviewKeyDown="txtSearch_PreviewKeyDown"
+            MaxLines="1"
             />
 
         <!-- Items ListBox -->

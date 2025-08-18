@@ -60,6 +60,11 @@ public class DismissOnClickOutsideBounds {
             var inMain = mainWindowBounds.Contains(logicalPoint);
             var inModal = modalWindowBounds.Contains(logicalPoint);
             if (inMain && !inModal) {
+#if(DEBUG)
+                if (System.Diagnostics.Debugger.IsAttached) {
+                    return;
+                }
+#endif
                 window.Close();
             }
         }

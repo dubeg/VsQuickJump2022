@@ -55,6 +55,8 @@
     <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
+    <Compile Include="Text\Scanner.cs" />
+    <Compile Include="Text\SubWordNavigation.cs" />
     <Compile Include="Tools\DismissOnClickOutsideBounds.cs" />
     <Compile Include="Models\FileItem.cs" />
     <Compile Include="Models\CommandItem.cs" />

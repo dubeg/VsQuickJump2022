@@ -17,6 +17,7 @@ using QuickJump2022.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Services;
+using QuickJump2022.Text;
 using QuickJump2022.Tools;
 using static QuickJump2022.Models.Enums;
 using Rect = System.Windows.Rect;
@@ -181,6 +182,46 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         else if (e.Key == Key.Back && Keyboard.Modifiers == ModifierKeys.Control) {
             txtSearch.Text = "";
             e.Handled = true;
+        }
+        else if (Keyboard.Modifiers == (ModifierKeys.Alt | ModifierKeys.Shift)) {
+            if (e.SystemKey == Key.Left) {
+                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Backward, txtSearch);
+                e.Handled = true;
+            }
+            else if (e.SystemKey == Key.Right) {
+                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Forward, txtSearch);
+                e.Handled = true;
+            }
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.Alt) {
+            if (e.SystemKey == Key.Left) {
+                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Backward, txtSearch);
+                e.Handled = true;
+            }
+            else if (e.SystemKey == Key.Right) {
+                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Forward, txtSearch);
+                e.Handled = true;
+            }
+        }
+        else if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)) {
+            if (e.Key == Key.Left) {
+                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Backward, txtSearch);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Right) {
+                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Forward, txtSearch);
+                e.Handled = true;
+            }
+        }
+        else if (Keyboard.Modifiers == ModifierKeys.Control) {
+            if (e.Key == Key.Left) {
+                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Backward, txtSearch);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Right) {
+                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Forward, txtSearch);
+                e.Handled = true;
+            }
         }
     }
 
