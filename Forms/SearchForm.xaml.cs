@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -13,6 +13,10 @@ using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Formatting;
 using QuickJump2022.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.QuickJump.Tools;
@@ -38,6 +42,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private bool _useSymbolColors = false;
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
+    public string searchText { get; set; } = "test";
+
 
     public static async Task ShowModalAsync(QuickJumpPackage package, ESearchType searchType) {
         var dialog = new SearchForm(package, searchType);
@@ -73,6 +79,16 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
         HintFontSize = Math.Max(8, fontSize - 1);
         Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options
+        searchText = "test";
+    }
+
+
+    private void TextBuffer_Changed(object sender, TextContentChangedEventArgs e) {
+        RefreshList();
+        if (Items.Count > 0) {
+            lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
+        }
     }
 
     private void AdjustPosition() {
@@ -103,7 +119,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private void RefreshList() {
-        var searchText = txtSearch.Text;
         var listItems = new List<ListItemViewModel>();
         var results = SearchInstance.Search(searchText);
         var brush = Application.Current.TryFindResource(ThemedDialogColors.ListBoxTextBrushKey) as System.Windows.Media.Brush;
@@ -121,15 +136,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         lstItems.ItemsSource = Items = listItems;
     }
 
-    private void txtSearch_TextChanged(object sender, TextChangedEventArgs e) {
-        RefreshList();
-        if (Items.Count > 0) {
-            lstItems.SelectedIndex = 0;
-            EnsureSelectedItemIsVisible();
-        }
-    }
+    // Text changes are handled via the VS editor buffer change event
 
-    private async void txtSearch_PreviewKeyDown(object sender, KeyEventArgs e) {
+    private async void EditorHost_PreviewKeyDown(object sender, KeyEventArgs e) {
         // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
         // so they work normally for text navigation and selection
         if (e.Key == Key.Escape) {
@@ -138,11 +147,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
         else if (e.Key == Key.Return) {
             await GoToItem(true);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control) {
-            // Handle Ctrl+A to select all text
-            txtSearch.SelectAll();
             e.Handled = true;
         }
         else if (e.Key == Key.Up) {
@@ -178,50 +182,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             EnsureSelectedItemIsVisible();
             await GoToItem();
             e.Handled = true;
-        }
-        else if (e.Key == Key.Back && Keyboard.Modifiers == ModifierKeys.Control) {
-            txtSearch.Text = "";
-            e.Handled = true;
-        }
-        else if (Keyboard.Modifiers == (ModifierKeys.Alt | ModifierKeys.Shift)) {
-            if (e.SystemKey == Key.Left) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.SystemKey == Key.Right) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
-        }
-        else if (Keyboard.Modifiers == ModifierKeys.Alt) {
-            if (e.SystemKey == Key.Left) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.SystemKey == Key.Right) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
-        }
-        else if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)) {
-            if (e.Key == Key.Left) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Right) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
-        }
-        else if (Keyboard.Modifiers == ModifierKeys.Control) {
-            if (e.Key == Key.Left) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Right) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
         }
     }
 
@@ -275,8 +235,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private void lstItems_PreviewKeyUp(object sender, KeyEventArgs e) {
-        txtSearch.Focus();
-        txtSearch.SelectionStart = txtSearch.Text.Length;
+        //_textView?.VisualElement.Focus();
     }
     
     public event PropertyChangedEventHandler PropertyChanged;
