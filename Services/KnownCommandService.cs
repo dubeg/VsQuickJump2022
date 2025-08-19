@@ -427,6 +427,12 @@ public class KnownCommandService {
             //new (KnownCommands.Project_UnloadProject,"Project: Unload Project",default),
             //new (KnownCommands.Project_UpdateServiceReference,"Project: Update Service Reference",default),
             //new (KnownCommands.Project_UpdateWebReference,"Project: Update Web Reference",default),
+            // --
+            new (new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x100),"Project: Manage NuGet packages...",KnownMonikers.NuGet),
+        ]);
+
+        commands.AddRange([
+            new(new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x200), "Solution: Manage NuGet packages...", KnownMonikers.NuGet),
         ]);
 
         //commands.AddRange([
