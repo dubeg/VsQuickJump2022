@@ -56,7 +56,7 @@ public class ProjectFileService() {
                 };
                 results.Add(fileItem);
             }
-            else if (item.Children.Any()) {
+            if (item.Children.Any()) {
                 InternalGetProjectItems(projectMetadata, item.Children, results);
             }
         }
