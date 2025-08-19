@@ -30,7 +30,18 @@ public class SymbolService(VisualStudioWorkspace workspace) {
     private List<CodeItem> ProcessSyntaxNodeWithSemantics(Guid documentId, SyntaxNode node, SemanticModel semanticModel) {
         var codeItems = new List<CodeItem>();
         foreach (var child in node.DescendantNodes()) {
-            if (child is MemberDeclarationSyntax memberDeclaration) {
+            if (child is FieldDeclarationSyntax fieldDeclaration) {
+                foreach (var var in fieldDeclaration.Declaration.Variables) {
+                    var symbol = semanticModel.GetDeclaredSymbol(var);
+                    if (symbol != null) {
+                        var codeItem = ConvertSymbolToCodeItem(symbol, documentId);
+                        if (codeItem != null) {
+                            codeItems.Add(codeItem);
+                        }
+                    }
+                }
+            }
+            else if (child is MemberDeclarationSyntax memberDeclaration) {
                 var symbol = semanticModel.GetDeclaredSymbol(memberDeclaration);
                 if (symbol != null) {
                     var codeItem = ConvertSymbolToCodeItem(symbol, documentId);
