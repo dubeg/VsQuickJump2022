@@ -1,7 +1,8 @@
-﻿using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Design;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 
 namespace QuickJump2022.Services;
 
@@ -457,9 +458,10 @@ public class KnownCommandService {
             //new (KnownCommands.Tools_GoToCommandLine,"Tools: Go To Command Line",default),
             //new (KnownCommands.Tools_ImmediateMode,"Tools: Immediate Mode",default),
             new (KnownCommands.Tools_ImportandExportSettings,"Tools: Import and Export Settings...",default),
-            //new (KnownCommands.Tools_Open,"Tools: Open",KnownMonikers.Open),
+            new (KnownCommands.Tools_Open,"Tools: Open",KnownMonikers.Open),
             //new (KnownCommands.Tools_OpenWith,"Tools: Open With...",default),
             new (KnownCommands.Tools_Options,"Tools: Options",KnownMonikers.Settings),
+            new (KnownCommands.ManageExtensions,"Tools: Manage Extensions...",KnownMonikers.Extension),
         ]);
 
         commands.AddRange([
