@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:QuickJump2022.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             HorizontalAlignment="Stretch"
-             VerticalAlignment="Stretch"
+             HorizontalAlignment="Left"
+             VerticalAlignment="Center"
              >
     <Grid>
         <ContentControl x:Name="EditorHost"/>

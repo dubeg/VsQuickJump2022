@@ -58,6 +58,12 @@
     </Compile>
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
+    <Compile Include="TextEditor\AllowedCommands.cs" />
+    <Compile Include="TextEditor\CodeBehaviorFlags.cs" />
+    <Compile Include="TextEditor\CodeEditorCommandFilter.cs" />
+    <Compile Include="TextEditor\HostEditorHelper.cs" />
+    <Compile Include="TextEditor\Hoster.cs" />
+    <Compile Include="TextEditor\InputEditorClassification.cs" />
     <Compile Include="Text\Scanner.cs" />
     <Compile Include="Text\SubWordNavigation.cs" />
     <Compile Include="Tools\DismissOnClickOutsideBounds.cs" />

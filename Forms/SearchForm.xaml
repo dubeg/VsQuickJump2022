@@ -24,7 +24,7 @@
     ShowInTaskbar="False"
     ResizeMode="NoResize"
     platform:FocusHelper.EnableActivationSynchronization="True"
-    platform:FocusHelper.FocusTarget="{Binding ElementName=editorHost}"
+    platform:FocusHelper.FocusTarget="{Binding ElementName=CodeView}"
     SizeToContent="Height"
     toolkit:Themes.UseVsTheme="True"
     HasDialogFrame="False"
@@ -44,8 +44,9 @@
         </Grid.RowDefinitions>
 
         <!-- Search Editor Host (VS IWpfTextViewHost) -->
-        <localc:UserControl1 x:Name="CodeView" Grid.Row="0" Margin="4" Height="50" Width="600" Text="{Binding searchText, Mode=TwoWay}"/>
-
+        <Border BorderBrush="Red" BorderThickness="2">
+            <localc:UserControl1 x:Name="CodeView" Grid.Row="0" Margin="0" Height="20"  />
+        </Border>
         <!-- Items ListBox -->
         <ListBox 
             x:Name="lstItems" 
