@@ -1,10 +1,15 @@
-﻿using Microsoft.VisualStudio.ComponentModelHost;
+﻿using EnvDTE;
+using Microsoft.CodeAnalysis.Classification;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.TextEditor;
+using QuickJump2022.Tools;
 using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,7 +60,13 @@ new PropertyMetadata(string.Empty, OnTextChanged));
     internal ITextBufferFactoryService TextBufferFactoryService { get; set; }
 
     [Import]
+    internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; set; }
+
+    [Import]
     internal IClassificationFormatMapService ClassificationFormatMapService { get; set; }
+
+    [Import]
+    internal IEditorFormatMapService EditorFormatMapService { get; set; }
 
     [Import]
     internal IClassifierAggregatorService ClassifierAggregatorService { get; set; }
@@ -77,18 +88,20 @@ new PropertyMetadata(string.Empty, OnTextChanged));
         // Text Editor = "text"
         // Output Window = "output"
         // --
-        var appearanceCategory = QuickJumpClassifications.InputEditor;
-        var qjFormatMap = ClassificationFormatMapService.GetClassificationFormatMap(appearanceCategory);
-        if (qjFormatMap is not null) {
-            var size = 16 * 96 / 72;
-            var textFormatMap = ClassificationFormatMapService.GetClassificationFormatMap(appearanceCategory);
-            qjFormatMap.DefaultTextProperties = textFormatMap.DefaultTextProperties.SetFontRenderingEmSize(
-                textFormatMap.DefaultTextProperties.FontRenderingEmSize + 2
-            );
-        }
-        else {
-            appearanceCategory = "text";
-        }
+        //var appearanceCategory = QuickJumpClassifications.InputEditor;
+        //var qjFormatMap = ClassificationFormatMapService.GetClassificationFormatMap(appearanceCategory);
+        //if (qjFormatMap is not null) {
+        //    var size = 16 * 96 / 72;
+            
+        //    var textFormatMap = ClassificationFormatMapService.GetClassificationFormatMap("text");
+        //    qjFormatMap.DefaultTextProperties = textFormatMap.DefaultTextProperties.SetFontRenderingEmSize(
+        //        textFormatMap.DefaultTextProperties.FontRenderingEmSize + 6
+        //    );
+        //    //qjFormatMap.SetExplicitTextProperties(ClassificationTypeRegistryService.GetClassificationType(ClassificationTypeNames.Text), textFormatMap.DefaultTextProperties);
+        //}
+        //else {
+        //    appearanceCategory = "text";
+        //}
         // --
         var hoster = TextEditor.HostEditorHelper.CreateHoster(
             "FILTER...",
@@ -116,34 +129,83 @@ new PropertyMetadata(string.Empty, OnTextChanged));
                 view.Options.SetOptionValue(DefaultTextViewOptions.WordWrapStyleId, WordWrapStyles.None);
                 view.Options.SetOptionValue(DefaultTextViewOptions.UseVisibleWhitespaceId, true);
                 view.Options.SetOptionValue(DefaultOptions.FallbackFontId, "Consolas"); // Unused
-                view.Options.SetOptionValue(DefaultWpfViewOptions.AppearanceCategory, appearanceCategory); // Unused
+                //view.Options.SetOptionValue(DefaultWpfViewOptions.AppearanceCategory, appearanceCategory); // Unused
             },
             false
         );
         var textViewHost = hoster.GetTextViewHost();
-        //var formatMap = ClassificationFormatMapService.GetClassificationFormatMap(textViewHost.TextView);
-        //formatMap.DefaultTextProperties = TextFormattingRunProperties.CreateTextFormattingRunProperties(
-        //    new Typeface(
-        //        formatMap.DefaultTextProperties.Typeface.FontFamily,
-        //        formatMap.DefaultTextProperties.Typeface.Style,
-        //        formatMap.DefaultTextProperties.Typeface.Weight,
-        //        formatMap.DefaultTextProperties.Typeface.Stretch
-        //    //FontStretches.Normal
-        //    ),
-        //    16,
-        //    formatMap.DefaultTextProperties.Foreground
-        //);
-        // TODO:
-        // This doesn't really work well.
-        // I think I might have to create a new classification style & use that to set the default size.
-        //formatMap.DefaultTextProperties = formatMap.DefaultTextProperties.SetFontRenderingEmSize(16);
-        // --
+        SetStyles(textViewHost.TextView);
         TextViewHost = textViewHost;
         EditorHost.Content = TextViewHost.HostControl;
         // Content = textViewHost.HostControl;
         Focus();
     }
 
+    private void SetStyles(IWpfTextView textView) {
+        var fontSize = 24;
+        var fontFamilyName = "Consolas";
+        var fontFamily = new FontFamily(fontFamilyName);
+        // --
+        //textView.VisualElement.Resources["CollapsedTextForeground"] = new SolidColorBrush(Color.FromRgb(0xA5, 0xA5, 0xA5));
+        //textView.VisualElement.Resources
+        // --
+        var formatMap = EditorFormatMapService.GetEditorFormatMap(textView);
+        //var textProperties = formatMap.GetProperties("Text");
+        var textProperties = formatMap.GetProperties("Plain Text");
+        formatMap.BeginBatchUpdate();
+        textProperties[ClassificationFormatDefinition.TypefaceId] = new Typeface("Arial");
+        textProperties[ClassificationFormatDefinition.FontRenderingSizeId] = 20.0;
+        formatMap.SetProperties("Plain Text", textProperties);
+        formatMap.EndBatchUpdate();
+        // --
+        //var classFormatMap = ClassificationFormatMapService.GetClassificationFormatMap(textView);
+        //var textFormattingRun = classFormatMap.DefaultTextProperties.SetFontRenderingEmSize(fontSize * 96 / 72);
+        //var textFormattingRun = TextFormattingRunProperties.CreateTextFormattingRunProperties(
+        //    new Typeface(
+        //        classFormatMap.DefaultTextProperties.Typeface.FontFamily,
+        //        classFormatMap.DefaultTextProperties.Typeface.Style,
+        //        classFormatMap.DefaultTextProperties.Typeface.Weight,
+        //        classFormatMap.DefaultTextProperties.Typeface.Stretch
+        //    //FontStretches.Normal
+        //    ),
+        //    16,
+        //    classFormatMap.DefaultTextProperties.ForegroundBrush.
+        //);
+        //classFormatMap.SetTextProperties(ClassificationTypeRegistryService.GetClassificationType(ClassificationTypeNames.Text), textFormattingRun);
+        // --
+        //ResourceDictionary regularCaretProperties = formatMap.GetProperties("Caret");
+        //ResourceDictionary overwriteCaretProperties = formatMap.GetProperties("Overwrite Caret");
+        //ResourceDictionary indicatorMargin = formatMap.GetProperties("Indicator Margin");
+        //ResourceDictionary visibleWhitespace = formatMap.GetProperties("Visible Whitespace");
+        //ResourceDictionary selectedText = formatMap.GetProperties("Selected Text");
+        //ResourceDictionary inactiveSelectedText = formatMap.GetProperties("Inactive Selected Text");
+
+        //formatMap.BeginBatchUpdate();
+
+        //textProperties[ClassificationFormatDefinition.TypefaceId] = new Typeface(fontFamilyName);
+        //textProperties[ClassificationFormatDefinition.FontRenderingSizeId] = fontSize * 96 / 72;
+        //formatMap.SetProperties("Text", textProperties);
+
+        //regularCaretProperties[EditorFormatDefinition.ForegroundBrushId] = Brushes.Magenta;
+        //formatMap.SetProperties("Caret", regularCaretProperties);
+
+        //overwriteCaretProperties[EditorFormatDefinition.ForegroundBrushId] = Brushes.Turquoise;
+        //formatMap.SetProperties("Overwrite Caret", overwriteCaretProperties);
+
+        //indicatorMargin[EditorFormatDefinition.BackgroundColorId] = Colors.LightGreen;
+        //formatMap.SetProperties("Indicator Margin", indicatorMargin);
+
+        //visibleWhitespace[EditorFormatDefinition.ForegroundColorId] = Colors.Red;
+        //formatMap.SetProperties("Visible Whitespace", visibleWhitespace);
+
+        //selectedText[EditorFormatDefinition.BackgroundBrushId] = Brushes.LightPink;
+        //formatMap.SetProperties("Selected Text", selectedText);
+
+        //inactiveSelectedText[EditorFormatDefinition.BackgroundBrushId] = Brushes.DeepPink;
+        //formatMap.SetProperties("Inactive Selected Text", inactiveSelectedText);
+
+        //formatMap.EndBatchUpdate();
+    }
 
     private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         if (d is UserControl1 control && e.NewValue is string newText) {
