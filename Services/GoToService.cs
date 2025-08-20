@@ -35,9 +35,11 @@ public class GoToService {
                 textView.Caret.MoveTo(point);
                 // -------
                 // Ensure span is visible
-                // TODO: make sure this isn't too slow.
-                // If it is, we'll revert to the fastest solution,
-                // even if it's annoying visually.
+                // -------
+                // TODO: make this configurable.
+                // It may be preferable to avoid being too "smart" & cause unnecessary layout updates,
+                // messing with the user's eye-tracking.
+                // If we disable this, we should then always call EnsureSpanVisible(ShowStart).
                 // -------
                 textView.TryGetTextViewLineContainingBufferPosition(point, out var textViewLine);
                 var isLineWithinViewport = false;
