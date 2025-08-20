@@ -53,8 +53,8 @@
     <Compile Include="Commands\ShowCommandSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
     <Compile Include="Commands\TestCommand.cs" />
-    <Compile Include="Controls\UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
+    <Compile Include="TextEditor\InputTextEditor.xaml.cs">
+      <DependentUpon>InputTextEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
@@ -63,7 +63,6 @@
     <Compile Include="TextEditor\CodeEditorCommandFilter.cs" />
     <Compile Include="TextEditor\HostEditorHelper.cs" />
     <Compile Include="TextEditor\Hoster.cs" />
-    <Compile Include="TextEditor\InputEditorClassification.cs" />
     <Compile Include="Text\Scanner.cs" />
     <Compile Include="Text\SubWordNavigation.cs" />
     <Compile Include="Tools\DismissOnClickOutsideBounds.cs" />
@@ -95,7 +94,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
-    <Page Include="Controls\UserControl1.xaml">
+    <Page Include="TextEditor\InputTextEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

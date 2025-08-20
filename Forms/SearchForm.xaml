@@ -7,6 +7,7 @@
     xmlns:localb="clr-namespace:QuickJump2022.Behaviors"
     xmlns:localm="clr-namespace:QuickJump2022.Models"
     xmlns:localc="clr-namespace:QuickJump2022.Controls"
+    xmlns:localtxt="clr-namespace:QuickJump2022.TextEditor"
     xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
@@ -45,7 +46,7 @@
 
         <!-- Search Editor Host (VS IWpfTextViewHost) -->
         <Border BorderBrush="Red" BorderThickness="2">
-            <localc:UserControl1 x:Name="CodeView" Grid.Row="0" Margin="0" Height="20"  />
+            <localtxt:InputTextEditor x:Name="CodeView" Grid.Row="0" Margin="0" MinHeight="20"  />
         </Border>
         <!-- Items ListBox -->
         <ListBox 
