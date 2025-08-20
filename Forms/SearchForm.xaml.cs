@@ -73,18 +73,15 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         HintFontSize = Math.Max(8, fontSize - 1);
         Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options.
         _initialText = initialText; // TODO: configure via options.
+        if (_initialText is not null) {
+            txtSearch.Text = _initialText;
+            txtSearch.SelectAll();
+        }
         // --
         this.txtSearch.TextChanged += txtSearch_TextChanged;
         this.txtSearch.PreviewKeyDown += txtSearch_PreviewKeyDown;
         this.lstItems.PreviewMouseLeftButtonUp += lstItems_PreviewMouseLeftButtonUp;
         this.lstItems.PreviewKeyUp += lstItems_PreviewKeyUp;
-        this.Loaded += (s, e) => {
-            // Select all text after focus is applied
-            Dispatcher.BeginInvoke(new Action(() => {
-                txtSearch.SelectAll();
-                txtSearch.Focus();
-            }), DispatcherPriority.ContextIdle);
-        };
     }
 
     private void AdjustPosition() {
@@ -107,9 +104,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
 
     public async Task LoadDataAsync() {
         await SearchInstance.LoadDataAsync();
-        if (_initialText is not null) {
-            txtSearch.Text = _initialText;
-        }
         RefreshList();
         if (Items.Count > 0) {
             lstItems.SelectedIndex = 0;
