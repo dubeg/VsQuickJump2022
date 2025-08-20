@@ -53,8 +53,19 @@
     <Compile Include="Commands\ShowCommandSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
     <Compile Include="Commands\TestCommand.cs" />
+    <Compile Include="Forms\InputForm.xaml.cs">
+      <DependentUpon>InputForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
+    <Compile Include="TextEditor\AllowedCommands.cs" />
+    <Compile Include="TextEditor\CodeBehaviorFlags.cs" />
+    <Compile Include="TextEditor\CodeEditorCommandFilter.cs" />
+    <Compile Include="TextEditor\HostEditorHelper.cs" />
+    <Compile Include="TextEditor\Hoster.cs" />
+    <Compile Include="TextEditor\InputTextEditor.xaml.cs">
+      <DependentUpon>InputTextEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Text\Scanner.cs" />
     <Compile Include="Text\SubWordNavigation.cs" />
     <Compile Include="Tools\DismissOnClickOutsideBounds.cs" />
@@ -86,6 +97,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
+    <Page Include="Forms\InputForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Forms\SearchForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -112,6 +127,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
+    <Page Include="TextEditor\InputTextEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">

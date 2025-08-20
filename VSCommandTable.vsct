@@ -58,16 +58,16 @@
 				</Strings>
 			</Button>
 			
-			<!--<Button guid="QuickJump2022" id="TestCommand" priority="0x0100" type="Button">
+			<Button guid="QuickJump2022" id="TestCommand" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
-				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
+				<Icon guid="ImageCatalogGuid" id="StatusWarningNoColor" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
 					<ButtonText>Test command</ButtonText>
 					<LocCanonicalName>.QuickJump.TestCommand</LocCanonicalName>
 					<CanonicalName>.QuickJump.TestCommand</CanonicalName>
 				</Strings>
-			</Button>-->
+			</Button>
 			
 			<!--<Button guid="QuickJump2022" id="RefreshPreloadedData" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
