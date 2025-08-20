@@ -1,17 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Linq;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
+using QuickJump2022.Models;
 
 namespace QuickJump2022.Services;
 
-public record class KnownCommandMapping(CommandID Command, string DisplayName, ImageMoniker Image);
-
 public class KnownCommandService {
-    public List<KnownCommandMapping> GetCommands() {
-        var commands = new List<KnownCommandMapping>();
+    private List<KnownCommandItem> commands = new();
 
+    public List<KnownCommandItem> GetCommands() => commands;
+
+    public List<KnownCommandItem> PreloadCommands(CommandService commandService) {
         commands.AddRange([
             //new (KnownCommands.Build_BatchBuild,"Build: Batch Build...",KnownMonikers.BuildSolution),
             //new (KnownCommands.Build_BuildOnlyProject,"Build: Build Project",KnownMonikers.BuildSelection),
@@ -116,10 +119,67 @@ public class KnownCommandService {
             new (KnownCommands.Edit_FindSymbol,"Edit: Find Symbol",KnownMonikers.FindSymbol),
             new (KnownCommands.Edit_FormatDocument,"Edit: Format Document",KnownMonikers.FormatDocument),
             new (KnownCommands.Edit_FormatSelection,"Edit: Format Selection",KnownMonikers.FormatSelection),
-            new (KnownCommands.Edit_GoTo,"Edit: Go To...",default),
+            new (KnownCommands.Edit_GoTo,"Edit: Go To Line",default),
             new (KnownCommands.Edit_GotoBrace,"Edit: Go To Brace",default),
             new (KnownCommands.Edit_GoToDeclaration,"Edit: Go To Declaration",KnownMonikers.GoToDeclaration),
             new (KnownCommands.Edit_GoToDefinition,"Edit: Go To Definition",KnownMonikers.GoToDefinition),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToLastEditLocation),
+                "Edit: Go To Last Edit Location",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToBase),
+                "Edit: Go To Base",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToContainingDeclaration),
+                "Edit: Go To Containing Block",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, 66),
+                "Edit: Expand Selection to Line",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.JoinLines),
+                "Edit: Join Lines",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.SortLines),
+                "Edit: Sort Lines",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, 94),
+                "Edit: Next Suggestion",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, 93),
+                "Edit: Previous Suggestion",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.ToggleLineComments),
+                "Edit: Toggle Line Comment",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.ToggleBlockComments),
+                "Edit: Toggle Block Comment",
+                default
+            ),
+            new (
+                new CommandID(EditorConstants.EditorCommandSet, 59),
+                "Edit: Toggle Spell Checker",
+                default
+            ),
+            new (KnownCommands.View_QuickActions,"Edit: Quick Fixes",default),
+            new (KnownCommands.Edit_PeekDefinition,"Edit: Peek Definition",default),
             //new (KnownCommands.Edit_GoToFindResults1Location,"Edit: Go To Location",default),
             //new (KnownCommands.Edit_GoToFindResults1NextLocation,"Edit: Go To Next Location",default),
             //new (KnownCommands.Edit_GoToFindResults1PrevLocation,"Edit: Go To Previous Location",default),
@@ -127,12 +187,17 @@ public class KnownCommandService {
             //new (KnownCommands.Edit_GoToFindResults2NextLocation,"Edit: Go To Next Location",default),
             //new (KnownCommands.Edit_GoToFindResults2PrevLocation,"Edit: Go To Previous Location",default),
             //new (KnownCommands.Edit_GoToNextLocation,"Edit: Go To Next Location",default),
+            //new (KnownCommands.Edit_GoToPrevLocation,"Edit: Go To Previous Location",default),
             //new (KnownCommands.Edit_GoToOutputWindowLocation,"Edit: Go To Location",default),
             //new (KnownCommands.Edit_GoToOutputWindowNextLocation,"Edit: Go To Next Location",default),
             //new (KnownCommands.Edit_GoToOutputWindowPrevLocation,"Edit: Go To Previous Location",default),
-            //new (KnownCommands.Edit_GoToPrevLocation,"Edit: Go To Previous Location",default),
             new (KnownCommands.Edit_GoToReference,"Edit: Go To Reference",KnownMonikers.GoToReference),
             new (KnownCommands.Edit_GoToTypeDefinition,"Edit: Go To Type Definition",KnownMonikers.GoToTypeDefinition),
+            new (
+                new CommandID(new Guid("{B61E1A20-8C13-49A9-A727-A0EC091647DD}"),0x200),
+                "Edit: Go To Implementation",
+                default
+            ),
             //new (KnownCommands.Edit_HideAdvancedCompletionMembers,"Edit: Hide Advanced Completion Members",default),
             //new (KnownCommands.Edit_HideSelection,"Edit: Hide Selection",default),
             //new (KnownCommands.Edit_HideSnippetHighlighting,"Edit: Hide Snippet Highlighting",default),
@@ -202,14 +267,17 @@ public class KnownCommandService {
             new (KnownCommands.Edit_PreviousBookmark,"Edit: Previous Bookmark",KnownMonikers.PreviousBookmark),
             new (KnownCommands.Edit_PreviousBookmarkInDocument,"Edit: Previous Bookmark In Document",default),
             new (KnownCommands.Edit_PreviousMethod,"Edit: Previous Method",default),
-            new (KnownCommands.Edit_QuickFindSymbol,"Edit: Quick Find Symbol",default),
+            //new (KnownCommands.Edit_QuickFindSymbol,"Edit: Quick Find Symbol",default),
             new (KnownCommands.Edit_QuickInfo,"Edit: Quick Info",default),
             new (KnownCommands.Edit_Redo,"Edit: Redo",KnownMonikers.Redo),
             //new (KnownCommands.Edit_RedoLastGlobalAction,"Edit: Redo Last Global Action",default),
             new (KnownCommands.Edit_Remove,"Edit: Remove",KnownMonikers.Remove),
             //new (KnownCommands.Edit_RemoveTagHandler,"Edit: Remove Tag Handler",default),
-            new (KnownCommands.Edit_Replace,"Edit: Replace",default),
-            new (KnownCommands.Edit_ReplaceinFiles,"Edit: Replace in Files",default),
+            new (KnownCommands.Edit_FindAllReferences,"Edit: Find All References",default),
+            new (KnownCommands.Edit_FindinFiles,"Edit: Find In Files",KnownMonikers.FindInFile),
+            new (KnownCommands.Edit_Find,"Edit: Quick Find",KnownMonikers.QuickFind),
+            new (KnownCommands.Edit_Replace,"Edit: Quick Replace",KnownMonikers.QuickReplace),
+            new (KnownCommands.Edit_ReplaceinFiles,"Edit: Replace in Files",KnownMonikers.ReplaceInFolder),
             //new (KnownCommands.Edit_ResourceIncludes,"Edit: Resource Includes...",default),
             //new (KnownCommands.Edit_ResourceSymbols,"Edit: Resource Symbols...",default),
             //new (KnownCommands.Edit_ReverseCancel,"Edit: Reverse Cancel",default),
@@ -465,9 +533,14 @@ public class KnownCommandService {
         ]);
 
         commands.AddRange([
+            new (
+                new CommandID(new Guid("{E286548F-5085-4E2B-A4FD-5984CCB553BC}"), 0x300),
+                "View: Call Hierarchy",
+                KnownMonikers.CallHierarchy
+            ),
             //new (KnownCommands.View_AddRemoveColumns,"View: Add/Remove Columns...",default),
             //new (KnownCommands.View_Autosize,"View: Autosize",default),
-            new (KnownCommands.View_Backward,"View: Backward",default),
+            //new (KnownCommands.View_Backward,"View: Backward",default), // Is it for a browser?
             new (KnownCommands.View_BookmarkWindow,"View: Bookmark Window",KnownMonikers.BookmarkMainMenuItem),
             new (KnownCommands.View_BrowseDefinition,"View: Browse Definition",KnownMonikers.BrowseDefinition),
             new (KnownCommands.View_BrowseNext,"View: Browse Next",KnownMonikers.BrowseNext),
@@ -487,7 +560,7 @@ public class KnownCommandService {
             //new (KnownCommands.View_FindResults1,"View: Find Results 1",KnownMonikers.FindInFile),
             //new (KnownCommands.View_FindResults2,"View: Find Results 2",KnownMonikers.FindInFile),
             //new (KnownCommands.View_FindSymbolResults,"View: Find Symbol Results",KnownMonikers.FindSymbol),
-            new (KnownCommands.View_Forward,"View: Forward",default),
+            //new (KnownCommands.View_Forward,"View: Forward",default), // Is it for a browser?
             //new (KnownCommands.View_ForwardBrowseContext,"View: Forward Browse Context",default),
             new (KnownCommands.View_FullScreen,"View: Full Screen",KnownMonikers.FullScreen),
             new (KnownCommands.View_NavigateBackward,"View: Navigate Backward",default),
@@ -553,6 +626,16 @@ public class KnownCommandService {
         //    new (KnownCommands.Errors,"Errors",default),
         //]);
 
+        var bindings = commandService.GetCommands();
+        var bindingDict = new Dictionary<(Guid, int), string>();
+        foreach (var x in bindings) {
+            bindingDict[(new Guid(x.Guid), x.ID)] = x.Shortcuts?.FirstOrDefault() ?? "";
+        };
+        foreach (var cmd in commands) {
+            if (bindingDict.TryGetValue((cmd.Command.Guid, cmd.Command.ID), out var shortcut)) {
+                cmd.Shortcut = shortcut;
+            }
+        }
         return commands;
     }
 }

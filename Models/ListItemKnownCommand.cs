@@ -10,10 +10,11 @@ using static QuickJump2022.Services.KnownCommandService;
 namespace QuickJump2022.Models;
 
 public class ListItemKnownCommand: ListItemBase {
-    public KnownCommandMapping Item { get; private set; }
+    public KnownCommandItem Item { get; private set; }
 
     public override string Name => Item.DisplayName;
+    public override string Description => Item.Shortcut;
 
-    public static ListItemKnownCommand FromKnownCommandMapping(KnownCommandMapping item)
+    public static ListItemKnownCommand FromKnownCommandMapping(KnownCommandItem item)
         => new ListItemKnownCommand { Item = item };
 }

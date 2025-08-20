@@ -30,11 +30,11 @@ public class CommandService(DTE Dte) {
     ];
 
     public void PreloadCommands() {
-        var commands = GetCommands();
+        var commands = InternalGetCommands();
         _commands = commands.Where(x => x.Name.IsNotIn(_exclusions, (a, b) => a.StartsWith(b))).ToList();
     }
     
-    public List<CommandItem> GetCachedCommands() {
+    public List<CommandItem> GetCommands() {
         if (_commands.Count == 0) PreloadCommands();
         return _commands;
     }
@@ -70,7 +70,7 @@ public class CommandService(DTE Dte) {
         }
     }
 
-    public List<CommandItem> GetCommands(bool availableOnly = false) {
+    public List<CommandItem> InternalGetCommands(bool availableOnly = false) {
         var results = new List<CommandItem>();
         foreach (Command command in Dte.Commands) {
             if (string.IsNullOrEmpty(command.Name)) continue;

@@ -56,6 +56,7 @@
     <Compile Include="Forms\InputForm.xaml.cs">
       <DependentUpon>InputForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\KnownCommandItem.cs" />
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
     <Compile Include="TextEditor\AllowedCommands.cs" />

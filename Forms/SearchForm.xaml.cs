@@ -50,6 +50,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             package.ProjectFileService,
             package.SymbolService,
             package.CommandService,
+            package.KnownCommandService,
             searchType,
             package.GeneralOptions.FileSortType,
             package.GeneralOptions.CSharpSortType,

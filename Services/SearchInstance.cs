@@ -16,6 +16,7 @@ public class SearchInstance(
     ProjectFileService projectFileService,
     SymbolService symbolService,
     CommandService commandService,
+    KnownCommandService knownCommandService,
     Enums.ESearchType SearchType,
     Enums.SortType FileSortType,
     Enums.SortType CSharpSortType,
@@ -45,14 +46,14 @@ public class SearchInstance(
         // Commands
         // -----------
         if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All) {
-            var items = commandService.GetCachedCommands();
+            var items = commandService.GetCommands();
             Commands = items.Select(x => ListItemCommand.FromCommandItem(x)).ToList();
         }
         // -----------
         // Known Commands
         // -----------
         if (SearchType is Enums.ESearchType.KnownCommands or Enums.ESearchType.All) {
-            var items = new KnownCommandService().GetCommands();
+            var items = knownCommandService.GetCommands();
             KnownCommands = items.Select(x => ListItemKnownCommand.FromKnownCommandMapping(x)).ToList();
         }
     }
