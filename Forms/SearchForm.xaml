@@ -51,8 +51,6 @@
             FontFamily="{Binding FontFamily}"
             FontSize="{Binding FontSize}"
             VerticalContentAlignment="Center"
-            TextChanged="txtSearch_TextChanged"
-            PreviewKeyDown="txtSearch_PreviewKeyDown"
             MaxLines="1"
             />
 
@@ -72,8 +70,6 @@
             VirtualizingStackPanel.ScrollUnit="Item"
             VirtualizingStackPanel.CacheLength="10,10"
             VirtualizingStackPanel.CacheLengthUnit="Item"
-            PreviewMouseLeftButtonUp="lstItems_PreviewMouseLeftButtonUp"
-            PreviewKeyUp="lstItems_PreviewKeyUp"
             >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>

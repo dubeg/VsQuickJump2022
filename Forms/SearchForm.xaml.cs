@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Threading;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Interop;
 using QuickJump2022.Models;
@@ -35,17 +31,20 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
     public ClassificationService ClassificationService { get; init; }
+    public string CurrentText => txtSearch.Text ?? string.Empty;
     private bool _useSymbolColors = false;
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
+    private string _initialText = string.Empty;
 
-    public static async Task ShowModalAsync(QuickJumpPackage package, ESearchType searchType) {
-        var dialog = new SearchForm(package, searchType);
+    public static async Task<string> ShowModalAsync(QuickJumpPackage package, ESearchType searchType, string initialText = "") {
+        var dialog = new SearchForm(package, searchType, initialText);
         await dialog.LoadDataAsync();
         dialog.ShowModal();
+        return dialog.CurrentText;
     }
 
-    protected SearchForm(QuickJumpPackage package, ESearchType searchType) {
+    protected SearchForm(QuickJumpPackage package, ESearchType searchType, string initialText = "") {
         InitializeComponent();  
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
@@ -72,7 +71,20 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         FontFamily = fontFamily;
         FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
         HintFontSize = Math.Max(8, fontSize - 1);
-        Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options
+        Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options.
+        _initialText = initialText; // TODO: configure via options.
+        // --
+        this.txtSearch.TextChanged += txtSearch_TextChanged;
+        this.txtSearch.PreviewKeyDown += txtSearch_PreviewKeyDown;
+        this.lstItems.PreviewMouseLeftButtonUp += lstItems_PreviewMouseLeftButtonUp;
+        this.lstItems.PreviewKeyUp += lstItems_PreviewKeyUp;
+        this.Loaded += (s, e) => {
+            // Select all text after focus is applied
+            Dispatcher.BeginInvoke(new Action(() => {
+                txtSearch.SelectAll();
+                txtSearch.Focus();
+            }), DispatcherPriority.ContextIdle);
+        };
     }
 
     private void AdjustPosition() {
@@ -95,6 +107,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
 
     public async Task LoadDataAsync() {
         await SearchInstance.LoadDataAsync();
+        if (_initialText is not null) {
+            txtSearch.Text = _initialText;
+        }
         RefreshList();
         if (Items.Count > 0) {
             lstItems.SelectedIndex = 0;
