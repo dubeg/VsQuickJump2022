@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Core.Imaging;
@@ -44,6 +45,18 @@ public class KnownCommandService {
             new (KnownCommands.Debug_Autos,"Debug: Autos",KnownMonikers.LocalsWindow),
             new (KnownCommands.Debug_BreakAll,"Debug: Break all",default),
             new (KnownCommands.Debug_CallStack,"Debug: Callstack",KnownMonikers.CallStackWindow),
+            new (KnownCommands.Debug_ToggleBreakpoint,"Debug: Toggle breakpoint",KnownMonikers.BreakpointEnabled),
+            //new (KnownCommands.Debug_EnableBreakpoint,"Debug: Enable breakpoint",KnownMonikers.BreakpointEnabled),
+            new (
+                new CommandID(new Guid("{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"), 0x123),
+                "Debug: Enable all breakpoints",
+                KnownMonikers.EnableAllBreakpoints
+            ),
+            new (
+                new CommandID(new Guid("{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"), 0x122),
+                "Debug: Disable all breakpoints",
+                KnownMonikers.DisableAllBreakpoints
+            ),
             new (KnownCommands.Debug_DeleteAllBreakpoints,"Debug: Delete all breakpoints",KnownMonikers.DeleteBreakpoint),
             new (KnownCommands.Debug_DetachAll,"Debug: Detach all",default),
             new (KnownCommands.Debug_ExceptionSettings,"Debug: Exception settings",KnownMonikers.ExceptionSettings),
