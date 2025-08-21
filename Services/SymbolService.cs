@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.LanguageServices;
@@ -18,16 +19,27 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         var documentView = await VS.Documents.GetActiveDocumentViewAsync();
         if (documentView is null) return new();
         var filePath = documentView.FilePath;
-        var documentId = workspace.CurrentSolution.GetDocumentIdsWithFilePath(filePath).FirstOrDefault();
-        if (documentId == null) return new();
-        var document = workspace.CurrentSolution.GetDocument(documentId);
-        if (document == null) return new();
+        var documentId = 
+            string.IsNullOrWhiteSpace(filePath) ? null
+            : workspace.CurrentSolution.GetDocumentIdsWithFilePath(filePath).FirstOrDefault();
+
+        Document document;
+        if (documentId is not null) {
+            document = workspace.CurrentSolution.GetDocument(documentId);
+        }
+        else {
+            // Temporary view (unsaved)
+            // documentId = workspace.GetDocumentIdInCurrentContext(documentView.TextBuffer.AsTextContainer());
+            document = documentView.TextView.TextBuffer.GetRelatedDocuments().FirstOrDefault();
+        }
+        
+        if (document is null) return new();
         var semanticModel = await document.GetSemanticModelAsync();
         var syntaxRoot = await document.GetSyntaxRootAsync();
-        return ProcessSyntaxNodeWithSemantics(documentId.Id, syntaxRoot, semanticModel);
+        return ProcessSyntaxNodeWithSemantics(documentId?.Id, syntaxRoot, semanticModel);
     }
 
-    private List<CodeItem> ProcessSyntaxNodeWithSemantics(Guid documentId, SyntaxNode node, SemanticModel semanticModel) {
+    private List<CodeItem> ProcessSyntaxNodeWithSemantics(Guid? documentId, SyntaxNode node, SemanticModel semanticModel) {
         var codeItems = new List<CodeItem>();
         foreach (var child in node.DescendantNodes()) {
             if (child is FieldDeclarationSyntax fieldDeclaration) {
@@ -64,9 +76,13 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         return codeItems;
     }
 
-    private CodeItem ConvertSymbolToCodeItem(ISymbol symbol, Guid documentId) {
+    private CodeItem ConvertSymbolToCodeItem(ISymbol symbol, Guid? documentId) {
         // Ignore enum members (they are represented as fields in Roslyn)
         if (symbol is IFieldSymbol fieldSymbol && fieldSymbol.ContainingType?.TypeKind == TypeKind.Enum) {
+            return null;
+        }
+        // Ignore nested function
+        if (symbol is IMethodSymbol methodSymbol && methodSymbol.ContainingSymbol is IMethodSymbol) {
             return null;
         }
         var location = symbol.Locations.FirstOrDefault();
