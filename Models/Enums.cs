@@ -1,16 +1,16 @@
 ﻿namespace QuickJump2022.Models;
 
 public static class Enums {
-    public enum ESearchType {
+    public enum SearchType {
         None,
         Files,
-        Methods,
+        Symbols,
         Commands,
         KnownCommands,
         All,
     }
 
-    public enum EBindType {
+    public enum TokenType {
         None,
         Namespace,
         Class,
@@ -26,11 +26,13 @@ public static class Enums {
         Indexer,
         Operator,
         Record,
-        RecordStruct
+        RecordStruct,
+        Text,
+        ParameterName
     }
 
-    [Flags]
-    public enum EAccessType {
+[Flags]
+    public enum ModifierType {
         None = 0,
         Static = 1,
         Const = 2,

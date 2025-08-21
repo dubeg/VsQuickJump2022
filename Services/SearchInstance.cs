@@ -17,7 +17,7 @@ public class SearchInstance(
     SymbolService symbolService,
     CommandService commandService,
     KnownCommandService knownCommandService,
-    Enums.ESearchType SearchType,
+    Enums.SearchType SearchType,
     Enums.SortType FileSortType,
     Enums.SortType CSharpSortType,
     Enums.SortType MixedSortType
@@ -31,28 +31,28 @@ public class SearchInstance(
         // -----------
         // Files
         // -----------
-        if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All) {
+        if (SearchType is Enums.SearchType.Files or Enums.SearchType.All) {
             var items = await projectFileService.GetFilesInSolutionAsync();
             Files = items.Select(x => ListItemFile.FromFileItem(x)).ToList();
         }
         // -----------
         // Symbols
         // -----------
-        if (SearchType is Enums.ESearchType.Methods or Enums.ESearchType.All) {
+        if (SearchType is Enums.SearchType.Symbols or Enums.SearchType.All) {
             var items = await symbolService.GetCodeItemsForActiveDocumentAsync();
             Symbols = items.Select(x => ListItemSymbol.FromCodeItem(x)).ToList();
         }
         // -----------
         // Commands
         // -----------
-        if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All) {
+        if (SearchType is Enums.SearchType.Commands or Enums.SearchType.All) {
             var items = commandService.GetCommands();
             Commands = items.Select(x => ListItemCommand.FromCommandItem(x)).ToList();
         }
         // -----------
         // Known Commands
         // -----------
-        if (SearchType is Enums.ESearchType.KnownCommands or Enums.ESearchType.All) {
+        if (SearchType is Enums.SearchType.KnownCommands or Enums.SearchType.All) {
             var items = knownCommandService.GetCommands();
             KnownCommands = items.Select(x => ListItemKnownCommand.FromKnownCommandMapping(x)).ToList();
         }
@@ -86,10 +86,10 @@ public class SearchInstance(
             }
         }
 
-        if (SearchType is Enums.ESearchType.Files or Enums.ESearchType.All) FilterItems(Files);
-        if (SearchType is Enums.ESearchType.Methods or Enums.ESearchType.All) FilterItems(Symbols);
-        if (SearchType is Enums.ESearchType.Commands or Enums.ESearchType.All) FilterItems(Commands);
-        if (SearchType is Enums.ESearchType.KnownCommands or Enums.ESearchType.All) FilterItems(KnownCommands);
+        if (SearchType is Enums.SearchType.Files or Enums.SearchType.All) FilterItems(Files);
+        if (SearchType is Enums.SearchType.Symbols or Enums.SearchType.All) FilterItems(Symbols);
+        if (SearchType is Enums.SearchType.Commands or Enums.SearchType.All) FilterItems(Commands);
+        if (SearchType is Enums.SearchType.KnownCommands or Enums.SearchType.All) FilterItems(KnownCommands);
 
         // -------------------
         // Fuzzy search
@@ -105,11 +105,11 @@ public class SearchInstance(
             // Standard search
             // -------------------
             Sort(results, SearchType switch {
-                Enums.ESearchType.Files => FileSortType,
-                Enums.ESearchType.Methods => CSharpSortType,
-                Enums.ESearchType.Commands => Enums.SortType.Alphabetical,
-                Enums.ESearchType.KnownCommands => Enums.SortType.Alphabetical,
-                Enums.ESearchType.All => MixedSortType,
+                Enums.SearchType.Files => FileSortType,
+                Enums.SearchType.Symbols => CSharpSortType,
+                Enums.SearchType.Commands => Enums.SortType.Alphabetical,
+                Enums.SearchType.KnownCommands => Enums.SortType.Alphabetical,
+                Enums.SearchType.All => MixedSortType,
                 _ => throw new NotImplementedException()
             });
         }

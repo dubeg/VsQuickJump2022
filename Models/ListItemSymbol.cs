@@ -13,7 +13,7 @@ public class ListItemSymbol : ListItemBase {
     public static ListItemSymbol FromCodeItem(CodeItem item) 
         => new ListItemSymbol { Item = item };
 
-    string FormatAccessType(Enums.EAccessType accessType) {
+    string FormatAccessType(Enums.ModifierType accessType) {
         var str = accessType.ToString();
         if (str.Contains(",")) {
             str = string.Empty;

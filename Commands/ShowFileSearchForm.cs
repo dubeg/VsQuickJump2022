@@ -9,6 +9,6 @@ namespace QuickJump2022;
 internal sealed class ShowFileSearchForm : BaseCommand<ShowFileSearchForm> {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.ESearchType.Files);
+        await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.Files);
     }
 }

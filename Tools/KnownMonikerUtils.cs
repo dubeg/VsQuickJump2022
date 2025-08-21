@@ -6,19 +6,19 @@ namespace QuickJump2022.Tools;
 
 public static class KnownMonikerUtils {
 
-    public static ImageMoniker GetCodeMoniker(Enums.EBindType bindType) {
+    public static ImageMoniker GetCodeMoniker(Enums.TokenType bindType) {
         return bindType switch {
-            Enums.EBindType.Namespace => KnownMonikers.Namespace,
-            Enums.EBindType.Class => KnownMonikers.Class,
-            Enums.EBindType.Constructor => KnownMonikers.Method,
-            Enums.EBindType.Method => KnownMonikers.Method,
-            Enums.EBindType.Property => KnownMonikers.Property,
-            Enums.EBindType.Field => KnownMonikers.Field,
-            Enums.EBindType.Enum => KnownMonikers.Enumeration,
-            Enums.EBindType.Delegate => KnownMonikers.Delegate,
-            Enums.EBindType.Event => KnownMonikers.Event,
-            Enums.EBindType.Interface => KnownMonikers.Interface,
-            Enums.EBindType.Struct => KnownMonikers.Structure,
+            Enums.TokenType.Namespace => KnownMonikers.Namespace,
+            Enums.TokenType.Class => KnownMonikers.Class,
+            Enums.TokenType.Constructor => KnownMonikers.Method,
+            Enums.TokenType.Method => KnownMonikers.Method,
+            Enums.TokenType.Property => KnownMonikers.Property,
+            Enums.TokenType.Field => KnownMonikers.Field,
+            Enums.TokenType.Enum => KnownMonikers.Enumeration,
+            Enums.TokenType.Delegate => KnownMonikers.Delegate,
+            Enums.TokenType.Event => KnownMonikers.Event,
+            Enums.TokenType.Interface => KnownMonikers.Interface,
+            Enums.TokenType.Struct => KnownMonikers.Structure,
             _ => KnownMonikers.QuestionMark
         };
     }

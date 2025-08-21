@@ -37,15 +37,23 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
 
-    public static async Task<string> ShowModalAsync(QuickJumpPackage package, ESearchType searchType, string initialText = "") {
+    public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "") {
         var dialog = new SearchForm(package, searchType, initialText);
         await dialog.LoadDataAsync();
         dialog.ShowModal();
         return dialog.CurrentText;
     }
 
-    protected SearchForm(QuickJumpPackage package, ESearchType searchType, string initialText = "") {
-        InitializeComponent();  
+    protected SearchForm(QuickJumpPackage package, SearchType searchType, string initialText = "") {
+        var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
+        FontFamily = fontFamily;
+        FontSize = fontSize < 14 ? fontSize + 1 : fontSize; // TODO: configure via options (?)
+        HintFontSize = Math.Max(8, fontSize - 1);
+        // --
+        InitializeComponent();
+        // --
+        var x = txtSearch.FontSize;
+        // --
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
             package.SymbolService,
@@ -68,11 +76,12 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         this.SizeChanged += (s, e) => AdjustPosition();
         _dismissOnClickOutsideBounds = new(this);
         // --
-        var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
-        FontFamily = fontFamily;
-        FontSize = fontSize < 14 ? fontSize + 2 : fontSize; // TODO: configure via options (?)
-        HintFontSize = Math.Max(8, fontSize - 1);
-        Width = searchType == ESearchType.Files ? 800 : 600; // TODO: configure via options.
+        Width = searchType switch {
+            SearchType.Files => 800,
+            SearchType.Symbols => 800,
+            _ => 600
+        }; // TODO: configure via options.
+        // TODO: check the active document's width & don't make it larger than that.
         _initialText = initialText; // TODO: configure via options.
         if (_initialText is not null) {
             txtSearch.Text = _initialText;
@@ -120,11 +129,14 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         foreach (var item in results) {
             var viewModel = new ListItemViewModel(item);
             if (item is ListItemSymbol symbol && _useSymbolColors) {
-                var fgBrush = ClassificationService.GetFgColorForClassification(symbol.Item.BindType);
-                viewModel.NameForeground = fgBrush;
+                viewModel.NameForeground = ClassificationService.GetFgColorForClassification(symbol.Item.BindType);
+                viewModel.NameParametersForeground = ClassificationService.GetFgColorForClassification(Enums.TokenType.ParameterName);
+                viewModel.NamePunctuationMarksForeground = ClassificationService.GetFgColorForClassification(Enums.TokenType.Text);
             }
             else {
                 viewModel.NameForeground = brush;
+                viewModel.NameParametersForeground = brush;
+                viewModel.NamePunctuationMarksForeground = brush;
             }
             listItems.Add(viewModel);
         }

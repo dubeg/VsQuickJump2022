@@ -80,7 +80,7 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         var name = GetSymbolDisplayName(symbol);
         var nameOnly = GetSymbolName(symbol);
         var type = GetSymbolType(symbol);
-        if (bindType == Enums.EBindType.None || string.IsNullOrEmpty(name)) {
+        if (bindType == Enums.TokenType.None || string.IsNullOrEmpty(name)) {
             return null;
         }
         return new CodeItem {
@@ -94,52 +94,52 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         };
     }
 
-    private Enums.EBindType GetBindTypeFromSymbol(ISymbol symbol) {
+    private Enums.TokenType GetBindTypeFromSymbol(ISymbol symbol) {
         return symbol switch {
             INamedTypeSymbol namedType => namedType.TypeKind switch {
-                TypeKind.Class => Enums.EBindType.Class,
-                TypeKind.Struct => Enums.EBindType.Struct,
-                TypeKind.Interface => Enums.EBindType.Interface,
-                TypeKind.Enum => Enums.EBindType.Enum,
-                TypeKind.Delegate => Enums.EBindType.Delegate,
-                _ => Enums.EBindType.None
+                TypeKind.Class => Enums.TokenType.Class,
+                TypeKind.Struct => Enums.TokenType.Struct,
+                TypeKind.Interface => Enums.TokenType.Interface,
+                TypeKind.Enum => Enums.TokenType.Enum,
+                TypeKind.Delegate => Enums.TokenType.Delegate,
+                _ => Enums.TokenType.None
             },
             IMethodSymbol method => method.MethodKind switch {
-                MethodKind.Constructor => Enums.EBindType.Constructor,
-                MethodKind.Destructor => Enums.EBindType.Method,
-                MethodKind.BuiltinOperator => Enums.EBindType.Operator,
-                MethodKind.UserDefinedOperator => Enums.EBindType.Operator,
-                MethodKind.Conversion => Enums.EBindType.Operator,
-                _ => Enums.EBindType.Method
+                MethodKind.Constructor => Enums.TokenType.Constructor,
+                MethodKind.Destructor => Enums.TokenType.Method,
+                MethodKind.BuiltinOperator => Enums.TokenType.Operator,
+                MethodKind.UserDefinedOperator => Enums.TokenType.Operator,
+                MethodKind.Conversion => Enums.TokenType.Operator,
+                _ => Enums.TokenType.Method
             },
-            IPropertySymbol => Enums.EBindType.Property,
-            IFieldSymbol => Enums.EBindType.Field,
-            IEventSymbol => Enums.EBindType.Event,
-            _ => Enums.EBindType.None
+            IPropertySymbol => Enums.TokenType.Property,
+            IFieldSymbol => Enums.TokenType.Field,
+            IEventSymbol => Enums.TokenType.Event,
+            _ => Enums.TokenType.None
         };
     }
 
-    private Enums.EAccessType GetAccessTypeFromSymbol(ISymbol symbol) {
-        var accessType = Enums.EAccessType.None;
+    private Enums.ModifierType GetAccessTypeFromSymbol(ISymbol symbol) {
+        var accessType = Enums.ModifierType.None;
         // Access modifiers
         switch (symbol.DeclaredAccessibility) {
-            case Accessibility.Public: accessType |= Enums.EAccessType.Public; break;
-            case Accessibility.Private: accessType |= Enums.EAccessType.Private; break;
-            case Accessibility.Protected: accessType |= Enums.EAccessType.Protected; break;
-            case Accessibility.Internal: accessType |= Enums.EAccessType.Internal; break;
-            case Accessibility.ProtectedOrInternal: accessType |= Enums.EAccessType.Protected | Enums.EAccessType.Internal; break;
+            case Accessibility.Public: accessType |= Enums.ModifierType.Public; break;
+            case Accessibility.Private: accessType |= Enums.ModifierType.Private; break;
+            case Accessibility.Protected: accessType |= Enums.ModifierType.Protected; break;
+            case Accessibility.Internal: accessType |= Enums.ModifierType.Internal; break;
+            case Accessibility.ProtectedOrInternal: accessType |= Enums.ModifierType.Protected | Enums.ModifierType.Internal; break;
         }
         // Other modifiers
-        if (symbol.IsStatic) accessType |= Enums.EAccessType.Static;
-        if (symbol.IsAbstract) accessType |= Enums.EAccessType.Abstract;
-        if (symbol.IsVirtual) accessType |= Enums.EAccessType.Virtual;
-        if (symbol.IsOverride) accessType |= Enums.EAccessType.Override;
-        if (symbol.IsSealed) accessType |= Enums.EAccessType.Sealed;
-        if (symbol.IsExtern) accessType |= Enums.EAccessType.Extern;
-        if (symbol is IFieldSymbol field && field.IsConst) accessType |= Enums.EAccessType.Const;
-        if (symbol is IFieldSymbol field2 && field2.IsReadOnly) accessType |= Enums.EAccessType.Readonly;
-        if (symbol is IMethodSymbol method && method.IsAsync) accessType |= Enums.EAccessType.Async;
-        if (symbol is INamedTypeSymbol type && type.IsRecord) accessType |= Enums.EAccessType.Record;
+        if (symbol.IsStatic) accessType |= Enums.ModifierType.Static;
+        if (symbol.IsAbstract) accessType |= Enums.ModifierType.Abstract;
+        if (symbol.IsVirtual) accessType |= Enums.ModifierType.Virtual;
+        if (symbol.IsOverride) accessType |= Enums.ModifierType.Override;
+        if (symbol.IsSealed) accessType |= Enums.ModifierType.Sealed;
+        if (symbol.IsExtern) accessType |= Enums.ModifierType.Extern;
+        if (symbol is IFieldSymbol field && field.IsConst) accessType |= Enums.ModifierType.Const;
+        if (symbol is IFieldSymbol field2 && field2.IsReadOnly) accessType |= Enums.ModifierType.Readonly;
+        if (symbol is IMethodSymbol method && method.IsAsync) accessType |= Enums.ModifierType.Async;
+        if (symbol is INamedTypeSymbol type && type.IsRecord) accessType |= Enums.ModifierType.Record;
         return accessType;
     }
 

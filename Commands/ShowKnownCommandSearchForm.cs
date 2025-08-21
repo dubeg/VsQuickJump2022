@@ -10,7 +10,7 @@ internal sealed class ShowKnownCommandSearchForm : BaseCommand<ShowKnownCommandS
 
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var result = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.ESearchType.KnownCommands, _lastFilter);
+        var result = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.KnownCommands, _lastFilter);
         _lastFilter = result ?? string.Empty;
     }
 }

@@ -37,7 +37,14 @@ public class ListItemViewModel : INotifyPropertyChanged {
         }
     }
     public Brush NameForeground { get; set; }
-    public Brush TypeForeground { get; set; }
+    /// <summary>
+    /// For symbols only.
+    /// </summary>
+    public Brush NameParametersForeground { get; set; }
+    /// <summary>
+    /// For symbols only.
+    /// </summary>
+    public Brush NamePunctuationMarksForeground { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

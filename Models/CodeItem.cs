@@ -5,8 +5,8 @@
 /// </summary>
 public class CodeItem {
 	public Guid DocumentId;
-	public Enums.EBindType BindType;
-	public Enums.EAccessType AccessType;
+	public Enums.TokenType BindType;
+	public Enums.ModifierType AccessType;
 	public string Name;
 	public string NameOnly;
 	public string Type;

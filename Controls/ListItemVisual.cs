@@ -27,7 +27,10 @@ public class ListItemVisual : Control {
     private ImageSource _cachedIconImage;
     private ImageMoniker _cachedMoniker;
     private System.Drawing.Color _backColor;
-    
+
+    /// <summary>
+    /// Font size of type & description.
+    /// </summary>
     public static readonly DependencyProperty HintFontSizeProperty = DependencyProperty.Register(
         name: nameof(HintFontSize),
         propertyType: typeof(double),
@@ -35,6 +38,9 @@ public class ListItemVisual : Control {
         new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure)
     );
 
+    /// <summary>
+    /// Font size of type & description.
+    /// </summary>
     public double HintFontSize {
         get => (double)GetValue(HintFontSizeProperty);
         set => SetValue(HintFontSizeProperty, value);
@@ -62,7 +68,8 @@ public class ListItemVisual : Control {
         var defaultTextBrush = (Brush)Application.Current.TryFindResource(ThemedDialogColors.ListBoxTextBrushKey);
         var disabledTextBrush = (Brush)Application.Current.TryFindResource(ThemedDialogColors.ListItemDisabledTextBrushKey);
         var nameBrush = vm.NameForeground ?? defaultTextBrush ?? Brushes.Black;
-        var auxBrush = (vm.IsSelected ? defaultTextBrush : disabledTextBrush) ?? Brushes.Gray;
+        var typeBrush = (vm.IsSelected ? defaultTextBrush : disabledTextBrush) ?? Brushes.Gray;
+        var descBrush = typeBrush;
 
         // Fonts
         var nameTypeface = new Typeface(FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
@@ -76,34 +83,6 @@ public class ListItemVisual : Control {
         var rightLimitX = ActualWidth - TextRightMargin;
 
         // Measure texts without constraints
-        var descriptionText = vm.Description ?? string.Empty;
-        var description = new FormattedText(
-            descriptionText,
-            CultureInfo.CurrentUICulture,
-            FlowDirection.LeftToRight,
-            nameTypeface,
-            hintFontSize,
-            auxBrush,
-            pixelsPerDip
-        ) { 
-            Trimming = TextTrimming.CharacterEllipsis,
-            MaxLineCount = 1,
-        };
-
-        var typeText = vm.Type ?? string.Empty;
-        var type = new FormattedText(
-            typeText,
-            CultureInfo.CurrentUICulture,
-            FlowDirection.LeftToRight,
-            nameTypeface,
-            hintFontSize,
-            auxBrush,
-            pixelsPerDip
-        ) { 
-            Trimming = TextTrimming.CharacterEllipsis,
-            MaxLineCount = 1,
-        };
-
         var nameText = vm.Name ?? string.Empty;
         var name = new FormattedText(
             nameText,
@@ -112,6 +91,70 @@ public class ListItemVisual : Control {
             nameTypeface,
             FontSize,
             nameBrush,
+            pixelsPerDip
+        ) {
+            Trimming = TextTrimming.CharacterEllipsis,
+            MaxLineCount = 1,
+        };
+        if (_viewModel.Item is ListItemSymbol) {
+            // For example: "methodName(param1, param2, param3)"
+            // We want to color parameters and punctuation differently.
+            var text = nameText;
+            int openParen = text.IndexOf('(');
+            int closeParen = text.LastIndexOf(')');
+            if (openParen >= 0 && closeParen > openParen) {
+                // Color parameters
+                var parametersForeground = _viewModel.NameParametersForeground;
+                var punctuationForeground = _viewModel.NamePunctuationMarksForeground;
+
+                // Scan between parentheses
+                int paramStart = openParen + 1;
+                int i = paramStart;
+                while (i < closeParen) {
+                    // Skip whitespace
+                    while (i < closeParen && char.IsWhiteSpace(text[i])) i++;
+                    int paramEnd = i;
+                    // Find next comma or closing paren
+                    while (paramEnd < closeParen && text[paramEnd] != ',') paramEnd++;
+                    int length = paramEnd - i;
+                    if (length > 0 && parametersForeground != null) {
+                        // Set parameter color
+                        name.SetForegroundBrush(parametersForeground, i, length);
+                    }
+                    // Set comma color
+                    if (paramEnd < closeParen && text[paramEnd] == ',' && punctuationForeground != null) {
+                        name.SetForegroundBrush(punctuationForeground, paramEnd, 1);
+                    }
+                    i = paramEnd + 1;
+                }
+                // Set color for opening and closing parenthesis
+                name.SetForegroundBrush(punctuationForeground, openParen, 1);
+                name.SetForegroundBrush(punctuationForeground, closeParen, 1);
+            }
+        }
+
+        var typeText = vm.Type ?? string.Empty;
+        var type = new FormattedText(
+            typeText,
+            CultureInfo.CurrentUICulture,
+            FlowDirection.LeftToRight,
+            nameTypeface,
+            hintFontSize,
+            typeBrush,
+            pixelsPerDip
+        ) {
+            Trimming = TextTrimming.CharacterEllipsis,
+            MaxLineCount = 1,
+        };
+
+        var descriptionText = vm.Description ?? string.Empty;
+        var description = new FormattedText(
+            descriptionText,
+            CultureInfo.CurrentUICulture,
+            FlowDirection.LeftToRight,
+            nameTypeface,
+            hintFontSize,
+            descBrush,
             pixelsPerDip
         ) { 
             Trimming = TextTrimming.CharacterEllipsis,

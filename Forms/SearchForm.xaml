@@ -39,7 +39,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -50,9 +49,13 @@
             BorderThickness="0"
             FontFamily="{Binding FontFamily}"
             FontSize="{Binding FontSize}"
+            Padding="6"
             VerticalContentAlignment="Center"
             MaxLines="1"
-            />
+            MinLines="1"
+            ScrollViewer.CanContentScroll="False"
+            >
+        </TextBox>
 
         <!-- Items ListBox -->
         <ListBox 

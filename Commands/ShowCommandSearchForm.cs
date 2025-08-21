@@ -11,7 +11,7 @@ internal sealed class ShowCommandSearchForm : BaseCommand<ShowCommandSearchForm>
     
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var result = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.ESearchType.Commands, _lastFilter);
+        var result = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.Commands, _lastFilter);
         _lastFilter = result ?? string.Empty;
     }
 }

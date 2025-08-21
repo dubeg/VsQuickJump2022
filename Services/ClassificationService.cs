@@ -12,24 +12,24 @@ namespace QuickJump2022.Services;
 
 public class ClassificationService {
     private IServiceProvider _serviceProvider;
-    private Dictionary<Enums.EBindType, Brush> _cache = new();
+    private Dictionary<Enums.TokenType, Brush> _cache = new();
     private Brush _defaultBrush;
-    private Dictionary<Enums.EBindType, string> _mappings = new Dictionary<Enums.EBindType, string> {
-        { Enums.EBindType.Class, "class name" },
-        { Enums.EBindType.Method, "method name" },
-        { Enums.EBindType.Property, "property name" },
-        { Enums.EBindType.Field, "field name" },
-        { Enums.EBindType.Enum, "enum name" },
-        { Enums.EBindType.Interface, "interface name" },
-        { Enums.EBindType.Struct, "struct name" },
-        { Enums.EBindType.Delegate, "delegate name" },
-        { Enums.EBindType.Constructor, "method name" }, // "constructor name"
+    private Dictionary<Enums.TokenType, string> _mappings = new Dictionary<Enums.TokenType, string> {
+        { Enums.TokenType.Text, "text" },
+        { Enums.TokenType.Class, "class name" },
+        { Enums.TokenType.Method, "method name" },
+        { Enums.TokenType.Property, "property name" },
+        { Enums.TokenType.Field, "field name" },
+        { Enums.TokenType.Enum, "enum name" },
+        { Enums.TokenType.Interface, "interface name" },
+        { Enums.TokenType.Struct, "struct name" },
+        { Enums.TokenType.Delegate, "delegate name" },
+        { Enums.TokenType.Constructor, "method name" }, // "constructor name"
+        { Enums.TokenType.ParameterName, "parameter name"},
         // "event name"
         // "operator"
-        // "property name"
         // "record class name"
         // "record struct name"
-        // "text"
     };
 
     public ClassificationService(IServiceProvider serviceProvider) {
@@ -53,7 +53,7 @@ public class ClassificationService {
         _defaultBrush = GetClassificationFormat(PredefinedClassificationTypeNames.Text).ForegroundBrush;
     }
 
-    public Brush GetFgColorForClassification(Enums.EBindType type) {
+    public Brush GetFgColorForClassification(Enums.TokenType type) {
         if (_cache.TryGetValue(type, out var brush)) {
             return brush;
         }
