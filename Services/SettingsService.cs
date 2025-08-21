@@ -1,16 +1,24 @@
 ﻿using System.Drawing;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell.Settings;
 using QuickJump2022.Models;
 using QuickJump2022.Options;
 
 namespace QuickJump2022.Services;
-public class SettingsService(GeneralOptionsPage GeneralOptions, IServiceProvider serviceProvider) {
+public class SettingsService {
+    private GeneralOptionsPage GeneralOptions { get; init; }
+    private ShellSettingsManager ShellSettingsManager { get; init; }
     private string Category = "General";
     private SettingsScope UserSettings => SettingsScope.UserSettings;
-    private SettingsStore GetReadOnlyStore() => new ShellSettingsManager(serviceProvider).GetReadOnlySettingsStore(UserSettings);
-    private WritableSettingsStore GetWriteStore() => new ShellSettingsManager(serviceProvider).GetWritableSettingsStore(UserSettings);
+    private SettingsStore GetReadOnlyStore() => ShellSettingsManager.GetReadOnlySettingsStore(UserSettings);
+    private WritableSettingsStore GetWriteStore() => ShellSettingsManager.GetWritableSettingsStore(UserSettings);
+
+    public SettingsService(GeneralOptionsPage generalOptions, IVsSettingsManager settingsManager) {
+        GeneralOptions = generalOptions;
+        ShellSettingsManager = new ShellSettingsManager(settingsManager);
+    }
 
     public void LoadSettings() {
         var store = GetReadOnlyStore();

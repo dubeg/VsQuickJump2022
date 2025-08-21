@@ -2,6 +2,7 @@
 using System.ComponentModel.Design;
 using System.Linq;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Core.Imaging;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -10,12 +11,12 @@ using QuickJump2022.Models;
 namespace QuickJump2022.Services;
 
 public class KnownCommandService {
-    private List<KnownCommandItem> commands = new();
+    private List<KnownCommandItem> _commands = new();
 
-    public List<KnownCommandItem> GetCommands() => commands;
+    public List<KnownCommandItem> GetCommands() => _commands;
 
-    public List<KnownCommandItem> PreloadCommands(CommandService commandService) {
-        commands.AddRange([
+    public List<KnownCommandItem> PreloadCommandsCache(CommandService commandService, PackageInfoService packageInfoService) {
+        _commands.AddRange([
             //new (KnownCommands.Build_BatchBuild,"Build: Batch Build...",KnownMonikers.BuildSolution),
             //new (KnownCommands.Build_BuildOnlyProject,"Build: Build Project",KnownMonikers.BuildSelection),
             //new (KnownCommands.Build_BuildSelection,"Build: Build Selection",KnownMonikers.BuildSelection),
@@ -37,7 +38,7 @@ public class KnownCommandService {
             //new (KnownCommands.Build_RunCodeAnalysisonSelection,"Build: Run Code Analysis on Selection",KnownMonikers.Analysis),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new (KnownCommands.Debug_AddWatch,"Debug: Add watch",KnownMonikers.Watch),
             new (KnownCommands.Debug_AttachtoProcess,"Debug: Attach to process",KnownMonikers.Process),
             new (KnownCommands.Debug_Autos,"Debug: Autos",KnownMonikers.LocalsWindow),
@@ -61,7 +62,7 @@ public class KnownCommandService {
             new (KnownCommands.Debug_Threads,"Debug: Threads",KnownMonikers.Thread),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             //new (KnownCommands.Edit_AddResource,"Edit: Add Resource...",default),
             //new (KnownCommands.Edit_AddTagHandler,"Edit: Add Tag Handler",default),
             //new (KnownCommands.Edit_BreakLine,"Edit: Break Line",default),
@@ -343,7 +344,7 @@ public class KnownCommandService {
             new (KnownCommands.Edit_WordTranspose,"Edit: Word Transpose",default),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new (KnownCommands.File_AddExistingProject,"File: Add Existing Project...",default),
             new (KnownCommands.File_AddNewProject,"File: Add New Project...",default),
             //new (KnownCommands.File_AdvancedSaveOptions,"File: Advanced Save Options...",default),
@@ -374,7 +375,7 @@ public class KnownCommandService {
             new (KnownCommands.File_ViewinBrowser,"File: View in Browser",default),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             //new (KnownCommands.Format_AlignBottoms,"Align Bottoms",default),
             //new (KnownCommands.Format_AlignCenters,"Align Centers",KnownMonikers.AlignCenter),
             //new (KnownCommands.Format_AlignLefts,"Align Lefts",default),
@@ -430,7 +431,7 @@ public class KnownCommandService {
             //new (KnownCommands.Format_Underline,"Underline",KnownMonikers.Underline),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new (KnownCommands.Help_About,"Help: About...",default),
             new (KnownCommands.Help_DebugHelpContext,"Help: Debug Help Context",default),
             new (KnownCommands.Help_F1Help,"Help: F1 Help",KnownMonikers.F1Help),
@@ -439,7 +440,7 @@ public class KnownCommandService {
             new (KnownCommands.Help_WindowHelp,"Help: Window Help",default),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new (KnownCommands.Project_AddAssemblyReference,"Project: Add Assembly Reference...",KnownMonikers.Assembly),
             new (KnownCommands.Project_AddClass,"Project: Add Class...",KnownMonikers.AddClass),
             //new (KnownCommands.Project_AddComponent,"Project: Add Component...",KnownMonikers.AddComponent),
@@ -500,7 +501,7 @@ public class KnownCommandService {
             new (new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x100),"Project: Manage NuGet packages...",KnownMonikers.NuGet),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new(new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x200), "Solution: Manage NuGet packages...", KnownMonikers.NuGet),
         ]);
 
@@ -517,7 +518,7 @@ public class KnownCommandService {
         //new (KnownCommands.RepeatFind,"Modify Find",KnownMonikers.Edit),
         //new (KnownCommands.SwitchtoFindSymbol,"Find Symbol",default),
 
-        commands.AddRange([
+        _commands.AddRange([
             //new (KnownCommands.Tools_AddRemoveToolboxItems,"Tools: Choose Toolbox Items...",default),
             //new (KnownCommands.Tools_Alias,"Alias",default),
             //new (KnownCommands.Tools_CodeSnippetsManager,"Tools: Code Snippets Manager...",default),
@@ -532,7 +533,7 @@ public class KnownCommandService {
             new (KnownCommands.ManageExtensions,"Tools: Manage Extensions...",KnownMonikers.Extension),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new (
                 new CommandID(new Guid("{E286548F-5085-4E2B-A4FD-5984CCB553BC}"), 0x300),
                 "View: Call Hierarchy",
@@ -586,7 +587,7 @@ public class KnownCommandService {
             new (KnownCommands.View_Zoom,"View: Zoom...",KnownMonikers.Zoom),
         ]);
 
-        commands.AddRange([
+        _commands.AddRange([
             new (KnownCommands.Window_ActivateDocumentWindow,"Window: Activate Document Window",default),
             new (KnownCommands.Window_AutoHide,"Window: Auto Hide",default),
             new (KnownCommands.Window_AutoHideAll,"Window: Auto Hide All",default),
@@ -620,22 +621,77 @@ public class KnownCommandService {
             new (KnownCommands.Window_Windows,"Window: Windows...",default),
         ]);
 
+        // ----------
+        // Related to the 'Error List' window.
+        // ----------
         //commands.AddRange([
         //    new (KnownCommands.Messages,"Messages",KnownMonikers.Message),
         //    new (KnownCommands.Warnings,"Warnings",default),
         //    new (KnownCommands.Errors,"Errors",default),
         //]);
 
+        var packages = packageInfoService.GetPackages();
+        if (packages.Any(x => x.PackageGuid == KnownPackages.VsDbg)) {
+            _commands.AddRange([
+                new (new CommandID(KnownPackages.VsDbg, 0x100),"Debug: Toggle JavaScript Debugging",default),
+                new (new CommandID(KnownPackages.VsDbg, 0x200),"Debug: Toggle Just My Code",default),
+                new (new CommandID(KnownPackages.VsDbg, 0x300),"Debug: Toggle XAML Hot Reload",default),
+                new (new CommandID(KnownPackages.VsDbg, 0x400),"Debug: Toggle CodeLens",default),
+            ]);
+        }
+
+        if (packages.Any(x => x.PackageGuid == KnownPackages.SettingsStoreExplorer)) {
+            var cmdSet = new Guid("{9fc9f69d-174d-4876-b28b-dc1e4fac89dc}");
+            var imgMoniker = new ImageMoniker() { Guid = new Guid("{3da9ddb5-b35b-4ed6-9d52-73aa4c30127e}"), Id = 1 };
+            _commands.AddRange([
+                new (new CommandID(cmdSet, 0x100),"View: Settings Store Explorer", imgMoniker),
+            ]);
+        }
+
+        if (packages.Any(x => x.PackageGuid == KnownPackages.KnownMonikerExplorer)) {
+            _commands.AddRange([
+                new (new CommandID(KnownPackages.KnownMonikerExplorer, 0x100),"View: Known Monikers Explorer",default),
+            ]);
+        }
+
+        if (packages.Any(x => x.PackageGuid == KnownPackages.CommandTableInfo)) {
+            var cmdSet = new Guid("{a5bb06f5-7f0a-4194-b06f-0bb25d48f268}");
+            _commands.AddRange([
+                new (new CommandID(cmdSet, 0x200),"View: Command Explorer",default),
+            ]);
+        }
+
+        if (packages.Any(x => x.PackageGuid == KnownPackages.AddAnyFile)) {
+            var cmdSet = new Guid("{32af8a17-bbbc-4c56-877e-fc6c6575a8cf}");
+            _commands.AddRange([
+                new (new CommandID(cmdSet, 0x100),"Project: Add Quick File...",default),
+            ]);
+        }
+
         var bindings = commandService.GetCommands();
         var bindingDict = new Dictionary<(Guid, int), string>();
         foreach (var x in bindings) {
             bindingDict[(new Guid(x.Guid), x.ID)] = x.Shortcuts?.FirstOrDefault() ?? "";
         };
-        foreach (var cmd in commands) {
+        foreach (var cmd in _commands) {
             if (bindingDict.TryGetValue((cmd.Command.Guid, cmd.Command.ID), out var shortcut)) {
                 cmd.Shortcut = shortcut;
             }
         }
-        return commands;
+        return _commands;
+    }
+
+    static class KnownPackages {
+        public static Guid AddAnyFile = new Guid("{27dd9dea-6dd2-403e-929d-3ff20d896c5e}"); // Mads' AddQuickFile
+        public static Guid CommandTableInfo = new Guid("{82d76b14-dcc0-423c-8b05-bac944909ebd}"); // Mads' Commands Explorer
+        public static Guid KnownMonikerExplorer = new Guid("{4256ca61-2162-4ca2-8d10-4c6a2794521c}"); // Mads' Known Moniker Explorer
+        public static Guid VsDbg = new Guid("{bbda3f82-23d0-4ed9-8244-3701c4042139}"); // Dubeg's misc commands
+        public static Guid SelectNextOccurrence = new Guid("{70ceadaa-6e24-4d6d-92aa-6e5a836ca8f2}");
+        public static Guid SettingsStoreExplorer = new Guid("{e8762000-5824-4411-bc19-417b39b309f5}");
+        // TODO:
+        // Add packages for text editing:
+        // - Subword nav
+        // - VSTricks
+        // - ...
     }
 }

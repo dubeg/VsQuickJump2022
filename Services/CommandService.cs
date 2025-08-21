@@ -29,13 +29,13 @@ public class CommandService(DTE Dte) {
         "SQLTableDesigner.",
     ];
 
-    public void PreloadCommands() {
+    public void PreloadCommandsCache() {
         var commands = InternalGetCommands();
         _commands = commands.Where(x => x.Name.IsNotIn(_exclusions, (a, b) => a.StartsWith(b))).ToList();
     }
     
     public List<CommandItem> GetCommands() {
-        if (_commands.Count == 0) PreloadCommands();
+        if (_commands.Count == 0) PreloadCommandsCache();
         return _commands;
     }
 

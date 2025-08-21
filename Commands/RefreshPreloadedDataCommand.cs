@@ -21,7 +21,7 @@ internal sealed class RefreshPreloadedDataCommand : BaseCommand<RefreshPreloaded
             
             // Refresh CommandService preloaded commands
             if (package.CommandService != null) {
-                package.CommandService.PreloadCommands();
+                package.CommandService.PreloadCommandsCache();
             }
             
             await VS.StatusBar.ShowMessageAsync("Preloaded data refreshed successfully");
