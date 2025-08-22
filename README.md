@@ -25,3 +25,7 @@ I'm adding a few niceties to it.
 
 ### Search known commands
 <img width="750" height="638" alt="image" src="https://github.com/user-attachments/assets/756761d2-e493-4c53-9a4e-d30386fb4312" />
+
+
+## Credits
+I should probably add a credits section here, since I used code from all over...
