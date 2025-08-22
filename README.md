@@ -9,7 +9,8 @@ I'm also trying to add few niceties to it, mostly using LLMs.
 ## Commands
 - `QuickJump.ShowMethodSearchForm`: search symbols in the active document.
 - `QuickJump.ShowFileSearchForm`: search files in the active solution.
-- `QuickJump.ShowAllSearchForm`: search files and symbols.
+- `QuickJump.ShowCommandSearchForm`: search all commands (with canonical name only).
+- `QuickJump.ShowKnownCommandSearchForm`: search known commands (with friendly name & icon).
 
 ## Screenshots
 
@@ -21,3 +22,6 @@ I'm also trying to add few niceties to it, mostly using LLMs.
 
 ### Search Commands
 <img width="750" height="586" alt="Commands" src="https://github.com/user-attachments/assets/5ae7c2e3-baa6-43c9-925a-d9f585931009" />
+
+### Search known commands
+<img width="750" height="638" alt="image" src="https://github.com/user-attachments/assets/756761d2-e493-4c53-9a4e-d30386fb4312" />
