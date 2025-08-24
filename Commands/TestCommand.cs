@@ -89,14 +89,13 @@ internal sealed class TestCommand : BaseCommand<TestCommand> {
         };
 
         
-
-        var remotableCommandInteropService = await VS.GetServiceAsync<SVsRemotableCommandInteropService, IVsRemotableCommandInteropService2>();
+        // Bad! Doesn't really work.
+        //var remotableCommandInteropService = await VS.GetServiceAsync<SVsRemotableCommandInteropService, IVsRemotableCommandInteropService2>();
         //remotableCommandInteropService.GetControlId("Edit.FormatDocument", out var ctID);
-        var ctData = new CommandData[1];
-        remotableCommandInteropService.GetControlData(ctID, ctData);
-
-        var ctData2 = new FullCommandAddress[1];
-        remotableCommandInteropService.GetCommandData(ctID, 1, ctData2);
+        //var ctData = new CommandData[1];
+        //remotableCommandInteropService.GetControlData(ctID, ctData);
+        //var ctData2 = new FullCommandAddress[1];
+        //remotableCommandInteropService.GetCommandData(ctID, 1, ctData2);
     }
 
     public ScopeLocation2[] LoadScopeLocations() {
