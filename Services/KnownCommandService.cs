@@ -637,19 +637,36 @@ public class KnownCommandService {
         // ----------
         // Related to the 'Error List' window.
         // ----------
-        //commands.AddRange([
+        //_commands.AddRange([
         //    new (KnownCommands.Messages,"Messages",KnownMonikers.Message),
         //    new (KnownCommands.Warnings,"Warnings",default),
         //    new (KnownCommands.Errors,"Errors",default),
         //]);
 
+        // ----------
+        // Tests
+        // ----------
+        {
+            var cmdSet = new Guid("{1E198C22-5980-4E7E-92F3-F73168D1FB63}"); 
+            var imgMonikerRun = new ImageMoniker() { Guid = new Guid("{b23d3054-21dc-479f-a9fa-ebd0fb383112}"), Id = 1003 };
+            _commands.AddRange([
+                new (new CommandID(cmdSet, 0x200),"View: Test Explorer",KnownMonikers.TestResult),
+                new (new CommandID(cmdSet, 0x310),"Test: Run tests",imgMonikerRun),
+                new (new CommandID(cmdSet, 0x315),"Test: Debug tests",KnownMonikers.DebugSelection),
+                new (new CommandID(cmdSet, 0x322),"Test: Clear results",default),
+            ]);
+        }
+
+        // ----------
+        // VS Extensions
+        // ----------
         var packages = packageInfoService.GetPackages();
         if (packages.Any(x => x.PackageGuid == KnownPackages.VsDbg)) {
             _commands.AddRange([
-                new (new CommandID(KnownPackages.VsDbg, 0x100),"Debug: Toggle JavaScript Debugging",default),
-                new (new CommandID(KnownPackages.VsDbg, 0x200),"Debug: Toggle Just My Code",default),
-                new (new CommandID(KnownPackages.VsDbg, 0x300),"Debug: Toggle XAML Hot Reload",default),
-                new (new CommandID(KnownPackages.VsDbg, 0x400),"Debug: Toggle CodeLens",default),
+                new (new CommandID(KnownPackages.VsDbg, 0x100),"Debug: Toggle JavaScript Debugging",KnownMonikers.Settings),
+                new (new CommandID(KnownPackages.VsDbg, 0x200),"Debug: Toggle Just My Code",KnownMonikers.Settings),
+                new (new CommandID(KnownPackages.VsDbg, 0x300),"Debug: Toggle XAML Hot Reload",KnownMonikers.Settings),
+                new (new CommandID(KnownPackages.VsDbg, 0x400),"Debug: Toggle CodeLens",KnownMonikers.Settings),
             ]);
         }
 
@@ -663,21 +680,21 @@ public class KnownCommandService {
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.KnownMonikerExplorer)) {
             _commands.AddRange([
-                new (new CommandID(KnownPackages.KnownMonikerExplorer, 0x100),"View: Known Monikers Explorer",default),
+                new (new CommandID(KnownPackages.KnownMonikerExplorer, 0x100),"View: Known Monikers Explorer",KnownMonikers.Image),
             ]);
         }
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.CommandTableInfo)) {
             var cmdSet = new Guid("{a5bb06f5-7f0a-4194-b06f-0bb25d48f268}");
             _commands.AddRange([
-                new (new CommandID(cmdSet, 0x200),"View: Command Explorer",default),
+                new (new CommandID(cmdSet, 0x200),"View: Command Explorer",KnownMonikers.CommandUIOption),
             ]);
         }
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.AddAnyFile)) {
             var cmdSet = new Guid("{32af8a17-bbbc-4c56-877e-fc6c6575a8cf}");
             _commands.AddRange([
-                new (new CommandID(cmdSet, 0x100),"Project: Add Quick File...",default),
+                new (new CommandID(cmdSet, 0x100),"Project: Add Quick File...",KnownMonikers.AddTextFile),
             ]);
         }
 
