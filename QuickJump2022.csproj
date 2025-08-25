@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Services\FastFetchCommandService.cs" />
     <Compile Include="Services\PackageInfoService.cs" />
     <Compile Include="Commands\ShowKnownCommandSearchForm.cs" />
     <Compile Include="Controls\ListItemVisual.cs" />
@@ -91,9 +92,9 @@
     <Compile Include="Interop\WindowUtils.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Tools\FuzzySearch2.cs" />
-    <Compile Include="Tools\OlePictureConverter.cs" />
     <Compile Include="Tools\PathExtensions.cs" />
     <Compile Include="Tools\StringExtensions.cs" />
+    <Compile Include="VisualStudio.Interop\FastFetchCommands.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
