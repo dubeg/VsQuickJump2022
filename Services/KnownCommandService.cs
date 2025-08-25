@@ -370,8 +370,8 @@ public class KnownCommandService {
             new (KnownCommands.File_CopyFullPath,"File: Copy Full Path",default),
             new (KnownCommands.File_CopyRelativePath,"File: Copy Relative Path",default),
             new (KnownCommands.File_Exit,"File: Exit",KnownMonikers.Exit),
-            new (KnownCommands.File_NewFile,"File: New File...",default),
-            new (KnownCommands.File_NewProject,"File: New Project...",default),
+            new (KnownCommands.File_NewFile,"File: New File...",KnownMonikers.NewDocument),
+            new (KnownCommands.File_NewProject,"File: New Project...",KnownMonikers.NewDocumentCollection),
             new (KnownCommands.File_OpenContainingFolder,"File: Open Containing Folder",default),
             new (KnownCommands.File_OpenFile,"File: Open File...",KnownMonikers.OpenFile),
             new (KnownCommands.File_OpenProject,"File: Open Project...",KnownMonikers.OpenDocumentGroup),
@@ -386,7 +386,7 @@ public class KnownCommandService {
             //new (KnownCommands.File_SaveSelectedItemsAs,"File: Save Selected Items As...",default),
             //new (KnownCommands.File_SaveSelection,"File: Save Selection",default),
             //new (KnownCommands.File_SelectProjectTemplate,"File: Select Project Template...",default),
-            new (KnownCommands.File_ViewinBrowser,"File: View in Browser",default),
+            new (KnownCommands.File_ViewinBrowser,"File: View in Browser",KnownMonikers.ViewInBrowser),
         ]);
 
         _commands.AddRange([
@@ -472,7 +472,7 @@ public class KnownCommandService {
             new (KnownCommands.Project_AddMethod,"Project: Add Method...",KnownMonikers.AddMethod),
             new (KnownCommands.Project_AddModule,"Project: Add Module...",KnownMonikers.AddModule),
             new (KnownCommands.Project_AddNestedClass,"Project: Add Nested Class...",default),
-            new (KnownCommands.Project_AddNewItem,"Project: Add New Item...",default),
+            new (KnownCommands.Project_AddNewItem,"Project: Add New Item...",KnownMonikers.NewItem),
             new (KnownCommands.Project_AddNewSolutionFolder,"Project: Add New Solution Folder",default),
             new (KnownCommands.Project_AddProjectOutputs,"Project: Add Project Outputs...",default),
             new (KnownCommands.Project_AddProjectReference,"Project: Add Project Reference...",KnownMonikers.AddReference),
@@ -506,7 +506,7 @@ public class KnownCommandService {
             //new (KnownCommands.Project_SetAsStartPage,"Project: Set As Start Page",default),
             //new (KnownCommands.Project_SetasStartupProject,"Project: Set as Startup Project",default),
             //new (KnownCommands.Project_ShowAllFiles,"Project: Show All Files",KnownMonikers.ShowAllFiles),
-            new (KnownCommands.Project_StartOptions,"Project: Start Options...",default),
+            new (KnownCommands.Project_StartOptions,"Project: Start Options...",KnownMonikers.Settings),
             //new (KnownCommands.Project_UnhideFolders,"Project: Unhide Folders",default),
             //new (KnownCommands.Project_UnloadProject,"Project: Unload Project",default),
             //new (KnownCommands.Project_UpdateServiceReference,"Project: Update Service Reference",default),
@@ -537,10 +537,10 @@ public class KnownCommandService {
             //new (KnownCommands.Tools_Alias,"Alias",default),
             //new (KnownCommands.Tools_CodeSnippetsManager,"Tools: Code Snippets Manager...",default),
             //new (KnownCommands.Tools_Customize,"Tools: Customize Toolbars...",default),
-            new (KnownCommands.Tools_CustomizeKeyboard,"Tools: Customize Keyboard...",default),
+            new (KnownCommands.Tools_CustomizeKeyboard,"Tools: Customize Keyboard...",KnownMonikers.Settings),
             //new (KnownCommands.Tools_GoToCommandLine,"Tools: Go To Command Line",default),
             //new (KnownCommands.Tools_ImmediateMode,"Tools: Immediate Mode",default),
-            new (KnownCommands.Tools_ImportandExportSettings,"Tools: Import and Export Settings...",default),
+            new (KnownCommands.Tools_ImportandExportSettings,"Tools: Import and Export Settings...",KnownMonikers.Settings),
             new (KnownCommands.Tools_Open,"Tools: Open",KnownMonikers.Open),
             //new (KnownCommands.Tools_OpenWith,"Tools: Open With...",default),
             new (KnownCommands.Tools_Options,"Tools: Options",KnownMonikers.Settings),
@@ -599,6 +599,7 @@ public class KnownCommandService {
             new (KnownCommands.View_ViewDesigner,"View: View Designer",default),
             new (KnownCommands.View_ViewMarkup,"View: View Markup",default),
             new (KnownCommands.View_Zoom,"View: Zoom...",KnownMonikers.Zoom),
+            new (KnownCommandsEx.File_StartWindow,"View: Start Window",KnownMonikers.ShowStartWindow),
         ]);
 
         _commands.AddRange([
@@ -747,5 +748,7 @@ public class KnownCommandService {
         public static CommandID TestExplorer_RunTests = new CommandID(TestExplorer_CmdSet, 0x310);
         public static CommandID TestExplorer_DebugTests = new CommandID(TestExplorer_CmdSet, 0x315);
         public static CommandID TestExplorer_ClearResults = new CommandID(TestExplorer_CmdSet, 0x322);
+
+        public static CommandID File_StartWindow = new CommandID(new Guid("{7C57081E-4F31-4EBF-A96F-4769E1D688EC}"), 0x120);
     }
 }
