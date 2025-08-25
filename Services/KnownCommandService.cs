@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using QuickJump2022.Models;
+using static Microsoft.VisualStudio.VSConstants;
 
 namespace QuickJump2022.Services;
 
@@ -647,13 +648,11 @@ public class KnownCommandService {
         // Tests
         // ----------
         {
-            var cmdSet = new Guid("{1E198C22-5980-4E7E-92F3-F73168D1FB63}"); 
-            var imgMonikerRun = new ImageMoniker() { Guid = new Guid("{b23d3054-21dc-479f-a9fa-ebd0fb383112}"), Id = 1003 };
             _commands.AddRange([
-                new (new CommandID(cmdSet, 0x200),"View: Test Explorer",KnownMonikers.TestResult),
-                new (new CommandID(cmdSet, 0x310),"Test: Run tests",imgMonikerRun),
-                new (new CommandID(cmdSet, 0x315),"Test: Debug tests",KnownMonikers.DebugSelection),
-                new (new CommandID(cmdSet, 0x322),"Test: Clear results",default),
+                new (KnownCommandsEx.TestExplorer_OpenToolWindow,"View: Test Explorer",KnownMonikers.TestResult),
+                new (KnownCommandsEx.TestExplorer_RunTests,"Test: Run tests",KnownMonikersEx.TestExplorer_RunTests),
+                new (KnownCommandsEx.TestExplorer_DebugTests,"Test: Debug tests",KnownMonikers.DebugSelection),
+                new (KnownCommandsEx.TestExplorer_ClearResults,"Test: Clear results",default),
             ]);
         }
 
@@ -663,38 +662,34 @@ public class KnownCommandService {
         var packages = packageInfoService.GetPackages();
         if (packages.Any(x => x.PackageGuid == KnownPackages.VsDbg)) {
             _commands.AddRange([
-                new (new CommandID(KnownPackages.VsDbg, 0x100),"Debug: Toggle JavaScript Debugging",KnownMonikers.Settings),
-                new (new CommandID(KnownPackages.VsDbg, 0x200),"Debug: Toggle Just My Code",KnownMonikers.Settings),
-                new (new CommandID(KnownPackages.VsDbg, 0x300),"Debug: Toggle XAML Hot Reload",KnownMonikers.Settings),
-                new (new CommandID(KnownPackages.VsDbg, 0x400),"Debug: Toggle CodeLens",KnownMonikers.Settings),
+                new (KnownCommandsEx.VsDbg_ToggleJSDebugging,"Debug: Toggle JavaScript Debugging",KnownMonikers.Settings),
+                new (KnownCommandsEx.VsDbg_ToggleJustMyCode,"Debug: Toggle Just My Code",KnownMonikers.Settings),
+                new (KnownCommandsEx.VsDbg_ToggleXamlHotReload,"Debug: Toggle XAML Hot Reload",KnownMonikers.Settings),
+                new (KnownCommandsEx.VsDbg_ToggleCodeLens,"Debug: Toggle CodeLens",KnownMonikers.Settings),
             ]);
         }
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.SettingsStoreExplorer)) {
-            var cmdSet = new Guid("{9fc9f69d-174d-4876-b28b-dc1e4fac89dc}");
-            var imgMoniker = new ImageMoniker() { Guid = new Guid("{3da9ddb5-b35b-4ed6-9d52-73aa4c30127e}"), Id = 1 };
             _commands.AddRange([
-                new (new CommandID(cmdSet, 0x100),"View: Settings Store Explorer", imgMoniker),
+                new (KnownCommandsEx.SettingsStoreExplorer_OpenToolWindow,"View: Settings Store Explorer", KnownMonikersEx.SettingsStoreExplorer_OpenToolWindow),
             ]);
         }
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.KnownMonikerExplorer)) {
             _commands.AddRange([
-                new (new CommandID(KnownPackages.KnownMonikerExplorer, 0x100),"View: Known Monikers Explorer",KnownMonikers.Image),
+                new (KnownCommandsEx.KnownMonikerExplorer_OpenToolWindow,"View: Known Monikers Explorer",KnownMonikers.Image),
             ]);
         }
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.CommandTableInfo)) {
-            var cmdSet = new Guid("{a5bb06f5-7f0a-4194-b06f-0bb25d48f268}");
             _commands.AddRange([
-                new (new CommandID(cmdSet, 0x200),"View: Command Explorer",KnownMonikers.CommandUIOption),
+                new (KnownCommandsEx.CommandTableInfo_OpenToolWindow,"View: Command Explorer",KnownMonikers.CommandUIOption),
             ]);
         }
 
         if (packages.Any(x => x.PackageGuid == KnownPackages.AddAnyFile)) {
-            var cmdSet = new Guid("{32af8a17-bbbc-4c56-877e-fc6c6575a8cf}");
             _commands.AddRange([
-                new (new CommandID(cmdSet, 0x100),"Project: Add Quick File...",KnownMonikers.AddTextFile),
+                new (KnownCommandsEx.AddAnyFile_NewEmptyFile,"Project: Add Quick File...",KnownMonikers.AddTextFile),
             ]);
         }
 
@@ -723,5 +718,34 @@ public class KnownCommandService {
         // - Subword nav
         // - VSTricks
         // - ...
+    }
+
+    static class KnownMonikersEx {
+        public static ImageMoniker SettingsStoreExplorer_OpenToolWindow = new ImageMoniker() { Guid = new Guid("{3da9ddb5-b35b-4ed6-9d52-73aa4c30127e}"), Id = 1 };
+        public static ImageMoniker TestExplorer_RunTests = new ImageMoniker() { Guid = new Guid("{b23d3054-21dc-479f-a9fa-ebd0fb383112}"), Id = 1003 };
+    }
+
+    static class KnownCommandsEx {
+        public static Guid AddAnyFile_CmdSet = new Guid("{32af8a17-bbbc-4c56-877e-fc6c6575a8cf}");
+        public static CommandID AddAnyFile_NewEmptyFile = new CommandID(AddAnyFile_CmdSet, 0x100);
+
+        public static Guid CommandTableInfo_CmdSet = new Guid("{a5bb06f5-7f0a-4194-b06f-0bb25d48f268}");
+        public static CommandID CommandTableInfo_OpenToolWindow = new CommandID(CommandTableInfo_CmdSet, 0x200);
+
+        public static CommandID KnownMonikerExplorer_OpenToolWindow = new CommandID(KnownPackages.KnownMonikerExplorer, 0x100);
+
+        public static Guid SettingsStoreExplorer_CmdSet = new Guid("{9fc9f69d-174d-4876-b28b-dc1e4fac89dc}");
+        public static CommandID SettingsStoreExplorer_OpenToolWindow = new CommandID(SettingsStoreExplorer_CmdSet, 0x100);
+
+        public static CommandID VsDbg_ToggleJSDebugging = new CommandID(KnownPackages.VsDbg, 0x100);
+        public static CommandID VsDbg_ToggleJustMyCode = new CommandID(KnownPackages.VsDbg, 0x200);
+        public static CommandID VsDbg_ToggleXamlHotReload = new CommandID(KnownPackages.VsDbg, 0x300);
+        public static CommandID VsDbg_ToggleCodeLens = new CommandID(KnownPackages.VsDbg, 0x400);
+
+        private static Guid TestExplorer_CmdSet = new Guid("{1E198C22-5980-4E7E-92F3-F73168D1FB63}");
+        public static CommandID TestExplorer_OpenToolWindow = new CommandID(TestExplorer_CmdSet, 0x200);
+        public static CommandID TestExplorer_RunTests = new CommandID(TestExplorer_CmdSet, 0x310);
+        public static CommandID TestExplorer_DebugTests = new CommandID(TestExplorer_CmdSet, 0x315);
+        public static CommandID TestExplorer_ClearResults = new CommandID(TestExplorer_CmdSet, 0x322);
     }
 }
