@@ -41,7 +41,7 @@
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>Search commands (ID)</ButtonText>
+					<ButtonText>Search all commands</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowCommandSearchForm</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowCommandSearchForm</CanonicalName>
 				</Strings>
@@ -62,8 +62,9 @@
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>CommandWellOnly</CommandFlag>
 				<Strings>
-					<ButtonText>Search commands</ButtonText>
+					<ButtonText>Search fast-fetch commands</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowFastFetchCommandSearchForm</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowFastFetchCommandSearchForm</CanonicalName>
 				</Strings>
@@ -73,6 +74,7 @@
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="StatusWarningNoColor" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>CommandWellOnly</CommandFlag>
 				<Strings>
 					<ButtonText>Test command</ButtonText>
 					<LocCanonicalName>.QuickJump.TestCommand</LocCanonicalName>
@@ -80,16 +82,17 @@
 				</Strings>
 			</Button>
 			
-			<!--<Button guid="QuickJump2022" id="RefreshPreloadedData" priority="0x0100" type="Button">
+			<Button guid="QuickJump2022" id="RefreshPreloadedData" priority="0x0100" type="Button">
 				<Parent guid="QuickJump2022" id="MainCmdGroup" />
 				<Icon guid="ImageCatalogGuid" id="Refresh" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>CommandWellOnly</CommandFlag>
 				<Strings>
 					<ButtonText>Refresh preloaded data</ButtonText>
 					<LocCanonicalName>.QuickJump.RefreshPreloadedData</LocCanonicalName>
 					<CanonicalName>.QuickJump.RefreshPreloadedData</CanonicalName>
 				</Strings>
-			</Button>-->
+			</Button>
     </Buttons>
   </Commands>
 

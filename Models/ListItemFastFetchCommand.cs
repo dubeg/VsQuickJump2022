@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using QuickJump2022.Services;
 
 namespace QuickJump2022.Models;
@@ -12,6 +12,4 @@ public class ListItemFastFetchCommand : ListItemBase {
     public static ListItemFastFetchCommand FromFastFetchItem(FastFetchCommandItem item)
         => new ListItemFastFetchCommand { Item = item };
 }
-
-
 
