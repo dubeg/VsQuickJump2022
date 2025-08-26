@@ -41,7 +41,7 @@
 				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>Search commands</ButtonText>
+					<ButtonText>Search commands (ID)</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowCommandSearchForm</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowCommandSearchForm</CanonicalName>
 				</Strings>
@@ -55,6 +55,17 @@
 					<ButtonText>Search known commands</ButtonText>
 					<LocCanonicalName>.QuickJump.ShowKnownCommandSearchForm</LocCanonicalName>
 					<CanonicalName>.QuickJump.ShowKnownCommandSearchForm</CanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="QuickJump2022" id="ShowFastFetchCommandSearchForm" priority="0x0100" type="Button">
+				<Parent guid="QuickJump2022" id="MainCmdGroup" />
+				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Search commands</ButtonText>
+					<LocCanonicalName>.QuickJump.ShowFastFetchCommandSearchForm</LocCanonicalName>
+					<CanonicalName>.QuickJump.ShowFastFetchCommandSearchForm</CanonicalName>
 				</Strings>
 			</Button>
 			
@@ -92,6 +103,7 @@
 			<IDSymbol name="ShowKnownCommandSearchForm" value="0x0500" />
 			<IDSymbol name="TestCommand" value="0x0600" />
 			<IDSymbol name="RefreshPreloadedData" value="0x0700" />
+			<IDSymbol name="ShowFastFetchCommandSearchForm" value="0x0800" />
 		</GuidSymbol> 
   </Symbols>
 </CommandTable>

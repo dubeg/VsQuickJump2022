@@ -16,7 +16,8 @@ public class ListItemViewModel : INotifyPropertyChanged {
             item is ListItemSymbol symbol ? KnownMonikerUtils.GetCodeMoniker(symbol.Item.BindType)
             : item is ListItemFile file ? KnownMonikerUtils.GetFileMoniker(file.FileExtension)
             : item is ListItemCommand cmd ? KnownMonikers.Settings // Run // RunOutline // Settings // ?
-            : item is ListItemKnownCommand knwnCmd ? knwnCmd.Item.Image // Run // RunOutline // Settings // ?
+            : item is ListItemKnownCommand knwnCmd ? knwnCmd.Item.Icon // Run // RunOutline // Settings // ?
+            : item is ListItemFastFetchCommand fastFetchCmd ? fastFetchCmd.Item.Icon
             : KnownMonikers.None;
     }
 

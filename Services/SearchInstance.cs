@@ -17,6 +17,7 @@ public class SearchInstance(
     SymbolService symbolService,
     CommandService commandService,
     KnownCommandService knownCommandService,
+    FastFetchCommandService fastFetchCommandService,
     Enums.SearchType SearchType,
     Enums.SortType FileSortType,
     Enums.SortType CSharpSortType,
@@ -26,6 +27,7 @@ public class SearchInstance(
     public List<ListItemSymbol> Symbols { get; set; } = new();
     public List<ListItemCommand> Commands { get; set; } = new();
     public List<ListItemKnownCommand> KnownCommands { get; set; } = new();
+    public List<ListItemFastFetchCommand> FastFetchCommands { get; set; } = new();
 
     public async Task LoadDataAsync() {
         // -----------
@@ -55,6 +57,13 @@ public class SearchInstance(
         if (SearchType is Enums.SearchType.KnownCommands or Enums.SearchType.All) {
             var items = knownCommandService.GetCommands();
             KnownCommands = items.Select(x => ListItemKnownCommand.FromKnownCommandMapping(x)).ToList();
+        }
+        // -----------
+        // Fast Fetch Commands
+        // -----------
+        if (SearchType is Enums.SearchType.FastFetchCommands or Enums.SearchType.All) {
+            var items = await fastFetchCommandService.GetCommandsAsync();
+            FastFetchCommands = items.Select(x => ListItemFastFetchCommand.FromFastFetchItem(x)).ToList();
         }
     }
 
@@ -90,6 +99,7 @@ public class SearchInstance(
         if (SearchType is Enums.SearchType.Symbols or Enums.SearchType.All) FilterItems(Symbols);
         if (SearchType is Enums.SearchType.Commands or Enums.SearchType.All) FilterItems(Commands);
         if (SearchType is Enums.SearchType.KnownCommands or Enums.SearchType.All) FilterItems(KnownCommands);
+        if (SearchType is Enums.SearchType.FastFetchCommands or Enums.SearchType.All) FilterItems(FastFetchCommands);
 
         // -------------------
         // Fuzzy search
@@ -109,6 +119,7 @@ public class SearchInstance(
                 Enums.SearchType.Symbols => CSharpSortType,
                 Enums.SearchType.Commands => Enums.SortType.Alphabetical,
                 Enums.SearchType.KnownCommands => Enums.SortType.Alphabetical,
+                Enums.SearchType.FastFetchCommands => Enums.SortType.Alphabetical,
                 Enums.SearchType.All => MixedSortType,
                 _ => throw new NotImplementedException()
             });

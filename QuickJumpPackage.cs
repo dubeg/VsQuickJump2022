@@ -33,6 +33,7 @@ public sealed class QuickJumpPackage : ToolkitPackage {
     public ClassificationService ClassificationService { get; set; }
     public CommandService CommandService { get; private set; }
     public KnownCommandService KnownCommandService { get; private set; }
+    public FastFetchCommandService FastFetchCommandService { get; private set; }
     public PackageInfoService PackageInfoService { get; private set; }
 
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
@@ -53,6 +54,7 @@ public sealed class QuickJumpPackage : ToolkitPackage {
         ClassificationService = new(this);
         CommandService = new(Dte);
         KnownCommandService = new();
+        FastFetchCommandService = new(this);
         PackageInfoService = new(settingsManager);
         // --
         SettingsService.LoadSettings();

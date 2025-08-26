@@ -7,6 +7,7 @@ public static class Enums {
         Symbols,
         Commands,
         KnownCommands,
+        FastFetchCommands,
         All,
     }
 

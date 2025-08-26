@@ -11,7 +11,11 @@ namespace QuickJump2022.Commands;
 internal sealed class TestCommand : BaseCommand<TestCommand> {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var form = new InputForm();
-        form.ShowModal();
+        // ----------------
+        // Form with CodeEditor as textbox
+        // ----------------
+        //var form = new InputForm();
+        //form.ShowModal();
+        // ----------------
     }
 }

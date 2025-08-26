@@ -11,7 +11,7 @@ namespace QuickJump2022.Models;
 public record class KnownCommandItem {
     public CommandID Command { get; set; }
     public string DisplayName { get; set; }
-    public ImageMoniker Image { get; set; }
+    public ImageMoniker Icon { get; set; }
     public string Shortcut { get; set; } = "";
 
     public KnownCommandItem(
@@ -22,7 +22,7 @@ public record class KnownCommandItem {
     ) {
         Command = command;
         DisplayName = displayName;
-        Image = image;
+        Icon = image;
         Shortcut = shortcut;
     }
 };

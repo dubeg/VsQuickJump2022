@@ -59,6 +59,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             package.SymbolService,
             package.CommandService,
             package.KnownCommandService,
+            package.FastFetchCommandService,
             searchType,
             package.GeneralOptions.FileSortType,
             package.GeneralOptions.CSharpSortType,
@@ -277,6 +278,12 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                     // The dialog must be closed before executing a command bar button
                     // in case it opens another modal dialog.
                     CommandService.Execute(knownCommand.Item.Command);
+                    return;
+                }
+            }
+            else if (listItem is ListItemFastFetchCommand fastFetch) {
+                if (commit) {
+                    CommandService.Execute(fastFetch.Item.CommandID);
                     return;
                 }
             }

@@ -45,6 +45,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\ShowFastFetchCommandSearchForm.cs" />
+    <Compile Include="Models\ListItemFastFetchCommand.cs" />
     <Compile Include="Services\FastFetchCommandService.cs" />
     <Compile Include="Services\PackageInfoService.cs" />
     <Compile Include="Commands\ShowKnownCommandSearchForm.cs" />
