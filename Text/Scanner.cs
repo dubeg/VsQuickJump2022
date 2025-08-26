@@ -65,6 +65,7 @@ struct Scanner {
         r['&'] = CharClass.Operator;
         r['|'] = CharClass.Operator;
         r['^'] = CharClass.Operator;
+        r['\\'] = CharClass.Operator;
         return r;
     }))();
 
@@ -101,15 +102,27 @@ struct Scanner {
                 action_((CharClass)i_);
             }
         }
-        // --
-        var r = new BitArray(TransTableSize * TransTableSize * TransTableSize, false);
-        r.SetRange(TransRange(CharClass.Uppercase, CharClass.Whitespace), true);
-        r.SetRange(TransRange(CharClass.Lowercase, CharClass.Whitespace), true);
-        r.SetRange(TransRange(CharClass.Whitespace, CharClass.Uppercase), true);
-        r.SetRange(TransRange(CharClass.Whitespace, CharClass.Lowercase), true);
-        // --
-        // ForEachCharClass(cc => r.SetRange(TransRange(cc, cc), false));
-        // ForEachCharClass(cc => r.SetRange(TransRange(CharClass.Whitespace, cc), false));
+        var r = new BitArray(TransTableSize * TransTableSize * TransTableSize, true);
+        
+        // Don't break within same class.
+        ForEachCharClass(cc => r.SetRange(TransRange(cc, cc), false)); 
+        
+        // Don't break between letters and numerals.
+        r.SetRange(TransRange(CharClass.Uppercase, CharClass.Lowercase), false);
+        r.SetRange(TransRange(CharClass.Lowercase, CharClass.Uppercase), false);
+        r.SetRange(TransRange(CharClass.Uppercase, CharClass.Numeral), false);
+        r.SetRange(TransRange(CharClass.Numeral, CharClass.Uppercase), false);
+        r.SetRange(TransRange(CharClass.Lowercase, CharClass.Numeral), false);
+        r.SetRange(TransRange(CharClass.Numeral, CharClass.Lowercase), false);
+
+        // Don't break between alphanumerics and underscores.
+        r.SetRange(TransRange(CharClass.Uppercase, CharClass.Underscore), false);
+        r.SetRange(TransRange(CharClass.Lowercase, CharClass.Underscore), false);
+        r.SetRange(TransRange(CharClass.Numeral, CharClass.Underscore), false);
+        r.SetRange(TransRange(CharClass.Underscore, CharClass.Uppercase), false);
+        r.SetRange(TransRange(CharClass.Underscore, CharClass.Lowercase), false);
+        r.SetRange(TransRange(CharClass.Underscore, CharClass.Numeral), false);
+
         // --
         transTable = r;
     }
@@ -123,6 +136,7 @@ struct Scanner {
             }
         }
 
+        // Don't break within same class.
         ForEachCharClass(cc => r.SetRange(TransRange(cc, cc), false));
 
         if (options.RecognizePascal) {
