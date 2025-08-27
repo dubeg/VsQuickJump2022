@@ -18,7 +18,7 @@
     mc:Ignorable="d"
     Title="QuickJump Search" 
     BorderThickness="1"
-    BorderBrush="{DynamicResource {x:Static platform:ThemedDialogColors.WindowBorderBrushKey}}"
+    BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.MainWindowActiveBuildingBorderBrushKey }}"
     WindowStyle="None"
     Background="Transparent"
     ShowInTaskbar="False"
@@ -36,6 +36,13 @@
     TextOptions.TextRenderingMode="Auto"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     >
+    <!--
+    Any of these brushes could do well as the window's border brush:
+    * MainWindowActiveBuildingBorderBrushKey
+    * MainWindowActiveDebuggingBorderBrushKey
+    * MainWindowActiveDefaultBorderBrushKey
+    * AccentBorderBrushKey
+    -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
