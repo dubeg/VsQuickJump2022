@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -36,6 +37,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
+    private SearchType _searchType;
 
     public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "") {
         var dialog = new SearchForm(package, searchType, initialText);
@@ -54,6 +56,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // --
         var x = txtSearch.FontSize;
         // --
+        _searchType = searchType;
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
             package.SymbolService,
@@ -155,7 +158,22 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private async void txtSearch_PreviewKeyDown(object sender, KeyEventArgs e) {
         // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
         // so they work normally for text navigation and selection
-        if (e.Key == Key.Escape) {
+        if (e.KeyboardDevice.IsKeyDown(Key.Tab)) {
+            var reverse = e.KeyboardDevice.IsKeyDown(Key.LeftShift);
+            Close();
+            e.Handled = true;
+            var dict = new Dictionary<SearchType, (int backward, int forward)>() {
+                { SearchType.Files, (backword: PackageIds.ShowFastFetchCommandSearchForm, forward: PackageIds.ShowMethodSearchForm)},
+                { SearchType.Symbols, (backword: PackageIds.ShowFileSearchForm, forward: PackageIds.ShowCommandSearchForm)},
+                { SearchType.Commands, (backword: PackageIds.ShowMethodSearchForm, forward: PackageIds.ShowKnownCommandSearchForm)},
+                { SearchType.KnownCommands, (backword: PackageIds.ShowCommandSearchForm, forward: PackageIds.ShowFastFetchCommandSearchForm)},
+                { SearchType.FastFetchCommands, (backword: PackageIds.ShowKnownCommandSearchForm, forward: PackageIds.ShowFileSearchForm)},
+            };
+            if (dict.TryGetValue(_searchType, out var cmds)) {
+                CommandService.Execute(new CommandID(PackageGuids.QuickJump2022, reverse ? cmds.backward : cmds.forward));
+            }
+        }
+        else if (e.Key == Key.Escape) {
             Close();
             e.Handled = true;
         }

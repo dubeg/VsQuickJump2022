@@ -86,17 +86,17 @@ public class FastFetchCommandService(IServiceProvider _serviceProvider) {
     }
 
     private static (string name, string description) FormatNameAndDescription(string commandPlacementText) {
-        var item = string.Empty;
-        var text = string.Empty;
+        var name = commandPlacementText;
+        var desc = string.Empty;
         var array = commandPlacementText.Split(SegmentSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
         if (array.Length > 1) {
-            text = array[1];
+            desc = array[1];
             for (var i = 2; i < array.Length; i++) {
-                text = $"{text} > {array[i]}";
+                desc = $"{desc} > {array[i]}";
             }
-            item = array[array.Length - 1];
+            name = array[array.Length - 1];
         }
-        return (name: item, description: text);
+        return (name: name, description: desc);
     }
 
     private static readonly char[] SegmentSeparatorArray = new char[1];
