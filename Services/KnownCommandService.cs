@@ -669,6 +669,7 @@ public class KnownCommandService {
                 new (KnownCommandsEx.VsDbg_ToggleCodeLens,"Text Editor: Toggle CodeLens",KnownMonikers.Settings),
                 new (KnownCommandsEx.VsDbg_ToggleCSharpFadeOut,"Text Editor: Toggle C# Fade Out",KnownMonikers.Settings),
                 new (KnownCommandsEx.VsDbg_ToggleCSharpInlineParameterNameHint,"Text Editor: C# Inline Parameter Name Hint",KnownMonikers.Settings),
+                new (KnownCommandsEx.VsDbg_ToggleAspnetIntegratedTerminal,"Debug: Toggle AspNet Integrator Terminal",KnownMonikers.Settings),
             ]);
         }
 
@@ -746,6 +747,7 @@ public class KnownCommandService {
         public static CommandID VsDbg_ToggleCodeLens = new CommandID(KnownPackages.VsDbg, 0x400);
         public static CommandID VsDbg_ToggleCSharpFadeOut = new CommandID(KnownPackages.VsDbg, 0x500);
         public static CommandID VsDbg_ToggleCSharpInlineParameterNameHint = new CommandID(KnownPackages.VsDbg, 0x600);
+        public static CommandID VsDbg_ToggleAspnetIntegratedTerminal = new CommandID(KnownPackages.VsDbg, 0x700);
 
         private static Guid TestExplorer_CmdSet = new Guid("{1E198C22-5980-4E7E-92F3-F73168D1FB63}");
         public static CommandID TestExplorer_OpenToolWindow = new CommandID(TestExplorer_CmdSet, 0x200);
