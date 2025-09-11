@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
@@ -14,6 +15,16 @@ using QuickJump2022.Models;
 
 namespace QuickJump2022.Services;
 public class GoToService {
+
+    // [Import] public ITextDocumentFactoryService TextDocumentFactoryService { get; set; }
+    // [Import] public ITextBufferFactoryService TextBufferFactoryService { get; set; }
+    // [Import] public IContentTypeRegistryService ContentService { get; set; }
+
+    public GoToService() {
+        var componentModel = (IComponentModel)Package.GetGlobalService(typeof(SComponentModel));
+        componentModel.DefaultCompositionService.SatisfyImportsOnce(this);
+    }
+
     public void GoToFile(ListItemFile file) {
         using var scope = new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Permanent, VSConstants.NewDocumentStateReason.Navigation);
         VsShellUtilities.OpenDocument(
@@ -46,35 +57,39 @@ public class GoToService {
             out var itemId,
             out var windowFrame
         );
-        if (windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var docView) == VSConstants.S_OK) {
-            if (docView is IVsCodeWindow codeWindow) {
-                codeWindow.GetPrimaryView(out var vsTextView);
-                var componentModel = (IComponentModel)Package.GetGlobalService(typeof(SComponentModel));
-                var adaptersFactory = componentModel.GetService<IVsEditorAdaptersFactoryService>();
-                var wpfTextView = adaptersFactory.GetWpfTextView(vsTextView);
-                if (wpfTextView != null) {
-                    var options = wpfTextView.Options;
-                    options.SetOptionValue(DefaultTextViewHostOptions.EnableFileHealthIndicatorOptionId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.EditingStateMarginOptionId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.SourceImageMarginEnabledOptionId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.ShowChangeTrackingMarginOptionId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.ChangeTrackingId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.VerticalScrollBarId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.HorizontalScrollBarId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.LineNumberMarginId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.OutliningMarginId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.SuggestionMarginId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.SelectionMarginId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.ZoomControlId, false);
-                    options.SetOptionValue(DefaultTextViewHostOptions.ShowMarksOptionId, false);
-                    options.SetOptionValue(DefaultTextViewOptions.DisplayUrlsAsHyperlinksId, false);
-                    options.SetOptionValue(DefaultTextViewOptions.WordWrapStyleId, WordWrapStyles.None);
-                    options.SetOptionValue(DefaultTextViewOptions.BraceCompletionEnabledOptionId, false);
-                }
-            }
-        }
+        //if (windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var docView) == VSConstants.S_OK) {
+        //    if (docView is IVsCodeWindow codeWindow) {
+        //        codeWindow.GetPrimaryView(out var vsTextView);
+        //        var componentModel = (IComponentModel)Package.GetGlobalService(typeof(SComponentModel));
+        //        var adaptersFactory = componentModel.GetService<IVsEditorAdaptersFactoryService>();
+        //        var wpfTextView = adaptersFactory.GetWpfTextView(vsTextView);
+        //        if (wpfTextView != null) {
+        //            var options = wpfTextView.Options;
+        //            options.SetOptionValue(DefaultTextViewHostOptions.EnableFileHealthIndicatorOptionId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.EditingStateMarginOptionId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.SourceImageMarginEnabledOptionId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.ShowChangeTrackingMarginOptionId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.ChangeTrackingId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.VerticalScrollBarId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.HorizontalScrollBarId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.LineNumberMarginId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.OutliningMarginId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.SuggestionMarginId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.SelectionMarginId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.ZoomControlId, false);
+        //            options.SetOptionValue(DefaultTextViewHostOptions.ShowMarksOptionId, false);
+        //            options.SetOptionValue(DefaultTextViewOptions.DisplayUrlsAsHyperlinksId, false);
+        //            options.SetOptionValue(DefaultTextViewOptions.WordWrapStyleId, WordWrapStyles.None);
+        //            options.SetOptionValue(DefaultTextViewOptions.BraceCompletionEnabledOptionId, false);
+        //            options.SetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId, true);
+        //            wpfTextView.TextBuffer.ChangeContentType(TextBufferFactoryService.PlaintextContentType, null);
+        //        }
+        //    }
+        //}
     }
+
+
 
     public bool IsTextFile(string filePath) {
         var componentModel = (IComponentModel)Package.GetGlobalService(typeof(SComponentModel));

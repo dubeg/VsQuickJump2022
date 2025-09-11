@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +34,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public CommandService CommandService { get; init; }
     public ClassificationService ClassificationService { get; init; }
     public string CurrentText => txtSearch.Text ?? string.Empty;
+
+    public Action DebouncedGoToItem { get; }
+
     private bool _useSymbolColors = false;
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
@@ -96,6 +100,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         this.txtSearch.PreviewKeyDown += txtSearch_PreviewKeyDown;
         this.lstItems.PreviewMouseLeftButtonUp += lstItems_PreviewMouseLeftButtonUp;
         this.lstItems.PreviewKeyUp += lstItems_PreviewKeyUp;
+        Action goToItem = () => GoToItem();
+        this.DebouncedGoToItem = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
 
     private void AdjustPosition() {
@@ -191,7 +197,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 lstItems.SelectedIndex--;
                 EnsureSelectedItemIsVisible();
             }
-            await GoToItem();
+            DebouncedGoToItem();
             e.Handled = true;
         }
         else if (e.Key == Key.Down) {
@@ -199,7 +205,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 lstItems.SelectedIndex++;
                 EnsureSelectedItemIsVisible();
             }
-            await GoToItem();
+            DebouncedGoToItem();
             e.Handled = true;
         }
         if (e.Key == Key.PageUp) {
