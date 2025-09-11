@@ -281,7 +281,10 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         if (selectedItem != null) {
             if (commit) Close();
             var listItem = selectedItem.Item;
-            if (listItem is ListItemFile file) await GoToService.GoToFileAsync(file);
+            if (listItem is ListItemFile file) {
+                if (commit) GoToService.GoToFile(file); 
+                else await GoToService.PreviewFileAsync(file);
+            }
             else if (listItem is ListItemSymbol symbol) await GoToService.GoToSymbolAsync(symbol);
             else if (listItem is ListItemCommand command) {
                 if (commit) {
