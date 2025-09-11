@@ -35,7 +35,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public ClassificationService ClassificationService { get; init; }
     public string CurrentText => txtSearch.Text ?? string.Empty;
 
-    public Action DebouncedGoToItem { get; }
+    public Action<bool, ListItemFile> DebouncedGoToFile { get; }
 
     private bool _useSymbolColors = false;
     private DTE _dte;
@@ -100,8 +100,11 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         this.txtSearch.PreviewKeyDown += txtSearch_PreviewKeyDown;
         this.lstItems.PreviewMouseLeftButtonUp += lstItems_PreviewMouseLeftButtonUp;
         this.lstItems.PreviewKeyUp += lstItems_PreviewKeyUp;
-        Action goToItem = () => GoToItem();
-        this.DebouncedGoToItem = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
+        Action<bool, ListItemFile> goToItem = (commit, file) => {
+            if (commit) GoToService.GoToFile(file);
+            else GoToService.PreviewFileAsync(file);
+        };
+        DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
 
     private void AdjustPosition() {
@@ -197,7 +200,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 lstItems.SelectedIndex--;
                 EnsureSelectedItemIsVisible();
             }
-            DebouncedGoToItem();
+            GoToItem();
             e.Handled = true;
         }
         else if (e.Key == Key.Down) {
@@ -205,7 +208,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 lstItems.SelectedIndex++;
                 EnsureSelectedItemIsVisible();
             }
-            DebouncedGoToItem();
+            GoToItem();
             e.Handled = true;
         }
         if (e.Key == Key.PageUp) {
@@ -287,10 +290,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         if (selectedItem != null) {
             if (commit) Close();
             var listItem = selectedItem.Item;
-            if (listItem is ListItemFile file) {
-                if (commit) GoToService.GoToFile(file); 
-                else await GoToService.PreviewFileAsync(file);
-            }
+            if (listItem is ListItemFile file) DebouncedGoToFile(commit, file);
             else if (listItem is ListItemSymbol symbol) await GoToService.GoToSymbolAsync(symbol);
             else if (listItem is ListItemCommand command) {
                 if (commit) {
