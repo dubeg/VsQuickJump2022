@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 
@@ -14,7 +15,7 @@ public static class PathExtensions {
     public static string ReversePath(this string path) {
         if (string.IsNullOrWhiteSpace(path)) return path;
         var parts = path.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
-        var reversedParts = parts.Reverse();
+        var reversedParts = parts.AsEnumerable().Reverse();
         return string.Join("/", reversedParts);
     }
 }
