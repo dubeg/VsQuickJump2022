@@ -81,9 +81,17 @@ public class SearchInstance(
                     //    results.Add(item);
                     //}
 
-                    // Fastest
-                    if (Fts.FuzzyMatch(searchText, item.Name, out var score)) {
-                        item.Weight = score;
+                    // Fast but has some matching issues,
+                    // Eg. "viewcode" matches "View Component Designer" before "View Code".
+                    //if (Fts.FuzzyMatch(searchText, item.Name, out var score)) {
+                    //    item.Weight = score;
+                    //    results.Add(item);
+                    //}
+
+                    // Fast & no issue so far
+                    var result = FlxCs.Flx.Score(item.Name, searchText);
+                    if (result is not null) {
+                        item.Weight = result.score;
                         results.Add(item);
                     }
 
