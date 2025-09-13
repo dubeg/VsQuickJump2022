@@ -64,6 +64,7 @@
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
     <Compile Include="TextEditor\AllowedCommands.cs" />
+    <Compile Include="TextEditor\InputTextBoxFormatDefinition.cs" />
     <Compile Include="TextEditor\CodeBehaviorFlags.cs" />
     <Compile Include="TextEditor\CodeEditorCommandFilter.cs" />
     <Compile Include="TextEditor\HostEditorHelper.cs" />

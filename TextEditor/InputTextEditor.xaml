@@ -12,7 +12,5 @@
     HorizontalAlignment="Left"
     VerticalAlignment="Center"
     >
-    <Border x:Name="EditorBorder" Padding="4">
-        <ContentControl x:Name="EditorHost"/>
-    </Border>
+    <ContentControl x:Name="EditorHost"/>
 </UserControl>

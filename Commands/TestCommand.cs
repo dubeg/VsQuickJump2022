@@ -16,6 +16,7 @@ internal sealed class TestCommand : BaseCommand<TestCommand> {
         // ----------------
         //var form = new InputForm();
         //form.ShowModal();
+        var result = InputForm.ShowModalEx("test");
         // ----------------
     }
 }

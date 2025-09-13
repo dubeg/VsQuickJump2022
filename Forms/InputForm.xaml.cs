@@ -1,31 +1,56 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
+using QuickJump2022.TextEditor;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace QuickJump2022.Forms;
-/// <summary>
-/// Interaction logic for InputForm.xaml
-/// </summary>
-public partial class InputForm : DialogWindow {
-    public InputForm() {
-        InitializeComponent();
-        Width = 300;
-    }
 
+public partial class InputForm : DialogWindow {
+    public string ResultText { get; private set; }
+    
+    public InputForm(string initialText = "") {
+        InitializeComponent();
+        
+        // Set initial text if provided
+        if (!string.IsNullOrEmpty(initialText)) {
+            CodeView.Text = initialText;
+        }
+        
+        // Subscribe to key events from the InputTextEditor
+        CodeView.EscapePressed += OnEscapePressed;
+        CodeView.EnterPressed += OnEnterPressed;
+        
+        // Focus the editor when loaded
+        Loaded += (s, e) => CodeView.Focus();
+    }
+    
+    private void OnEscapePressed(object sender, EventArgs e) {
+        // Close the dialog when escape is pressed
+        DialogResult = false;
+        Close();
+    }
+    
+    // Optional: Add a method to handle Enter key if needed
+    private void OnEnterPressed(object sender, EventArgs e) {
+        // Save the text and close on Enter
+        ResultText = CodeView.Text;
+        DialogResult = true;
+        Close();
+    }
+    
     protected override void OnClosed(EventArgs e) {
+        // Clean up event subscriptions
+        if (CodeView != null) {
+            CodeView.EscapePressed -= OnEscapePressed;
+            CodeView.EnterPressed -= OnEnterPressed;
+        }
         base.OnClosed(e);
-        CodeView?.Dispose();
+    }
+    
+    // Static helper method to show the dialog
+    public static string ShowModalEx(string initialText = "") {
+        var dialog = new InputForm(initialText);
+        dialog.ShowModal(); // ShowModal is an instance method from DialogWindow base class
+        return dialog.ResultText;
     }
 }

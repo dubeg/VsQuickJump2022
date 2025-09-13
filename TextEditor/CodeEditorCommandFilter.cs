@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.OLE.Interop;
+﻿using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,12 @@ namespace QuickJump2022.TextEditor;
 
 internal sealed class CodeEditorCommandFilter : IOleCommandTarget {
     private readonly Dictionary<Guid, uint[]> allowedCommands;
+    
+    // Event that fires when Escape is pressed
+    public event EventHandler EscapePressed;
+    
+    // Event that fires when Enter is pressed
+    public event EventHandler EnterPressed;
 
     internal CodeEditorCommandFilter(
         Dictionary<Guid, uint[]> allowedCommands
@@ -42,6 +49,22 @@ internal sealed class CodeEditorCommandFilter : IOleCommandTarget {
     ) {
         ThreadHelper.ThrowIfNotOnUIThread(nameof(Exec));
         if (HasFocus) {
+            // Check if this is the Escape key (CANCEL command)
+            if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.CANCEL) {
+                // Fire the escape event
+                EscapePressed?.Invoke(this, EventArgs.Empty);
+                // Return S_OK to indicate we handled it
+                return VSConstants.S_OK;
+            }
+            
+            // Check if this is the Enter key (RETURN command)
+            if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN) {
+                // Fire the enter event
+                EnterPressed?.Invoke(this, EventArgs.Empty);
+                // Return S_OK to indicate we handled it
+                return VSConstants.S_OK;
+            }
+            
             if (!IsCommandAllowed(ref pguidCmdGroup, nCmdID)) {
                 return 0;
             }

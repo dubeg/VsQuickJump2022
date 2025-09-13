@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Classification;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
@@ -19,6 +20,12 @@ using System.Windows.Threading;
 namespace QuickJump2022.TextEditor;
 
 public partial class InputTextEditor : UserControl, IDisposable {
+    
+    // Event that fires when Escape key is pressed
+    public event EventHandler EscapePressed;
+    
+    // Event that fires when Enter key is pressed
+    public event EventHandler EnterPressed;
     
     public InputTextEditor() {
         InitializeComponent();
@@ -92,28 +99,74 @@ new PropertyMetadata(string.Empty, OnTextChanged));
         );
         var textViewHost = _hoster.GetTextViewHost();
         // --
-        var formatMap = EditorFormatMapService.GetEditorFormatMap(textViewHost.TextView);
-        var textProperties = formatMap.GetProperties("Plain Text");
-        formatMap.BeginBatchUpdate();
-        // textProperties[ClassificationFormatDefinition.TypefaceId] = new Typeface("Cascadia Mono");
-        textProperties[ClassificationFormatDefinition.FontRenderingSizeId] = 24.0; // MUST BE A DOUBLE.
-        formatMap.SetProperties("Plain Text", textProperties);
-        formatMap.EndBatchUpdate();
-        // --
+        var classificationFormatMap = ClassificationFormatMapService.GetClassificationFormatMap(textViewHost.TextView);
+        var defaultTextProps = classificationFormatMap.DefaultTextProperties;
+        var baseEmSize = defaultTextProps.FontRenderingEmSize;
+        if (baseEmSize > 0) {
+            var targetZoom = (24.0 / baseEmSize) * 100.0;
+            textViewHost.TextView.ZoomLevel = targetZoom;
+        }
+        textViewHost.TextView.ZoomLevelChanged += (_, __) => UpdateHeightFromTextView(textViewHost.TextView);
+        
+        // Initial height calculation
+        UpdateHeightFromTextView(textViewHost.TextView);
+
         TextViewHost = textViewHost;
         EditorHost.Content = TextViewHost.HostControl;
+        
+        // Subscribe to key press events from the command filter
+        if (_hoster.CommandFilter != null) {
+            _hoster.CommandFilter.EscapePressed += OnEscapePressed;
+            _hoster.CommandFilter.EnterPressed += OnEnterPressed;
+        }
+        
         // TODO: What's the difference?
         // Content = textViewHost.HostControl; 
-        this.Height =
-            textViewHost.TextView.LineHeight
+        Focus();
+    }
+
+    private void UpdateHeightFromTextView(IWpfTextView textView) {
+        var height = CalculateSingleLineHeight(textView)
             + BorderThickness.Top
             + BorderThickness.Bottom
-            + EditorBorder.Padding.Top
-            + EditorBorder.Padding.Bottom
-            + EditorBorder.BorderThickness.Top
-            + EditorBorder.BorderThickness.Bottom
             ;
-        Focus();
+        this.Height = height;
+        //EditorHost.Height = height;
+    }
+
+    private double CalculateSingleLineHeight(IWpfTextView textView) {
+        // Method 1: Try to get an actual text view line (most accurate)
+        // This works when the text view has been laid out and contains content
+        //var snapshot = textView.TextBuffer.CurrentSnapshot;
+        //if (snapshot.Length > 0) {
+        //    var firstLineStart = snapshot.GetLineFromLineNumber(0).Start;
+        //    var point = new SnapshotPoint(snapshot, firstLineStart);
+            
+        //    if (textView.TryGetTextViewLineContainingBufferPosition(point, out var textViewLine)) {
+        //        // The line height already includes zoom level and all formatting
+        //        return textViewLine.Height;
+        //    }
+        //}
+
+        // Method 2: Calculate from font metrics if no line is available
+        // This is used when the text view is empty or not yet laid out
+        var classificationFormatMap = ClassificationFormatMapService.GetClassificationFormatMap(textView);
+        var props = classificationFormatMap.DefaultTextProperties;
+        var typeface = props.Typeface;
+        var emSize = props.FontRenderingEmSize;
+        
+        if (typeface != null && typeface.TryGetGlyphTypeface(out var glyph)) {
+            // Calculate line height from glyph metrics
+            // Height represents the em height (typically 1.0), so we need to estimate line spacing
+            var lineSpacingFactor = 1.2; // Common line spacing factor
+            var lineHeight = glyph.Height * lineSpacingFactor * emSize;
+            var zoom = textView.ZoomLevel / 100.0;
+            return lineHeight * zoom; // DIPs
+        }
+        
+        // Method 3: Fallback to LineHeight property
+        // This is the simplest but may not reflect custom formatting
+        return textView.LineHeight;
     }
 
     private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -136,6 +189,16 @@ new PropertyMetadata(string.Empty, OnTextChanged));
         var element = TextViewHost.TextView.VisualElement;
         element.Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() => element.Focus()));
     }
+    
+    private void OnEscapePressed(object sender, EventArgs e) {
+        // Bubble the escape event up to any listeners
+        EscapePressed?.Invoke(this, EventArgs.Empty);
+    }
+    
+    private void OnEnterPressed(object sender, EventArgs e) {
+        // Bubble the enter event up to any listeners
+        EnterPressed?.Invoke(this, EventArgs.Empty);
+    }
 
     // --
 
@@ -146,7 +209,14 @@ new PropertyMetadata(string.Empty, OnTextChanged));
             if (disposing) {
                 // Dispose managed state (managed objects)
                 // e.g., Unsubscribe from events, dispose child controls if they implement IDisposable
-                _hoster.Dispose();
+                
+                // Unsubscribe from key events
+                if (_hoster?.CommandFilter != null) {
+                    _hoster.CommandFilter.EscapePressed -= OnEscapePressed;
+                    _hoster.CommandFilter.EnterPressed -= OnEnterPressed;
+                }
+                
+                _hoster?.Dispose();
             }
 
             // Free unmanaged resources (unmanaged objects) and override finalizer

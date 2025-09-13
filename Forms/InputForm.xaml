@@ -18,15 +18,15 @@
     x:Name="dialogWnd"
     mc:Ignorable="d"
     Title="QuickJump Search (exp)" 
-    BorderThickness="1"
+    BorderThickness="4"
     BorderBrush="{DynamicResource {x:Static platform:ThemedDialogColors.WindowBorderBrushKey}}"
-    WindowStyle="SingleBorderWindow"
+    WindowStyle="None"
+    SizeToContent="Height"
     Background="Transparent"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
     platform:FocusHelper.EnableActivationSynchronization="True"
     platform:FocusHelper.FocusTarget="{Binding ElementName=CodeView}"
-    SizeToContent="Height"
     toolkit:Themes.UseVsTheme="True"
     HasDialogFrame="False"
     theming:ImageThemingUtilities.ImageBackgroundColor="{DynamicResource {x:Static platform:ThemedDialogColors.WindowPanelColorKey}}"
@@ -37,7 +37,5 @@
     TextOptions.TextRenderingMode="Auto"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     >
-    <Border BorderBrush="Red" BorderThickness="2">
-        <localtxt:InputTextEditor x:Name="CodeView" Grid.Row="0" Margin="0" MinHeight="20"  />
-    </Border>
+    <localtxt:InputTextEditor x:Name="CodeView" Grid.Row="0" Margin="0" MinHeight="20"  />
 </platform:DialogWindow>

@@ -20,7 +20,7 @@ public static class AllowedCommands {
             {
                 (uint)VSConstants.VSStd2KCmdID.TYPECHAR,
                 (uint)VSConstants.VSStd2KCmdID.BACKSPACE,
-                //(uint)VSConstants.VSStd2KCmdID.RETURN,
+                (uint)VSConstants.VSStd2KCmdID.RETURN,
                 //(uint)VSConstants.VSStd2KCmdID.TAB,
                 //(uint)VSConstants.VSStd2KCmdID.BACKTAB,
                 (uint)VSConstants.VSStd2KCmdID.DELETE,

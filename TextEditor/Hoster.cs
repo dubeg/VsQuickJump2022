@@ -29,6 +29,9 @@ public class Hoster : IDisposable {
     private readonly IVsFilterKeys2 filterKeys;
     private uint unregisterPriorityCommandTargetCookie;
     private bool disposedValue;
+    
+    // Expose the command filter so clients can subscribe to events
+    internal CodeEditorCommandFilter CommandFilter => commandFilter;
 
     public static readonly IEnumerable<string> ReadOnlyDefaultTextViewRoles = new string[]
     {
