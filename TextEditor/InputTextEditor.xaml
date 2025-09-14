@@ -6,11 +6,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:QuickJump2022.TextEditor"
+    xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
     mc:Ignorable="d" 
     d:DesignHeight="50" 
     d:DesignWidth="200"
     HorizontalAlignment="Left"
     VerticalAlignment="Center"
+    Padding="4"
+    FontSize="16"
+    Background="{DynamicResource {x:Static platform:EnvironmentColors.EnvironmentBackgroundBrushKey }}"
     >
-    <ContentControl x:Name="EditorHost"/>
+    <ContentControl x:Name="EditorHost" />
 </UserControl>

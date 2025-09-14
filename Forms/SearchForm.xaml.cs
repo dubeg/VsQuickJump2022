@@ -7,15 +7,19 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Services;
 using QuickJump2022.Text;
+using QuickJump2022.TextEditor;
 using QuickJump2022.Tools;
 using static QuickJump2022.Models.Enums;
 using Rect = System.Windows.Rect;
@@ -42,6 +46,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
     private SearchType _searchType;
+    private string _lastSearchText = string.Empty;
 
     public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "") {
         var dialog = new SearchForm(package, searchType, initialText);
@@ -58,7 +63,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // --
         InitializeComponent();
         // --
-        var x = txtSearch.FontSize;
+        // TODO: InputTextEditor doesn't expose FontSize directly
         // --
         _searchType = searchType;
         var searchInstance = new SearchInstance(
@@ -91,13 +96,21 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }; // TODO: configure via options.
         // TODO: check the active document's width & don't make it larger than that.
         _initialText = initialText; // TODO: configure via options.
-        if (_initialText is not null) {
+        if (!string.IsNullOrWhiteSpace(_initialText)) {
             txtSearch.Text = _initialText;
             txtSearch.SelectAll();
         }
         // --
-        this.txtSearch.TextChanged += txtSearch_TextChanged;
-        this.txtSearch.PreviewKeyDown += txtSearch_PreviewKeyDown;
+        // TODO: implement TextChanged in InputTextEditor
+        //this.txtSearch.ArrowUp += 
+        //this.txtSearch.ArrowUp += 
+        //this.txtSearch.PageUp += 
+        //this.txtSearch.PageTab += 
+        //this.txtSearch.Tab += 
+        //this.txtSearch.ShiftTab += 
+        this.txtSearch.SpecialKeyPressed += (_, args) => txtSearch_HandleKey(this, args);
+        this.txtSearch.TextChanged += (_, _) => RefreshList();
+        // --
         this.lstItems.PreviewMouseLeftButtonUp += lstItems_PreviewMouseLeftButtonUp;
         this.lstItems.PreviewKeyUp += lstItems_PreviewKeyUp;
         Action<bool, ListItemFile> goToItem = (commit, file) => {
@@ -106,6 +119,11 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         };
         DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
+
+    record KeyEventArgs2(
+        KeyboardDevice KeyboardDevice,
+        Key Key
+    );
 
     private void AdjustPosition() {
         ThreadHelper.ThrowIfNotOnUIThread();
@@ -154,23 +172,17 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             listItems.Add(viewModel);
         }
         lstItems.ItemsSource = Items = listItems;
-    }
-
-    private void txtSearch_TextChanged(object sender, TextChangedEventArgs e) {
-        RefreshList();
-        if (Items.Count > 0) {
+        if (Items.Count >= 1) {
             lstItems.SelectedIndex = 0;
-            EnsureSelectedItemIsVisible();
         }
     }
 
-    private async void txtSearch_PreviewKeyDown(object sender, KeyEventArgs e) {
+    private async void txtSearch_HandleKey(object sender, VsKeyInfo e) {
         // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
         // so they work normally for text navigation and selection
-        if (e.KeyboardDevice.IsKeyDown(Key.Tab)) {
-            var reverse = e.KeyboardDevice.IsKeyDown(Key.LeftShift);
+        if (e.Key == Key.Tab) {
+            var reverse = e.ShiftPressed;
             Close();
-            e.Handled = true;
             var dict = new Dictionary<SearchType, (int backward, int forward)>() {
                 { SearchType.Files, (backword: PackageIds.ShowFastFetchCommandSearchForm, forward: PackageIds.ShowMethodSearchForm)},
                 { SearchType.Symbols, (backword: PackageIds.ShowFileSearchForm, forward: PackageIds.ShowCommandSearchForm)},
@@ -179,21 +191,16 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 { SearchType.FastFetchCommands, (backword: PackageIds.ShowKnownCommandSearchForm, forward: PackageIds.ShowFileSearchForm)},
             };
             if (dict.TryGetValue(_searchType, out var cmds)) {
-                CommandService.Execute(new CommandID(PackageGuids.QuickJump2022, reverse ? cmds.backward : cmds.forward));
+                Dispatcher.BeginInvoke(() => 
+                    CommandService.Execute(new CommandID(PackageGuids.QuickJump2022, reverse ? cmds.backward : cmds.forward))
+                );
             }
         }
         else if (e.Key == Key.Escape) {
             Close();
-            e.Handled = true;
         }
         else if (e.Key == Key.Return) {
             await GoToItem(true);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control) {
-            // Handle Ctrl+A to select all text
-            txtSearch.SelectAll();
-            e.Handled = true;
         }
         else if (e.Key == Key.Up) {
             if (lstItems.SelectedIndex > 0) {
@@ -201,7 +208,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 EnsureSelectedItemIsVisible();
             }
             GoToItem();
-            e.Handled = true;
         }
         else if (e.Key == Key.Down) {
             if (lstItems.SelectedIndex < Items.Count - 1) {
@@ -209,7 +215,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 EnsureSelectedItemIsVisible();
             }
             GoToItem();
-            e.Handled = true;
         }
         if (e.Key == Key.PageUp) {
             if (lstItems.SelectedIndex >= PageSize)
@@ -218,7 +223,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 lstItems.SelectedIndex = 0;
             EnsureSelectedItemIsVisible();
             await GoToItem();
-            e.Handled = true;
         }
         else if (e.Key == Key.PageDown) {
             if (lstItems.SelectedIndex < Items.Count - PageSize)
@@ -227,51 +231,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 lstItems.SelectedIndex = Items.Count - 1;
             EnsureSelectedItemIsVisible();
             await GoToItem();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Back && Keyboard.Modifiers == ModifierKeys.Control) {
-            txtSearch.Text = "";
-            e.Handled = true;
-        }
-        else if (Keyboard.Modifiers == (ModifierKeys.Alt | ModifierKeys.Shift)) {
-            if (e.SystemKey == Key.Left) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.SystemKey == Key.Right) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
-        }
-        else if (Keyboard.Modifiers == ModifierKeys.Alt) {
-            if (e.SystemKey == Key.Left) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.SystemKey == Key.Right) {
-                SubwordNavigation.ExecuteSubWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
-        }
-        else if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)) {
-            if (e.Key == Key.Left) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Right) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Extend, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
-        }
-        else if (Keyboard.Modifiers == ModifierKeys.Control) {
-            if (e.Key == Key.Left) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Backward, txtSearch);
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Right) {
-                SubwordNavigation.ExecuteWholeWords(SubwordNavigationAction.Move, SubwordNavigationDirection.Forward, txtSearch);
-                e.Handled = true;
-            }
         }
     }
 
@@ -331,10 +290,22 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private void lstItems_PreviewKeyUp(object sender, KeyEventArgs e) {
-        txtSearch.Focus();
-        txtSearch.SelectionStart = txtSearch.Text.Length;
+        var editor = txtSearch as InputTextEditor;
+        if (editor != null) {
+            //editor.Focus();
+        }
     }
     
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    protected override void OnClosed(EventArgs e) {
+        base.OnClosed(e);
+        if (txtSearch != null) {
+            // TODO: 
+            // txtSearch.EscapePressed -= txtSearch_EscapePressed;
+            // txtSearch.EnterPressed -= txtSearch_EnterPressed;
+            // txtSearch.PreviewKeyDown -= txtSearch_PreviewKeyDown;
+        }
+    }
 }

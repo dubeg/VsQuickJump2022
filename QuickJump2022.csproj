@@ -57,23 +57,20 @@
     <Compile Include="Commands\ShowCommandSearchForm.cs" />
     <Compile Include="Commands\ShowMethodSearchForm.cs" />
     <Compile Include="Commands\TestCommand.cs" />
-    <Compile Include="Forms\InputForm.xaml.cs">
-      <DependentUpon>InputForm.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Models\KnownCommandItem.cs" />
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
-    <Compile Include="TextEditor\AllowedCommands.cs" />
-    <Compile Include="TextEditor\CodeBehaviorFlags.cs" />
-    <Compile Include="TextEditor\CodeEditorCommandFilter.cs" />
-    <Compile Include="TextEditor\HostEditorHelper.cs" />
-    <Compile Include="TextEditor\Hoster.cs" />
+    <Compile Include="TextEditor\EditorCommandFilter.cs" />
+    <Compile Include="TextEditor\EditorHost.AllowedCommands.cs" />
+    <Compile Include="TextEditor\EditorHost.cs" />
     <Compile Include="TextEditor\InputTextEditor.xaml.cs">
       <DependentUpon>InputTextEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TextEditor\VsKeyInfo.cs" />
     <Compile Include="Text\Scanner.cs" />
     <Compile Include="Text\SubWordNavigation.cs" />
     <Compile Include="Tools\DebounceUtils.cs" />
+    <Compile Include="Tools\DependencyPropertyHelper.cs" />
     <Compile Include="Tools\DismissOnClickOutsideBounds.cs" />
     <Compile Include="Models\FileItem.cs" />
     <Compile Include="Models\CommandItem.cs" />
@@ -103,10 +100,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
-    <Page Include="Forms\InputForm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Forms\SearchForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

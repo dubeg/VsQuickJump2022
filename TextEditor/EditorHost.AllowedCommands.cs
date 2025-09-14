@@ -1,16 +1,19 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QuickJump2022.TextEditor;
-
-public static class AllowedCommands {
-    public static Dictionary<Guid, uint[]> Instance = new() {
+public partial class EditorHost {
+    public static Dictionary<Guid, uint[]> AllowedCommands = new() {
         //https://learn.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.vsconstants.vsstd2kcmdid?view=visualstudiosdk-2022
         //https://learn.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.vsconstants.vsstd2kcmdid
         {
             VSConstants.GUID_VSStandardCommandSet97,
-            new uint[]{ 
+            new uint[]{
                 (uint)VSConstants.VSStd97CmdID.SelectAll
             }
         },
@@ -21,8 +24,8 @@ public static class AllowedCommands {
                 (uint)VSConstants.VSStd2KCmdID.TYPECHAR,
                 (uint)VSConstants.VSStd2KCmdID.BACKSPACE,
                 (uint)VSConstants.VSStd2KCmdID.RETURN,
-                //(uint)VSConstants.VSStd2KCmdID.TAB,
-                //(uint)VSConstants.VSStd2KCmdID.BACKTAB,
+                (uint)VSConstants.VSStd2KCmdID.TAB,
+                (uint)VSConstants.VSStd2KCmdID.BACKTAB,
                 (uint)VSConstants.VSStd2KCmdID.DELETE,
                 (uint)VSConstants.VSStd2KCmdID.LEFT,
                 (uint)VSConstants.VSStd2KCmdID.LEFT_EXT,
@@ -46,6 +49,10 @@ public static class AllowedCommands {
                 (uint)VSConstants.VSStd2KCmdID.WORDNEXT,
                 (uint)VSConstants.VSStd2KCmdID.WORDNEXT_EXT,
                 (uint)VSConstants.VSStd2KCmdID.CANCEL,
+                (uint)VSConstants.VSStd2KCmdID.UP,
+                (uint)VSConstants.VSStd2KCmdID.DOWN,
+                (uint)VSConstants.VSStd2KCmdID.PAGEUP,
+                (uint)VSConstants.VSStd2KCmdID.PAGEDN,
             }
         },
         {
