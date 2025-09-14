@@ -86,6 +86,7 @@
     <Compile Include="Services\ClassificationService.cs" />
     <Compile Include="Tools\ColorUtils.cs" />
     <Compile Include="Tools\CommandNameExtensions.cs" />
+    <Compile Include="Tools\DocUtils.cs" />
     <Compile Include="Tools\DoubleUtil.cs" />
     <Compile Include="Tools\FontsAndColorsHelper.cs" />
     <Compile Include="Interop\UnsafeNativeMethods.cs" />

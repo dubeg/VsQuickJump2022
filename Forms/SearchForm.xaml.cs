@@ -255,7 +255,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 if (commit) {
                     // The dialog must be closed before executing a command
                     // in case the command opens another modal dialog.
-                    CommandService.Execute(command.Item);
+                    Dispatcher.BeginInvoke(() => CommandService.Execute(command.Item));
                     return;
                 }
             }
@@ -263,13 +263,13 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 if (commit) {
                     // The dialog must be closed before executing a command bar button
                     // in case it opens another modal dialog.
-                    CommandService.Execute(knownCommand.Item.Command);
+                    Dispatcher.BeginInvoke(() => CommandService.Execute(knownCommand.Item.Command));
                     return;
                 }
             }
             else if (listItem is ListItemFastFetchCommand fastFetch) {
                 if (commit) {
-                    CommandService.Execute(fastFetch.Item.CommandID);
+                    Dispatcher.BeginInvoke(() => CommandService.Execute(fastFetch.Item.CommandID));
                     return;
                 }
             }

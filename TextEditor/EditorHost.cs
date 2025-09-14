@@ -42,8 +42,6 @@ public partial class EditorHost {
     }
     private IWpfTextView _wpfTextView;
     private IWpfTextViewHost _wpfTextViewHost;
-    private bool _hasFocus;
-    private bool _disposedValue;
     private uint _unregisterPriorityCommandTargetCookie;
     private IVsTextView _vsTextView;
     private ThreadMessageEventHandler _threadFilter;
@@ -84,7 +82,6 @@ public partial class EditorHost {
         ]);
 
         CommandFilter = new EditorCommandFilter(AllowedCommands);
-        CommandFilter.HasFocus = this._hasFocus;
 
         var vsTextView = VsEditorAdaptersFactoryService.CreateVsTextViewAdapter(OleServiceProvider, roleSet);
         ((IVsTextEditorPropertyCategoryContainer)vsTextView).GetPropertyCategory(DefGuidList.guidEditPropCategoryViewMasterSettings, out var propContainer);
@@ -120,29 +117,13 @@ public partial class EditorHost {
         _wpfTextView.Options.SetOptionValue(DefaultTextViewOptions.UseVisibleWhitespaceId, true);
         _wpfTextView.Options.SetOptionValue(DefaultOptions.FallbackFontId, "Consolas"); // Unused
 
-        this._wpfTextViewHost.HostControl.IsKeyboardFocusWithinChanged += HostControl_IsKeyboardFocusWithinChanged;
+        _threadFilter = new ThreadMessageEventHandler(this.FilterThreadMessage);
+        ComponentDispatcher.ThreadFilterMessage += _threadFilter;
         this._wpfTextViewHost.HostControl.TabIndex = 0;
-        this._hasFocus = this._wpfTextViewHost.HostControl.IsKeyboardFocusWithin;
 
         VsRegisterPriorityCommandTarget.RegisterPriorityCommandTarget(0U, CommandFilter, out _unregisterPriorityCommandTargetCookie);
 
         return this._wpfTextViewHost;
-    }
-    
-
-
-    private void HostControl_IsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e) {
-        _hasFocus = (bool)e.NewValue;
-        if (CommandFilter != null) {
-            CommandFilter.HasFocus = _hasFocus;
-        }
-        if (_hasFocus) {
-            _threadFilter ??= new ThreadMessageEventHandler(this.FilterThreadMessage);
-            ComponentDispatcher.ThreadFilterMessage += _threadFilter;
-        }
-        else {
-            ComponentDispatcher.ThreadFilterMessage -= _threadFilter;
-        }
     }
 
     private void FilterThreadMessage(ref System.Windows.Interop.MSG msg, ref bool handled) {
@@ -189,8 +170,6 @@ public partial class EditorHost {
         VsRegisterPriorityCommandTarget.UnregisterPriorityCommandTarget(_unregisterPriorityCommandTargetCookie);
         ComponentDispatcher.ThreadFilterMessage -= _threadFilter;
         _wpfTextView.Close();
-        
-        
         var uiShell = ServiceProvider.GlobalProvider.GetService<SVsUIShell, IVsUIShell>();
         uiShell?.UpdateCommandUI(0); // 0 means immediate update
     }

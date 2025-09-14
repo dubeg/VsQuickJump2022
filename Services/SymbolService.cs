@@ -36,10 +36,10 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         if (document is null) return new();
         var semanticModel = await document.GetSemanticModelAsync();
         var syntaxRoot = await document.GetSyntaxRootAsync();
-        return ProcessSyntaxNodeWithSemantics(documentId?.Id, syntaxRoot, semanticModel);
+        return ProcessSyntaxNodeWithSemantics(documentId, syntaxRoot, semanticModel);
     }
 
-    private List<CodeItem> ProcessSyntaxNodeWithSemantics(Guid? documentId, SyntaxNode node, SemanticModel semanticModel) {
+    private List<CodeItem> ProcessSyntaxNodeWithSemantics(DocumentId documentId, SyntaxNode node, SemanticModel semanticModel) {
         var codeItems = new List<CodeItem>();
         foreach (var child in node.DescendantNodes()) {
             if (child is FieldDeclarationSyntax fieldDeclaration) {
@@ -76,7 +76,7 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         return codeItems;
     }
 
-    private CodeItem ConvertSymbolToCodeItem(ISymbol symbol, Guid? documentId) {
+    private CodeItem ConvertSymbolToCodeItem(ISymbol symbol, DocumentId documentId) {
         // Ignore enum members (they are represented as fields in Roslyn)
         if (symbol is IFieldSymbol fieldSymbol && fieldSymbol.ContainingType?.TypeKind == TypeKind.Enum) {
             return null;
