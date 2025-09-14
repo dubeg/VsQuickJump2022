@@ -120,6 +120,11 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
 
+    private void SuspendAndClose() {
+        txtSearch.SuspendProcessing();
+        Close();
+    }
+
     record KeyEventArgs2(
         KeyboardDevice KeyboardDevice,
         Key Key
@@ -182,7 +187,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // so they work normally for text navigation and selection
         if (e.Key == Key.Tab) {
             var reverse = e.ShiftPressed;
-            Close();
+            SuspendAndClose();
             var dict = new Dictionary<SearchType, (int backward, int forward)>() {
                 { SearchType.Files, (backword: PackageIds.ShowFastFetchCommandSearchForm, forward: PackageIds.ShowMethodSearchForm)},
                 { SearchType.Symbols, (backword: PackageIds.ShowFileSearchForm, forward: PackageIds.ShowCommandSearchForm)},
@@ -191,13 +196,11 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 { SearchType.FastFetchCommands, (backword: PackageIds.ShowKnownCommandSearchForm, forward: PackageIds.ShowFileSearchForm)},
             };
             if (dict.TryGetValue(_searchType, out var cmds)) {
-                Dispatcher.BeginInvoke(() => 
-                    CommandService.Execute(new CommandID(PackageGuids.QuickJump2022, reverse ? cmds.backward : cmds.forward))
-                );
+                Dispatcher.BeginInvoke(() => CommandService.Execute(new CommandID(PackageGuids.QuickJump2022, reverse ? cmds.backward : cmds.forward)));
             }
         }
         else if (e.Key == Key.Escape) {
-            Close();
+            SuspendAndClose();
         }
         else if (e.Key == Key.Return) {
             await GoToItem(true);
@@ -247,10 +250,10 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private async Task GoToItem(bool commit = false) {
         var selectedItem = lstItems.SelectedItem as ListItemViewModel;
         if (selectedItem != null) {
-            if (commit) Close();
+            if (commit) SuspendAndClose();
             var listItem = selectedItem.Item;
             if (listItem is ListItemFile file) DebouncedGoToFile(commit, file);
-            else if (listItem is ListItemSymbol symbol) await GoToService.GoToSymbolAsync(symbol);
+            else if (listItem is ListItemSymbol symbol) Dispatcher.BeginInvoke(() => GoToService.GoToSymbolAsync(symbol));
             else if (listItem is ListItemCommand command) {
                 if (commit) {
                     // The dialog must be closed before executing a command
@@ -275,6 +278,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             }
         }
     }
+
+    
 
     private void EnsureSelectedItemIsVisible() {
         if (lstItems.SelectedItem != null) {

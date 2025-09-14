@@ -24,8 +24,6 @@
     Background="Transparent"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
-    platform:FocusHelper.EnableActivationSynchronization="True"
-    platform:FocusHelper.FocusTarget="{Binding ElementName=txtSearch}"
     SizeToContent="Height"
     toolkit:Themes.UseVsTheme="True"
     HasDialogFrame="False"

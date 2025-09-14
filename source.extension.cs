@@ -4,15 +4,13 @@
 //     Available from https://marketplace.visualstudio.com/items?itemName=MadsKristensen.VsixSynchronizer64
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace QuickJump2022
-{
-    internal sealed partial class Vsix
-    {
+namespace QuickJump2022 {
+    internal sealed partial class Vsix {
         public const string Id = "QuickJump2022.a942616b-4a01-4229-b391-d7cf0e1e64d0";
         public const string Name = "QuickJump2022";
         public const string Description = @"Quick Jump 2022";
         public const string Language = "en-US";
-        public const string Version = "1.47";
+        public const string Version = "1.50";
         public const string Author = "DUBEG";
         public const string Tags = "";
         public const bool IsPreview = false;

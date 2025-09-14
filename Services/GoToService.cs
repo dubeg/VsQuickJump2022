@@ -1,22 +1,16 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.LanguageServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Models;
-using QuickJump2022.Tools;
+using System.ComponentModel.Composition;
+using System.IO;
 
 namespace QuickJump2022.Services;
+
 public class GoToService {
 
     // [Import] public ITextDocumentFactoryService TextDocumentFactoryService { get; set; }
@@ -122,7 +116,7 @@ public class GoToService {
         await GoToLineAsync(textView, symbol.Line);
     }
 
- 
+
 
     public async Task GoToLineAsync(IWpfTextView textView, int lineNumber) {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

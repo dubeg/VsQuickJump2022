@@ -166,11 +166,18 @@ public partial class EditorHost {
         handled = ErrorHandler.Succeeded(hr);
     }
 
+    public void StopProcessing() {
+        Close();
+    }
+
     public void Close() {
+        if (_closed) return; _closed = true;
         VsRegisterPriorityCommandTarget.UnregisterPriorityCommandTarget(_unregisterPriorityCommandTargetCookie);
         ComponentDispatcher.ThreadFilterMessage -= _threadFilter;
         _wpfTextView.Close();
         var uiShell = ServiceProvider.GlobalProvider.GetService<SVsUIShell, IVsUIShell>();
         uiShell?.UpdateCommandUI(0); // 0 means immediate update
     }
+
+    bool _closed = false;
 }

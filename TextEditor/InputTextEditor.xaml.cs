@@ -106,6 +106,8 @@ public partial class InputTextEditor : UserControl {
         return textView.LineHeight;
     }
 
+    public void SuspendProcessing() => _editorHost.StopProcessing();
+
     private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         if (d is InputTextEditor control && e.NewValue is string newText) {
             control.UpdateText(newText);
