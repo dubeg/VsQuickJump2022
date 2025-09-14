@@ -75,29 +75,44 @@ public partial class EditorHost {
         var vsTextBuffer = VsEditorAdaptersFactoryService.CreateVsTextBufferAdapter(OleServiceProvider, contentType);
         vsTextBuffer.InitializeContent(initialText, initialText.Length);
 
-        var textBuffer = VsEditorAdaptersFactoryService.GetDataBuffer(vsTextBuffer);
-        var roleSet = TextEditorFactoryService.CreateTextViewRoleSet([
-            PredefinedTextViewRoles.Editable,
-            PredefinedTextViewRoles.Interactive,
-        ]);
+        var codeWindowBehaviourFlags = CodeWindowBehaviourFlags.CWB_DISABLEDROPDOWNBAR | CodeWindowBehaviourFlags.CWB_DISABLESPLITTER | CodeWindowBehaviourFlags.CWB_DISABLEDIFF;
+        _codeWindow = VsEditorAdaptersFactoryService.CreateVsCodeWindowAdapter(OleServiceProvider);
+        ((IVsCodeWindowEx)_codeWindow).Initialize((uint)codeWindowBehaviourFlags, VSUSERCONTEXTATTRIBUTEUSAGE.VSUC_Usage_Filter, string.Empty, string.Empty, 196608U, new INITVIEW[1]);
+        var codeWindow = _codeWindow as IVsUserData;
+        var textViewRolesGuid = VSConstants.VsTextBufferUserDataGuid.VsTextViewRoles_guid;
+        codeWindow.SetData(ref textViewRolesGuid, (object)"Editable,Interactive");
+        _codeWindow.SetBuffer(vsTextBuffer as IVsTextLines);
+        _codeWindow.GetPrimaryView(out var textView);
+        _wpfTextViewHost = VsEditorAdaptersFactoryService.GetWpfTextViewHost(textView);
+        _wpfTextView = _wpfTextViewHost.TextView;
+
+        //var vsTextBuffer = VsEditorAdaptersFactoryService.CreateVsTextBufferAdapter(OleServiceProvider, contentType);
+        //vsTextBuffer.InitializeContent(initialText, initialText.Length);
+        //var textBuffer = VsEditorAdaptersFactoryService.GetDataBuffer(vsTextBuffer);
+        //var roleSet = TextEditorFactoryService.CreateTextViewRoleSet([
+        //    PredefinedTextViewRoles.Editable,
+        //    PredefinedTextViewRoles.Interactive,
+        //]);
 
         CommandFilter = new EditorCommandFilter(AllowedCommands);
-
-        var vsTextView = VsEditorAdaptersFactoryService.CreateVsTextViewAdapter(OleServiceProvider, roleSet);
-        ((IVsTextEditorPropertyCategoryContainer)vsTextView).GetPropertyCategory(DefGuidList.guidEditPropCategoryViewMasterSettings, out var propContainer);
-        propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewComposite_AllCodeWindowDefaults, true);
-        propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewGlobalOpt_AutoScrollCaretOnTextEntry, true);
-        _vsTextView = vsTextView;
-        vsTextView.AddCommandFilter(CommandFilter, out var nextCmdTarget);
+        textView.AddCommandFilter(CommandFilter, out var nextCmdTarget);
         CommandFilter.NextCommandTarget = nextCmdTarget;
-        vsTextView.Initialize(
-            (IVsTextLines)vsTextBuffer,
-            IntPtr.Zero,
-            (uint)TextViewInitFlags.VIF_DEFAULT | (uint)TextViewInitFlags3.VIF_NO_HWND_SUPPORT,
-            [new INITVIEW { fSelectionMargin = 0, fWidgetMargin = 0, fVirtualSpace = 0, fDragDropMove = 0, }]
-        );
-        _wpfTextViewHost = VsEditorAdaptersFactoryService.GetWpfTextViewHost(vsTextView);
-        _wpfTextView = VsEditorAdaptersFactoryService.GetWpfTextView(vsTextView);
+
+        //var vsTextView = VsEditorAdaptersFactoryService.CreateVsTextViewAdapter(OleServiceProvider, roleSet);
+        //((IVsTextEditorPropertyCategoryContainer)vsTextView).GetPropertyCategory(DefGuidList.guidEditPropCategoryViewMasterSettings, out var propContainer);
+        //propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewComposite_AllCodeWindowDefaults, true);
+        //propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewGlobalOpt_AutoScrollCaretOnTextEntry, true);
+        //_vsTextView = vsTextView;
+        //vsTextView.AddCommandFilter(CommandFilter, out var nextCmdTarget);
+        //CommandFilter.NextCommandTarget = nextCmdTarget;
+        //vsTextView.Initialize(
+        //    (IVsTextLines)vsTextBuffer,
+        //    IntPtr.Zero,
+        //    (uint)TextViewInitFlags.VIF_DEFAULT | (uint)TextViewInitFlags3.VIF_NO_HWND_SUPPORT,
+        //    [new INITVIEW { fSelectionMargin = 0, fWidgetMargin = 0, fVirtualSpace = 0, fDragDropMove = 0, }]
+        //);
+        //_wpfTextViewHost = VsEditorAdaptersFactoryService.GetWpfTextViewHost(vsTextView);
+        //_wpfTextView = VsEditorAdaptersFactoryService.GetWpfTextView(vsTextView);
 
         _wpfTextView.Options.SetOptionValue(DefaultTextViewHostOptions.EnableFileHealthIndicatorOptionId, false);
         _wpfTextView.Options.SetOptionValue(DefaultTextViewHostOptions.EditingStateMarginOptionId, false);
@@ -166,9 +181,7 @@ public partial class EditorHost {
         handled = ErrorHandler.Succeeded(hr);
     }
 
-    public void StopProcessing() {
-        Close();
-    }
+    public void StopProcessing() => Close();
 
     public void Close() {
         if (_closed) return; _closed = true;
@@ -180,4 +193,5 @@ public partial class EditorHost {
     }
 
     bool _closed = false;
+    private IVsCodeWindow _codeWindow;
 }

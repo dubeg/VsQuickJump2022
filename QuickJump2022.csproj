@@ -60,6 +60,7 @@
     <Compile Include="Models\KnownCommandItem.cs" />
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
+    <Compile Include="TextEditor\CodeWindowBehaviourFlags.cs" />
     <Compile Include="TextEditor\EditorCommandFilter.cs" />
     <Compile Include="TextEditor\EditorHost.AllowedCommands.cs" />
     <Compile Include="TextEditor\EditorHost.cs" />
