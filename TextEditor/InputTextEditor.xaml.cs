@@ -23,19 +23,25 @@ public partial class InputTextEditor : UserControl {
     public event EventHandler TextChanged;
     public event EditorCommandFilter.InputEditorSpecialKeyHandler SpecialKeyPressed;
     public static readonly DependencyProperty TextProperty = DP.Register<InputTextEditor, string>(nameof(Text), string.Empty, OnTextChanged);
-    
+    public static readonly DependencyProperty BorderBackgroundProperty = DP.Register<InputTextEditor, Brush>(nameof(BorderBackground), Brushes.Transparent, null);
+
     public string Text {
         get => (string)GetValue(TextProperty);
         set => SetValue(TextProperty, value);
     }
 
+    public Brush BorderBackground {
+        get => (Brush)GetValue(BorderBackgroundProperty);
+        set => SetValue(BorderBackgroundProperty, value);
+    }
+
     //[Import] internal ITextEditorFactoryService TextEditorFactoryService { get; set; }
     //[Import] internal ITextBufferFactoryService TextBufferFactoryService { get; set; }
-    //[Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; set; }
+    [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; set; }
     [Import] internal IClassificationFormatMapService ClassificationFormatMapService { get; set; }
-    //[Import] internal IEditorFormatMapService EditorFormatMapService { get; set; }
+    [Import] internal IEditorFormatMapService EditorFormatMapService { get; set; }
     //[Import] internal IClassifierAggregatorService ClassifierAggregatorService { get; set; }
-    //[Import] internal IContentTypeRegistryService ContentTypeRegistryService { get; set; }
+    [Import] internal IContentTypeRegistryService ContentTypeRegistryService { get; set; }
 
     private EditorHost _editorHost;
     private IWpfTextView TextView => _editorHost?.WpfTextView;
@@ -72,6 +78,8 @@ public partial class InputTextEditor : UserControl {
             + Padding.Bottom
             + BorderThickness.Top
             + BorderThickness.Bottom
+            + EditorBorder.BorderThickness.Top
+            + EditorBorder.BorderThickness.Bottom
             ;
         EditorHost.Content = textViewHost.HostControl;
         if (_editorHost.CommandFilter != null) {
@@ -84,6 +92,20 @@ public partial class InputTextEditor : UserControl {
                 }
             };
         }
+        // --
+        var formatMap = EditorFormatMapService.GetEditorFormatMap(TextView);
+        var resources = formatMap.GetProperties("TextView Background");
+        if (resources.Contains(EditorFormatDefinition.BackgroundBrushId)) {
+            var backgroundBrush = resources[EditorFormatDefinition.BackgroundBrushId] as Brush;
+            if (backgroundBrush is SolidColorBrush solidBrush) {
+                BorderBackground = backgroundBrush;
+            }
+        }
+        else { 
+            // TODO: try to get it using FontsAndColors service.
+            // I'm not sure it's needed though. The code here might never run.
+        }
+        // --
         Focus();
     }
 

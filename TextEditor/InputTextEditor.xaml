@@ -18,9 +18,12 @@
     d:DesignWidth="200"
     HorizontalAlignment="Left"
     VerticalAlignment="Center"
-    Padding="4"
+    Padding="0"
+    BorderThickness="0"
     FontSize="16"
-    Background="{DynamicResource {x:Static platform:EnvironmentColors.EnvironmentBackgroundBrushKey }}"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
     >
-    <ContentControl x:Name="EditorHost" />
+    <Border x:Name="EditorBorder" BorderThickness="4" BorderBrush="{Binding BorderBackground}">
+        <ContentControl x:Name="EditorHost" />
+    </Border>
 </UserControl>
