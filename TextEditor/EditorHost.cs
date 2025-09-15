@@ -166,7 +166,11 @@ public partial class EditorHost {
         };
         if (!ErrorHandler.Succeeded(this.VsFilterKeys.TranslateAcceleratorEx(
             [msg1], 
-            (uint)(__VSTRANSACCELEXFLAGS.VSTAEXF_NoFireCommand | __VSTRANSACCELEXFLAGS.VSTAEXF_UseTextEditorKBScope | __VSTRANSACCELEXFLAGS.VSTAEXF_AllowModalState),
+            (uint)(
+                __VSTRANSACCELEXFLAGS.VSTAEXF_NoFireCommand 
+                | __VSTRANSACCELEXFLAGS.VSTAEXF_UseTextEditorKBScope 
+                | __VSTRANSACCELEXFLAGS.VSTAEXF_AllowModalState
+            ),
             0U, [], out var pguidCmd, out var pdwCmd, out _, out _))
         ) {
             return;
@@ -177,7 +181,7 @@ public partial class EditorHost {
             return;
         }
         Debug.WriteLine($"Executing {cmdAndId}");
-        int hr = VsFilterKeys.TranslateAcceleratorEx([msg1], 20U, 0U, [], out _, out _, out _, out _);
+        int hr = VsFilterKeys.TranslateAcceleratorEx([msg1], (uint)(__VSTRANSACCELEXFLAGS.VSTAEXF_UseTextEditorKBScope | __VSTRANSACCELEXFLAGS.VSTAEXF_AllowModalState), 0U, [], out _, out _, out _, out _);
         handled = ErrorHandler.Succeeded(hr);
     }
 

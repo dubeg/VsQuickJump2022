@@ -50,9 +50,6 @@ public class EditorCommandFilter : IOleCommandTarget {
         if (pguidCmdGroup == VSConstants.VSStd2K) {
             var commandID = (VSConstants.VSStd2KCmdID)nCmdID;
             switch (commandID) {
-                case VSConstants.VSStd2KCmdID.TYPECHAR: break;
-                case VSConstants.VSStd2KCmdID.BACKSPACE: break;
-                // --
                 case VSConstants.VSStd2KCmdID.TAB:
                 case VSConstants.VSStd2KCmdID.BACKTAB:
                 case VSConstants.VSStd2KCmdID.UP:

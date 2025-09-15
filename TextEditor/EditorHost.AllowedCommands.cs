@@ -14,7 +14,10 @@ public partial class EditorHost {
         {
             VSConstants.GUID_VSStandardCommandSet97,
             new uint[]{
-                (uint)VSConstants.VSStd97CmdID.SelectAll
+                (uint)VSConstants.VSStd97CmdID.SelectAll,
+                (uint)VSConstants.VSStd97CmdID.Copy,
+                (uint)VSConstants.VSStd97CmdID.Paste,
+                (uint)VSConstants.VSStd97CmdID.Cut,
             }
         },
         {
@@ -35,6 +38,12 @@ public partial class EditorHost {
                 (uint)VSConstants.VSStd2KCmdID.HOME_EXT,
                 (uint)VSConstants.VSStd2KCmdID.END,
                 (uint)VSConstants.VSStd2KCmdID.END_EXT,
+                (uint)VSConstants.VSStd2KCmdID.EOL,
+                (uint)VSConstants.VSStd2KCmdID.EOL_EXT,
+                (uint)VSConstants.VSStd2KCmdID.BOL,
+                (uint)VSConstants.VSStd2KCmdID.BOL_EXT,
+                (uint)VSConstants.VSStd2KCmdID.DELETETOBOL,
+                (uint)VSConstants.VSStd2KCmdID.DELETETOEOL,
                 (uint)VSConstants.VSStd2KCmdID.SELECTALL,
                 (uint)VSConstants.VSStd2KCmdID.CUT,
                 (uint)VSConstants.VSStd2KCmdID.COPY,
