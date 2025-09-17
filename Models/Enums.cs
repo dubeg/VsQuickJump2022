@@ -11,6 +11,11 @@ public static class Enums {
         All,
     }
 
+    public enum FileSearchScope {
+        Solution,
+        ActiveProject
+    }
+
     public enum TokenType {
         None,
         Namespace,

@@ -15,9 +15,9 @@ public class ProjectFileService() {
 
     public async Task<List<FileItem>> GetFilesInSolutionAsync(bool activeProjectOnly = false) {
         // --
-        static async Task<IEnumerable<Project>> GetActiveProjectAsync() { 
+        static async Task<IEnumerable<Project>> GetActiveProjectAsync() {
             var project = await VS.Solutions.GetActiveProjectAsync();
-            return [project];
+            return project is null ? Enumerable.Empty<Project>() : [ project ];
         }
         // --
         var results = new List<FileItem>();
@@ -25,6 +25,7 @@ public class ProjectFileService() {
             ? await GetActiveProjectAsync()
             : await VS.Solutions.GetAllProjectsAsync();
         foreach (var project in projects) {
+            if (project is null) continue;
             if (!project.IsLoaded) continue;
             var projectName = project.Name;
             var projectPath = project.FullPath;

@@ -53,6 +53,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
     private SearchType _searchType;
+    private Enums.FileSearchScope _fileScope = Enums.FileSearchScope.Solution;
 
     public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "", bool enableCommandTabCycle = false) {
         var dialog = new SearchForm(package, searchType, initialText, enableCommandTabCycle);
@@ -84,6 +85,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             package.KnownCommandService,
             package.FastFetchCommandService,
             searchType,
+            _fileScope,
             package.GeneralOptions.FileSortType,
             package.GeneralOptions.CSharpSortType,
             package.GeneralOptions.MixedSortType
@@ -138,6 +140,31 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             _package.KnownCommandService,
             _package.FastFetchCommandService,
             newType,
+            _fileScope,
+            _package.GeneralOptions.FileSortType,
+            _package.GeneralOptions.CSharpSortType,
+            _package.GeneralOptions.MixedSortType
+        );
+        await SearchInstance.LoadDataAsync();
+        RefreshList();
+        if (Items.Count > 0) {
+            lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
+        }
+    }
+
+    private async Task SwitchFileScopeAsync(Enums.FileSearchScope newScope) {
+        if (_searchType != SearchType.Files) return;
+        _fileScope = newScope;
+        UpdateStatusBar();
+        SearchInstance = new SearchInstance(
+            _package.ProjectFileService,
+            _package.SymbolService,
+            _package.CommandService,
+            _package.KnownCommandService,
+            _package.FastFetchCommandService,
+            _searchType,
+            _fileScope,
             _package.GeneralOptions.FileSortType,
             _package.GeneralOptions.CSharpSortType,
             _package.GeneralOptions.MixedSortType
@@ -211,8 +238,19 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
         // so they work normally for text navigation and selection
         if (e.Key == Key.Tab) {
+            if (_searchType == SearchType.Files) {
+                var reverse = e.ShiftPressed;
+                var nextScope = (_fileScope, reverse) switch {
+                    (Enums.FileSearchScope.Solution, false) => Enums.FileSearchScope.ActiveProject,
+                    (Enums.FileSearchScope.Solution, true) => Enums.FileSearchScope.ActiveProject,
+                    (Enums.FileSearchScope.ActiveProject, false) => Enums.FileSearchScope.Solution,
+                    (Enums.FileSearchScope.ActiveProject, true) => Enums.FileSearchScope.Solution,
+                    _ => _fileScope
+                };
+                await SwitchFileScopeAsync(nextScope);
+            }
             // Cycle only among command search modes, and only if enabled by the invoker
-            if (_enableCommandTabCycle && (_searchType == SearchType.Commands || _searchType == SearchType.KnownCommands || _searchType == SearchType.FastFetchCommands)) {
+            else if (_enableCommandTabCycle && (_searchType == SearchType.Commands || _searchType == SearchType.KnownCommands || _searchType == SearchType.FastFetchCommands)) {
                 var reverse = e.ShiftPressed;
                 var nextType = (_searchType, reverse) switch {
                     (SearchType.Commands, false) => SearchType.KnownCommands,
@@ -358,7 +396,10 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
 
     private (string text, ImageMoniker moniker) GetScopeDisplay() {
         switch (_searchType) {
-            case SearchType.Files: return ("Solution", KnownMonikers.Solution);
+            case SearchType.Files:
+                return _fileScope == Enums.FileSearchScope.ActiveProject
+                    ? ("Active Project", KnownMonikers.CSProjectNode)
+                    : ("Solution", KnownMonikers.Solution);
             case SearchType.Symbols: return ("Document", KnownMonikers.Document);
             case SearchType.Commands: return ("Canonical Name", KnownMonikers.None);
             case SearchType.KnownCommands: return ("Custom Name", KnownMonikers.None);

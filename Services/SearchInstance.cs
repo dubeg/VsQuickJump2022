@@ -16,6 +16,7 @@ public class SearchInstance(
     KnownCommandService knownCommandService,
     FastFetchCommandService fastFetchCommandService,
     Enums.SearchType SearchType,
+    Enums.FileSearchScope FileScope,
     Enums.SortType FileSortType,
     Enums.SortType CSharpSortType,
     Enums.SortType MixedSortType
@@ -31,7 +32,7 @@ public class SearchInstance(
         // Files
         // -----------
         if (SearchType is Enums.SearchType.Files or Enums.SearchType.All) {
-            var items = await projectFileService.GetFilesInSolutionAsync();
+            var items = await projectFileService.GetFilesInSolutionAsync(activeProjectOnly: FileScope == Enums.FileSearchScope.ActiveProject);
             Files = items.Select(x => ListItemFile.FromFileItem(x)).ToList();
         }
         // -----------
