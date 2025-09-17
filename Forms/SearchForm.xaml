@@ -46,6 +46,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Search Input (using experimental InputTextEditor) -->
@@ -99,5 +100,50 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" 
+                Padding="4" 
+                BorderThickness="0,1,0,0" 
+                BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.MainWindowActiveBuildingBorderBrushKey }}"
+                Opacity="0.6"
+                >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- Search Type -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <imaging:CrispImage 
+                        Width="16" 
+                        Height="16" 
+                        Margin="0,0,6,0" 
+                        Moniker="{Binding ElementName=dialogWnd, Path=StatusLeftIcon}"
+                        Visibility="{Binding ElementName=dialogWnd, Path=StatusLeftIconVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                        />
+                    <TextBlock 
+                        VerticalAlignment="Center"
+                        Text="{Binding ElementName=dialogWnd, Path=StatusLeftText}"
+                        />
+                </StackPanel>
+                <!-- Scope -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock 
+                        VerticalAlignment="Center"
+                        Text="{Binding ElementName=dialogWnd, Path=StatusRightText}"
+                        />
+                    <imaging:CrispImage 
+                        Width="16" 
+                        Height="16" 
+                        Margin="6,0,0,0" 
+                        Moniker="{Binding ElementName=dialogWnd, Path=StatusRightIcon}" 
+                        Visibility="{Binding ElementName=dialogWnd, Path=StatusRightIconVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                        />
+                </StackPanel>
+            </Grid>
+        </Border>
+
     </Grid>
 </platform:DialogWindow>

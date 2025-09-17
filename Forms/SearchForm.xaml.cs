@@ -1,24 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Threading;
 using EnvDTE;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using QuickJump2022.Interop;
 using QuickJump2022.Models;
 using QuickJump2022.QuickJump.Tools;
 using QuickJump2022.Services;
-using QuickJump2022.Text;
 using QuickJump2022.TextEditor;
 using QuickJump2022.Tools;
 using static QuickJump2022.Models.Enums;
@@ -27,26 +22,37 @@ using Rect = System.Windows.Rect;
 namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
+    public static readonly DependencyProperty HintFontSizeProperty = DP.Register<SearchForm, double>(nameof(HintFontSize), 0d);
+    public static readonly DependencyProperty StatusLeftIconProperty = DP.Register<SearchForm, ImageMoniker>(nameof(StatusLeftIcon), default(ImageMoniker));
+    public static readonly DependencyProperty StatusLeftTextProperty = DP.Register<SearchForm, string>(nameof(StatusLeftText), string.Empty);
+    public static readonly DependencyProperty StatusLeftIconVisibilityProperty = DP.Register<SearchForm, bool>(nameof(StatusLeftIconVisibility), false);
+    public static readonly DependencyProperty StatusRightIconProperty = DP.Register<SearchForm, ImageMoniker>(nameof(StatusRightIcon), default(ImageMoniker));
+    public static readonly DependencyProperty StatusRightTextProperty = DP.Register<SearchForm, string>(nameof(StatusRightText), string.Empty);
+    public static readonly DependencyProperty StatusRightIconVisibilityProperty = DP.Register<SearchForm, bool>(nameof(StatusRightIconVisibility), false);
+    // -----------------
+    // Status Bar (Left: Type, Right: Scope)
+    // -----------------
+    public ImageMoniker StatusLeftIcon { get => (ImageMoniker)GetValue(StatusLeftIconProperty); set => SetValue(StatusLeftIconProperty, value);    }
+    public string StatusLeftText { get => (string)GetValue(StatusLeftTextProperty); set => SetValue(StatusLeftTextProperty, value);    }
+    public bool StatusLeftIconVisibility { get => (bool)GetValue(StatusLeftIconVisibilityProperty); set => SetValue(StatusLeftIconVisibilityProperty, value);    }
+    public ImageMoniker StatusRightIcon { get => (ImageMoniker)GetValue(StatusRightIconProperty); set => SetValue(StatusRightIconProperty, value);    }
+    public string StatusRightText { get => (string)GetValue(StatusRightTextProperty); set => SetValue(StatusRightTextProperty, value);    }
+    public bool StatusRightIconVisibility { get => (bool)GetValue(StatusRightIconVisibilityProperty); set => SetValue(StatusRightIconVisibilityProperty, value);    }
+    // --
     private DismissOnClickOutsideBounds _dismissOnClickOutsideBounds;
     public int PageSize => 20; // TODO: make it configurable
-    public static readonly DependencyProperty HintFontSizeProperty = DependencyProperty.Register(
-        nameof(HintFontSize), typeof(double), typeof(SearchForm), new PropertyMetadata(0d)
-    );
     public double HintFontSize { get => (double)GetValue(HintFontSizeProperty); set => SetValue(HintFontSizeProperty, value); }
     public SearchInstance SearchInstance { get; private set; }
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
     public ClassificationService ClassificationService { get; init; }
     public string CurrentText => txtSearch.Text ?? string.Empty;
-
     public Action<bool, ListItemFile> DebouncedGoToFile { get; }
-
     private bool _useSymbolColors = false;
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
     private SearchType _searchType;
-    private string _lastSearchText = string.Empty;
 
     public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "", bool enableCommandTabCycle = false) {
         var dialog = new SearchForm(package, searchType, initialText, enableCommandTabCycle);
@@ -99,6 +105,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             SearchType.Symbols => 800,
             _ => 600
         }; // TODO: configure via options.
+        UpdateStatusBar();
         // TODO: check the active document's width & don't make it larger than that.
         _initialText = initialText; // TODO: configure via options.
         if (!string.IsNullOrWhiteSpace(_initialText)) {
@@ -106,13 +113,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             txtSearch.SelectAll();
         }
         // --
-        // TODO: implement TextChanged in InputTextEditor
-        //this.txtSearch.ArrowUp += 
-        //this.txtSearch.ArrowUp += 
-        //this.txtSearch.PageUp += 
-        //this.txtSearch.PageTab += 
-        //this.txtSearch.Tab += 
-        //this.txtSearch.ShiftTab += 
         this.txtSearch.SpecialKeyPressed += (_, args) => txtSearch_HandleKey(this, args);
         this.txtSearch.TextChanged += (_, _) => RefreshList();
         // --
@@ -130,11 +130,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private async Task SwitchCommandSearchTypeAsync(SearchType newType) {
         if (newType != SearchType.Commands && newType != SearchType.KnownCommands && newType != SearchType.FastFetchCommands) return;
         _searchType = newType;
-        Width = newType switch {
-            SearchType.Files => 800,
-            SearchType.Symbols => 800,
-            _ => 600
-        };
+        UpdateStatusBar();
         SearchInstance = new SearchInstance(
             _package.ProjectFileService,
             _package.SymbolService,
@@ -158,11 +154,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         txtSearch.SuspendProcessing();
         Close();
     }
-
-    record KeyEventArgs2(
-        KeyboardDevice KeyboardDevice,
-        Key Key
-    );
 
     private void AdjustPosition() {
         ThreadHelper.ThrowIfNotOnUIThread();
@@ -225,11 +216,11 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 var reverse = e.ShiftPressed;
                 var nextType = (_searchType, reverse) switch {
                     (SearchType.Commands, false) => SearchType.KnownCommands,
-                    (SearchType.Commands, true)  => SearchType.FastFetchCommands,
+                    (SearchType.Commands, true) => SearchType.FastFetchCommands,
                     (SearchType.KnownCommands, false) => SearchType.FastFetchCommands,
-                    (SearchType.KnownCommands, true)  => SearchType.Commands,
+                    (SearchType.KnownCommands, true) => SearchType.Commands,
                     (SearchType.FastFetchCommands, false) => SearchType.Commands,
-                    (SearchType.FastFetchCommands, true)  => SearchType.KnownCommands,
+                    (SearchType.FastFetchCommands, true) => SearchType.KnownCommands,
                     _ => _searchType
                 };
                 await SwitchCommandSearchTypeAsync(nextType);
@@ -318,7 +309,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
     }
 
-    
+
 
     private void EnsureSelectedItemIsVisible() {
         if (lstItems.SelectedItem != null) {
@@ -339,17 +330,41 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             //editor.Focus();
         }
     }
-    
+
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    protected override void OnClosed(EventArgs e) {
-        base.OnClosed(e);
-        if (txtSearch != null) {
-            // TODO: 
-            // txtSearch.EscapePressed -= txtSearch_EscapePressed;
-            // txtSearch.EnterPressed -= txtSearch_EnterPressed;
-            // txtSearch.PreviewKeyDown -= txtSearch_PreviewKeyDown;
+    // --------------------------------------
+    // Status Bar helpers
+    // --------------------------------------
+    private void UpdateStatusBar() {
+        (StatusLeftText, StatusLeftIcon) = GetSearchTypeDisplay();
+        (StatusRightText, StatusRightIcon) = GetScopeDisplay();
+        StatusLeftIconVisibility = StatusLeftIcon.Id != KnownMonikers.None.Id;
+        StatusRightIconVisibility = StatusRightIcon.Id != KnownMonikers.None.Id;
+    }
+
+    private (string text, ImageMoniker moniker) GetSearchTypeDisplay() {
+        switch (_searchType) {
+            case SearchType.Files: return ("Files", KnownMonikers.Document);
+            case SearchType.Symbols: return ("Symbols", KnownMonikers.CodeDefinitionWindow);
+            case SearchType.Commands:
+            case SearchType.KnownCommands:
+            case SearchType.FastFetchCommands: return ("Commands", KnownMonikers.Settings);
+            case SearchType.All: return ("All", KnownMonikers.Search);
+            default: return (string.Empty, KnownMonikers.None);
+        }
+    }
+
+    private (string text, ImageMoniker moniker) GetScopeDisplay() {
+        switch (_searchType) {
+            case SearchType.Files: return ("Solution", KnownMonikers.Solution);
+            case SearchType.Symbols: return ("Document", KnownMonikers.Document);
+            case SearchType.Commands: return ("Canonical Name", KnownMonikers.None);
+            case SearchType.KnownCommands: return ("Custom Name", KnownMonikers.None);
+            case SearchType.FastFetchCommands: return ("Friendly Name", KnownMonikers.None);
+            case SearchType.All:
+            default: return (string.Empty, KnownMonikers.None);
         }
     }
 }
