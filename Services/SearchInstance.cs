@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.Language.CodeCleanUp;
-using Newtonsoft.Json.Linq;
 using QuickJump2022.Models;
-using QuickJump2022.Tools;
 
 namespace QuickJump2022.Services;
 
@@ -69,46 +66,30 @@ public class SearchInstance(
 
     public List<ListItemBase> Search(string searchText) {
         var results = new List<ListItemBase>(20);
-
+        // ----------------------------------------
+        // Note: works around a limitation where FlxCs won't match an all-caps searchText
+        // to any result that isn't also all caps.
+        // ----------------------------------------
+        if (searchText.All(x => char.IsUpper(x))) { 
+            searchText = searchText.ToLower();
+        }
         void FilterItems<T>(List<T> items) where T : ListItemBase {
             if (string.IsNullOrEmpty(searchText)) results.AddRange(items);
             else {
                 foreach (var item in items) {
-                    // Show
-                    //var match = FuzzySearch.ScoreFuzzy(item.Name, searchText, true);
-                    //if (match.MatchPositions.Length > 0) {
-                    //    item.Weight = match.Score;
-                    //    results.Add(item);
-                    //}
-
-                    // Fast but has some matching issues,
-                    // Eg. "viewcode" matches "View Component Designer" before "View Code".
-                    //if (Fts.FuzzyMatch(searchText, item.Name, out var score)) {
-                    //    item.Weight = score;
-                    //    results.Add(item);
-                    //}
-
-                    // Fast & no issue so far
                     var result = FlxCs.Flx.Score(item.Name, searchText);
                     if (result is not null) {
                         item.Weight = result.score;
                         results.Add(item);
                     }
-
-                    //if (item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0) {
-                    //    item.Weight = searchText.Length - item.Name.Length;
-                    //    results.Add(item);
-                    //}
                 }
             }
         }
-
         if (SearchType is Enums.SearchType.Files or Enums.SearchType.All) FilterItems(Files);
         if (SearchType is Enums.SearchType.Symbols or Enums.SearchType.All) FilterItems(Symbols);
         if (SearchType is Enums.SearchType.Commands or Enums.SearchType.All) FilterItems(Commands);
         if (SearchType is Enums.SearchType.KnownCommands or Enums.SearchType.All) FilterItems(KnownCommands);
         if (SearchType is Enums.SearchType.FastFetchCommands or Enums.SearchType.All) FilterItems(FastFetchCommands);
-
         // -------------------
         // Fuzzy search
         // -------------------
