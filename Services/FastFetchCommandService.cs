@@ -28,11 +28,14 @@ public class FastFetchCommandItem {
 public class FastFetchCommandService(IServiceProvider _serviceProvider) {
     private const string ScopePath = "Search\\CommandScopes";
     private ScopeLocation2[] _cachedScope = null;
+    public bool UseCache { get; set; } = false;
     private List<FastFetchCommandItem> _cachedCommands = null;
 
     public async Task<List<FastFetchCommandItem>> GetCommandsAsync() {
-        if (_cachedCommands != null) {
-            return _cachedCommands;
+        if (UseCache) {
+            if (_cachedCommands is not null) {
+                return _cachedCommands;
+            }
         }
         _cachedScope ??= GetScopeLocations();
         var fastFetch = await VS.GetServiceAsync<SVsCommandSearchPrivate, IVsFastFetchCommands>();
@@ -62,8 +65,11 @@ public class FastFetchCommandService(IServiceProvider _serviceProvider) {
                 Icon = cmd.Icon,
             });
         }
-        _cachedCommands = commandInfos.GroupBy(x => x.Key).Select(g => g.First()).ToList();
-        return _cachedCommands;
+        if (UseCache) {
+            _cachedCommands = commandInfos.GroupBy(x => x.Key).Select(g => g.First()).ToList();
+            return _cachedCommands;
+        }
+        return commandInfos.GroupBy(x => x.Key).Select(g => g.First()).ToList();
     }
 
     private ScopeLocation2[] GetScopeLocations() {
