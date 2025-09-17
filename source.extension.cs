@@ -10,7 +10,7 @@ namespace QuickJump2022 {
         public const string Name = "QuickJump2022";
         public const string Description = @"Quick Jump 2022";
         public const string Language = "en-US";
-        public const string Version = "1.53";
+        public const string Version = "1.54";
         public const string Author = "DUBEG";
         public const string Tags = "";
         public const bool IsPreview = false;
