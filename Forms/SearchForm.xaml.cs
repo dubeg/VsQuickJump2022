@@ -52,14 +52,22 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
-    private SearchType _searchType;
-    private Enums.FileSearchScope _fileScope = Enums.FileSearchScope.Solution;
+    public SearchType SearchType { get; private set; }
+    public Enums.FileSearchScope FileScope { get; private set; } = Enums.FileSearchScope.Solution;
+    public string ResultText { get; private set; }
 
-    public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "", bool enableCommandTabCycle = false) {
+    public static async Task<SearchForm> ShowModalAsync(
+        QuickJumpPackage package, 
+        SearchType searchType, 
+        string initialText = "", 
+        bool enableCommandTabCycle = false,
+        FileSearchScope? fileSearchScope = null
+    ) {
         var dialog = new SearchForm(package, searchType, initialText, enableCommandTabCycle);
+        dialog.FileScope = fileSearchScope ?? dialog.FileScope;
         await dialog.LoadDataAsync();
         dialog.ShowModal();
-        return dialog._resultText ?? dialog.CurrentText;
+        return dialog;
     }
 
     private readonly QuickJumpPackage _package;
@@ -76,7 +84,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // TODO: InputTextEditor doesn't expose FontSize directly
         // --
         _package = package;
-        _searchType = searchType;
+        SearchType = searchType;
         _enableCommandTabCycle = enableCommandTabCycle;
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
@@ -85,7 +93,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             package.KnownCommandService,
             package.FastFetchCommandService,
             searchType,
-            _fileScope,
+            FileScope,
             package.GeneralOptions.FileSortType,
             package.GeneralOptions.CSharpSortType,
             package.GeneralOptions.MixedSortType
@@ -127,11 +135,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
 
-    private string _resultText;
-
     private async Task SwitchCommandSearchTypeAsync(SearchType newType) {
         if (newType != SearchType.Commands && newType != SearchType.KnownCommands && newType != SearchType.FastFetchCommands) return;
-        _searchType = newType;
+        SearchType = newType;
         UpdateStatusBar();
         SearchInstance = new SearchInstance(
             _package.ProjectFileService,
@@ -140,7 +146,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             _package.KnownCommandService,
             _package.FastFetchCommandService,
             newType,
-            _fileScope,
+            FileScope,
             _package.GeneralOptions.FileSortType,
             _package.GeneralOptions.CSharpSortType,
             _package.GeneralOptions.MixedSortType
@@ -154,8 +160,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private async Task SwitchFileScopeAsync(Enums.FileSearchScope newScope) {
-        if (_searchType != SearchType.Files) return;
-        _fileScope = newScope;
+        if (SearchType != SearchType.Files) return;
+        FileScope = newScope;
         UpdateStatusBar();
         SearchInstance = new SearchInstance(
             _package.ProjectFileService,
@@ -163,8 +169,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             _package.CommandService,
             _package.KnownCommandService,
             _package.FastFetchCommandService,
-            _searchType,
-            _fileScope,
+            SearchType,
+            FileScope,
             _package.GeneralOptions.FileSortType,
             _package.GeneralOptions.CSharpSortType,
             _package.GeneralOptions.MixedSortType
@@ -238,28 +244,28 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
         // so they work normally for text navigation and selection
         if (e.Key == Key.Tab) {
-            if (_searchType == SearchType.Files) {
+            if (SearchType == SearchType.Files) {
                 var reverse = e.ShiftPressed;
-                var nextScope = (_fileScope, reverse) switch {
+                var nextScope = (FileScope, reverse) switch {
                     (Enums.FileSearchScope.Solution, false) => Enums.FileSearchScope.ActiveProject,
                     (Enums.FileSearchScope.Solution, true) => Enums.FileSearchScope.ActiveProject,
                     (Enums.FileSearchScope.ActiveProject, false) => Enums.FileSearchScope.Solution,
                     (Enums.FileSearchScope.ActiveProject, true) => Enums.FileSearchScope.Solution,
-                    _ => _fileScope
+                    _ => FileScope
                 };
                 await SwitchFileScopeAsync(nextScope);
             }
             // Cycle only among command search modes, and only if enabled by the invoker
-            else if (_enableCommandTabCycle && (_searchType == SearchType.Commands || _searchType == SearchType.KnownCommands || _searchType == SearchType.FastFetchCommands)) {
+            else if (_enableCommandTabCycle && (SearchType == SearchType.Commands || SearchType == SearchType.KnownCommands || SearchType == SearchType.FastFetchCommands)) {
                 var reverse = e.ShiftPressed;
-                var nextType = (_searchType, reverse) switch {
+                var nextType = (SearchType, reverse) switch {
                     (SearchType.Commands, false) => SearchType.KnownCommands,
                     (SearchType.Commands, true) => SearchType.FastFetchCommands,
                     (SearchType.KnownCommands, false) => SearchType.FastFetchCommands,
                     (SearchType.KnownCommands, true) => SearchType.Commands,
                     (SearchType.FastFetchCommands, false) => SearchType.Commands,
                     (SearchType.FastFetchCommands, true) => SearchType.KnownCommands,
-                    _ => _searchType
+                    _ => SearchType
                 };
                 await SwitchCommandSearchTypeAsync(nextType);
             }
@@ -321,7 +327,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             else if (listItem is ListItemSymbol symbol) Dispatcher.BeginInvoke(() => GoToService.GoToSymbolAsync(symbol));
             else if (listItem is ListItemCommand command) {
                 if (commit) {
-                    _resultText = command.Name;
+                    ResultText = command.Name;
                     // The dialog must be closed before executing a command
                     // in case the command opens another modal dialog.
                     Dispatcher.BeginInvoke(() => CommandService.Execute(command.Item));
@@ -330,7 +336,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             }
             else if (listItem is ListItemKnownCommand knownCommand) {
                 if (commit) {
-                    _resultText = knownCommand.Name;
+                    ResultText = knownCommand.Name;
                     // The dialog must be closed before executing a command bar button
                     // in case it opens another modal dialog.
                     Dispatcher.BeginInvoke(() => CommandService.Execute(knownCommand.Item.Command));
@@ -339,7 +345,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             }
             else if (listItem is ListItemFastFetchCommand fastFetch) {
                 if (commit) {
-                    _resultText = fastFetch.Name;
+                    ResultText = fastFetch.Name;
                     Dispatcher.BeginInvoke(() => CommandService.Execute(fastFetch.Item.CommandID));
                     return;
                 }
@@ -383,7 +389,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private (string text, ImageMoniker moniker) GetSearchTypeDisplay() {
-        switch (_searchType) {
+        switch (SearchType) {
             case SearchType.Files: return ("Files", KnownMonikers.Document);
             case SearchType.Symbols: return ("Symbols", KnownMonikers.CodeDefinitionWindow);
             case SearchType.Commands:
@@ -395,9 +401,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private (string text, ImageMoniker moniker) GetScopeDisplay() {
-        switch (_searchType) {
+        switch (SearchType) {
             case SearchType.Files:
-                return _fileScope == Enums.FileSearchScope.ActiveProject
+                return FileScope == Enums.FileSearchScope.ActiveProject
                     ? ("Active Project", KnownMonikers.CSProjectNode)
                     : ("Solution", KnownMonikers.Solution);
             case SearchType.Symbols: return ("Document", KnownMonikers.Document);

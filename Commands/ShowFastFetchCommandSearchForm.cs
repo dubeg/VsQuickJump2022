@@ -1,5 +1,6 @@
 using QuickJump2022.Forms;
 using QuickJump2022.Models;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace QuickJump2022;
 
@@ -9,8 +10,8 @@ internal sealed class ShowFastFetchCommandSearchForm : BaseCommand<ShowFastFetch
 
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var result = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.FastFetchCommands, _lastFilter);
-        _lastFilter = result ?? string.Empty;
+        var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.FastFetchCommands, _lastFilter);
+        _lastFilter = dialog.ResultText ?? dialog.ResultText;
     }
 }
 
