@@ -31,5 +31,6 @@ namespace QuickJump2022
         public const int TestCommand = 0x0600;
         public const int RefreshPreloadedData = 0x0700;
         public const int ShowFastFetchCommandSearchForm = 0x0800;
+        public const int ShowCanonicalCommandSearchForm = 0x0900;
     }
 }

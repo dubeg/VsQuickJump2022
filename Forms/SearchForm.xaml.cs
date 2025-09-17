@@ -33,7 +33,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         nameof(HintFontSize), typeof(double), typeof(SearchForm), new PropertyMetadata(0d)
     );
     public double HintFontSize { get => (double)GetValue(HintFontSizeProperty); set => SetValue(HintFontSizeProperty, value); }
-    public SearchInstance SearchInstance { get; init; }
+    public SearchInstance SearchInstance { get; private set; }
     public GoToService GoToService { get; init; }
     public CommandService CommandService { get; init; }
     public ClassificationService ClassificationService { get; init; }
@@ -48,14 +48,17 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private SearchType _searchType;
     private string _lastSearchText = string.Empty;
 
-    public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "") {
-        var dialog = new SearchForm(package, searchType, initialText);
+    public static async Task<string> ShowModalAsync(QuickJumpPackage package, SearchType searchType, string initialText = "", bool enableCommandTabCycle = false) {
+        var dialog = new SearchForm(package, searchType, initialText, enableCommandTabCycle);
         await dialog.LoadDataAsync();
         dialog.ShowModal();
-        return dialog.CurrentText;
+        return dialog._resultText ?? dialog.CurrentText;
     }
 
-    protected SearchForm(QuickJumpPackage package, SearchType searchType, string initialText = "") {
+    private readonly QuickJumpPackage _package;
+    private readonly bool _enableCommandTabCycle;
+
+    protected SearchForm(QuickJumpPackage package, SearchType searchType, string initialText = "", bool enableCommandTabCycle = false) {
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;
         FontSize = fontSize < 14 ? fontSize + 1 : fontSize; // TODO: configure via options (?)
@@ -65,7 +68,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // --
         // TODO: InputTextEditor doesn't expose FontSize directly
         // --
+        _package = package;
         _searchType = searchType;
+        _enableCommandTabCycle = enableCommandTabCycle;
         var searchInstance = new SearchInstance(
             package.ProjectFileService,
             package.SymbolService,
@@ -118,6 +123,35 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             else GoToService.PreviewFileAsync(file);
         };
         DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
+    }
+
+    private string _resultText;
+
+    private async Task SwitchCommandSearchTypeAsync(SearchType newType) {
+        if (newType != SearchType.Commands && newType != SearchType.KnownCommands && newType != SearchType.FastFetchCommands) return;
+        _searchType = newType;
+        Width = newType switch {
+            SearchType.Files => 800,
+            SearchType.Symbols => 800,
+            _ => 600
+        };
+        SearchInstance = new SearchInstance(
+            _package.ProjectFileService,
+            _package.SymbolService,
+            _package.CommandService,
+            _package.KnownCommandService,
+            _package.FastFetchCommandService,
+            newType,
+            _package.GeneralOptions.FileSortType,
+            _package.GeneralOptions.CSharpSortType,
+            _package.GeneralOptions.MixedSortType
+        );
+        await SearchInstance.LoadDataAsync();
+        RefreshList();
+        if (Items.Count > 0) {
+            lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
+        }
     }
 
     private void SuspendAndClose() {
@@ -186,17 +220,19 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
         // so they work normally for text navigation and selection
         if (e.Key == Key.Tab) {
-            var reverse = e.ShiftPressed;
-            SuspendAndClose();
-            var dict = new Dictionary<SearchType, (int backward, int forward)>() {
-                { SearchType.Files, (backword: PackageIds.ShowFastFetchCommandSearchForm, forward: PackageIds.ShowMethodSearchForm)},
-                { SearchType.Symbols, (backword: PackageIds.ShowFileSearchForm, forward: PackageIds.ShowCommandSearchForm)},
-                { SearchType.Commands, (backword: PackageIds.ShowMethodSearchForm, forward: PackageIds.ShowKnownCommandSearchForm)},
-                { SearchType.KnownCommands, (backword: PackageIds.ShowCommandSearchForm, forward: PackageIds.ShowFastFetchCommandSearchForm)},
-                { SearchType.FastFetchCommands, (backword: PackageIds.ShowKnownCommandSearchForm, forward: PackageIds.ShowFileSearchForm)},
-            };
-            if (dict.TryGetValue(_searchType, out var cmds)) {
-                Dispatcher.BeginInvoke(() => CommandService.Execute(new CommandID(PackageGuids.QuickJump2022, reverse ? cmds.backward : cmds.forward)));
+            // Cycle only among command search modes, and only if enabled by the invoker
+            if (_enableCommandTabCycle && (_searchType == SearchType.Commands || _searchType == SearchType.KnownCommands || _searchType == SearchType.FastFetchCommands)) {
+                var reverse = e.ShiftPressed;
+                var nextType = (_searchType, reverse) switch {
+                    (SearchType.Commands, false) => SearchType.KnownCommands,
+                    (SearchType.Commands, true)  => SearchType.FastFetchCommands,
+                    (SearchType.KnownCommands, false) => SearchType.FastFetchCommands,
+                    (SearchType.KnownCommands, true)  => SearchType.Commands,
+                    (SearchType.FastFetchCommands, false) => SearchType.Commands,
+                    (SearchType.FastFetchCommands, true)  => SearchType.KnownCommands,
+                    _ => _searchType
+                };
+                await SwitchCommandSearchTypeAsync(nextType);
             }
         }
         else if (e.Key == Key.Escape) {
@@ -256,6 +292,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             else if (listItem is ListItemSymbol symbol) Dispatcher.BeginInvoke(() => GoToService.GoToSymbolAsync(symbol));
             else if (listItem is ListItemCommand command) {
                 if (commit) {
+                    _resultText = command.Name;
                     // The dialog must be closed before executing a command
                     // in case the command opens another modal dialog.
                     Dispatcher.BeginInvoke(() => CommandService.Execute(command.Item));
@@ -264,6 +301,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             }
             else if (listItem is ListItemKnownCommand knownCommand) {
                 if (commit) {
+                    _resultText = knownCommand.Name;
                     // The dialog must be closed before executing a command bar button
                     // in case it opens another modal dialog.
                     Dispatcher.BeginInvoke(() => CommandService.Execute(knownCommand.Item.Command));
@@ -272,6 +310,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             }
             else if (listItem is ListItemFastFetchCommand fastFetch) {
                 if (commit) {
+                    _resultText = fastFetch.Name;
                     Dispatcher.BeginInvoke(() => CommandService.Execute(fastFetch.Item.CommandID));
                     return;
                 }
