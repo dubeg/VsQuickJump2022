@@ -12,7 +12,7 @@ internal sealed class ShowFileSearchForm : BaseCommand<ShowFileSearchForm> {
 
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.Files);
+        var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.Files, fileSearchScope: _lastScope);
         _lastScope = dialog.FileScope;
     }
 }

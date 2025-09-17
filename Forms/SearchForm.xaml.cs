@@ -86,19 +86,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         _package = package;
         SearchType = searchType;
         _enableCommandTabCycle = enableCommandTabCycle;
-        var searchInstance = new SearchInstance(
-            package.ProjectFileService,
-            package.SymbolService,
-            package.CommandService,
-            package.KnownCommandService,
-            package.FastFetchCommandService,
-            searchType,
-            FileScope,
-            package.GeneralOptions.FileSortType,
-            package.GeneralOptions.CSharpSortType,
-            package.GeneralOptions.MixedSortType
-        );
-        SearchInstance = searchInstance;
         GoToService = package.GoToService;
         CommandService = package.CommandService;
         ClassificationService = package.ClassificationService;
@@ -115,7 +102,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             SearchType.Symbols => 800,
             _ => 600
         }; // TODO: configure via options.
-        UpdateStatusBar();
         // TODO: check the active document's width & don't make it larger than that.
         _initialText = initialText; // TODO: configure via options.
         if (!string.IsNullOrWhiteSpace(_initialText)) {
@@ -207,6 +193,19 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     public async Task LoadDataAsync() {
+        SearchInstance ??= new SearchInstance(
+            _package.ProjectFileService,
+            _package.SymbolService,
+            _package.CommandService,
+            _package.KnownCommandService,
+            _package.FastFetchCommandService,
+            SearchType,
+            FileScope,
+            _package.GeneralOptions.FileSortType,
+            _package.GeneralOptions.CSharpSortType,
+            _package.GeneralOptions.MixedSortType
+        );
+        UpdateStatusBar();
         await SearchInstance.LoadDataAsync();
         RefreshList();
         if (Items.Count > 0) {
