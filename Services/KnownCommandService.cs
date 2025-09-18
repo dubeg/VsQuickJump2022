@@ -32,7 +32,7 @@ public class KnownCommandService {
             //new (KnownCommands.Build_DeploySolution,"Build: Deploy Solution",default),
             //new (KnownCommands.Build_ProjectPickerBuild,"Build: Project Picker Build",default),
             //new (KnownCommands.Build_ProjectPickerRebuild,"Build: Project Picker Rebuild", default),
-            //new (KnownCommands.Build_PublishSelection,"Build: Publish Selection",default),
+            new (KnownCommands.Build_PublishSelection,"Build: Publish Selection",default),
             //new (KnownCommands.Build_RebuildOnlyProject,"Build: Rebuild Project",default),
             //new (KnownCommands.Build_RebuildSelection,"Build: Rebuild Selection",default),
             new (KnownCommands.Build_RebuildSolution,"Build: Rebuild Solution",default),
