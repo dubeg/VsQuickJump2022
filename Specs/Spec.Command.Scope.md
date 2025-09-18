@@ -1,4 +1,4 @@
-# TODO: Commands
+# Spec: Commands
 
 Currently, pressing TAB will switch to the next QuickJump type (file, symbol, commands (canonical names), commands (known cmds), commands (fast fetch)).
 

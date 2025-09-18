@@ -1,4 +1,4 @@
-# TODO: Files
+# Spec: Files
 Currently, pressing TAB cycling (search type) is only support for commands.
 When the search type is File, implement tab cycling between Solution and Current Project.
 

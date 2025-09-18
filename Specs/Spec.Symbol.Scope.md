@@ -1,4 +1,4 @@
-# TODO: Files
+# Spec: Files
 When the search type is Symbol, implement tab cycling between symbol types.
 In the dialog's status bar, display the scope as the symbol type name.
 

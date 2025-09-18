@@ -1,4 +1,4 @@
-# TODO: StatusBar
+# Spec: StatusBar
 
 Add a status bar to the search dialog, to display the search type & scope.
 Both the search type and scope will have an icon (using known monikers).
