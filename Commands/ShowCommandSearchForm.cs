@@ -12,7 +12,7 @@ internal sealed class ShowCommandSearchForm : BaseCommand<ShowCommandSearchForm>
     
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, _lastCommandScope, _lastFilter, enableCommandTabCycle: true);
+        var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, _lastCommandScope, _lastFilter);
         _lastFilter = dialog.ResultText ?? dialog.CurrentText;
         _lastCommandScope = dialog.SearchType;
     }

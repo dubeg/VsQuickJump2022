@@ -55,53 +55,44 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public SearchType SearchType { get; private set; }
     public Enums.FileSearchScope FileScope { get; private set; } = Enums.FileSearchScope.Solution;
     public string ResultText { get; private set; }
+    private readonly QuickJumpPackage _package;
 
     public static async Task<SearchForm> ShowModalAsync(
         QuickJumpPackage package, 
         SearchType searchType, 
         string initialText = "", 
-        bool enableCommandTabCycle = false,
         FileSearchScope? fileSearchScope = null
     ) {
-        var dialog = new SearchForm(package, searchType, initialText, enableCommandTabCycle);
+        var dialog = new SearchForm(package, searchType, initialText);
         dialog.FileScope = fileSearchScope ?? dialog.FileScope;
         await dialog.LoadDataAsync();
         dialog.ShowModal();
         return dialog;
     }
 
-    private readonly QuickJumpPackage _package;
-    private readonly bool _enableCommandTabCycle;
-
-    protected SearchForm(QuickJumpPackage package, SearchType searchType, string initialText = "", bool enableCommandTabCycle = false) {
+    protected SearchForm(QuickJumpPackage package, SearchType searchType, string initialText = "") {
         var (fontFamily, fontSize) = FontsAndColorsHelper.GetEditorFontInfo(true);
         FontFamily = fontFamily;
         FontSize = fontSize < 14 ? fontSize + 1 : fontSize; // TODO: configure via options (?)
         HintFontSize = Math.Max(8, fontSize - 1);
-        // --
         InitializeComponent();
-        // --
-        // TODO: InputTextEditor doesn't expose FontSize directly
-        // --
         _package = package;
         SearchType = searchType;
-        _enableCommandTabCycle = enableCommandTabCycle;
         GoToService = package.GoToService;
         CommandService = package.CommandService;
         ClassificationService = package.ClassificationService;
         _dte = package.Dte;
         _useSymbolColors = package.GeneralOptions.UseSymbolColors;
-        // --
         WindowStartupLocation = WindowStartupLocation.Manual;
         this.Loaded += (s, e) => AdjustPosition();
         this.SizeChanged += (s, e) => AdjustPosition();
         _dismissOnClickOutsideBounds = new(this);
-        // --
+        // TODO: configure via options.
         Width = searchType switch {
             SearchType.Files => 800,
             SearchType.Symbols => 800,
             _ => 600
-        }; // TODO: configure via options.
+        };
         // TODO: check the active document's width & don't make it larger than that.
         _initialText = initialText; // TODO: configure via options.
         if (!string.IsNullOrWhiteSpace(_initialText)) {
@@ -121,9 +112,17 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
 
-    private async Task SwitchCommandSearchTypeAsync(SearchType newType) {
-        if (newType != SearchType.Commands && newType != SearchType.KnownCommands && newType != SearchType.FastFetchCommands) return;
-        SearchType = newType;
+    private async Task SwitchCommandSearchTypeAsync(bool reverse = false) {
+        var nextType = (SearchType, reverse) switch {
+            (SearchType.Commands, false) => SearchType.KnownCommands,
+            (SearchType.Commands, true) => SearchType.FastFetchCommands,
+            (SearchType.KnownCommands, false) => SearchType.FastFetchCommands,
+            (SearchType.KnownCommands, true) => SearchType.Commands,
+            (SearchType.FastFetchCommands, false) => SearchType.Commands,
+            (SearchType.FastFetchCommands, true) => SearchType.KnownCommands,
+            _ => SearchType
+        };
+        SearchType = nextType;
         UpdateStatusBar();
         SearchInstance = new SearchInstance(
             _package.ProjectFileService,
@@ -131,7 +130,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             _package.CommandService,
             _package.KnownCommandService,
             _package.FastFetchCommandService,
-            newType,
+            nextType,
             FileScope,
             _package.GeneralOptions.FileSortType,
             _package.GeneralOptions.CSharpSortType,
@@ -145,9 +144,15 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
     }
 
-    private async Task SwitchFileScopeAsync(Enums.FileSearchScope newScope) {
-        if (SearchType != SearchType.Files) return;
-        FileScope = newScope;
+    private async Task SwitchFileScopeAsync(bool reverse) {
+        var nextScope = (FileScope, reverse) switch {
+            (Enums.FileSearchScope.Solution, false) => Enums.FileSearchScope.ActiveProject,
+            (Enums.FileSearchScope.Solution, true) => Enums.FileSearchScope.ActiveProject,
+            (Enums.FileSearchScope.ActiveProject, false) => Enums.FileSearchScope.Solution,
+            (Enums.FileSearchScope.ActiveProject, true) => Enums.FileSearchScope.Solution,
+            _ => FileScope
+        };
+        FileScope = nextScope;
         UpdateStatusBar();
         SearchInstance = new SearchInstance(
             _package.ProjectFileService,
@@ -193,6 +198,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     public async Task LoadDataAsync() {
+        UpdateStatusBar();
         SearchInstance ??= new SearchInstance(
             _package.ProjectFileService,
             _package.SymbolService,
@@ -205,7 +211,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
             _package.GeneralOptions.CSharpSortType,
             _package.GeneralOptions.MixedSortType
         );
-        UpdateStatusBar();
         await SearchInstance.LoadDataAsync();
         RefreshList();
         if (Items.Count > 0) {
@@ -240,33 +245,16 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private async void txtSearch_HandleKey(object sender, VsKeyInfo e) {
-        // Note: We don't handle Left/Right arrows, Ctrl+Shift+Left/Right, etc.
-        // so they work normally for text navigation and selection
         if (e.Key == Key.Tab) {
             if (SearchType == SearchType.Files) {
-                var reverse = e.ShiftPressed;
-                var nextScope = (FileScope, reverse) switch {
-                    (Enums.FileSearchScope.Solution, false) => Enums.FileSearchScope.ActiveProject,
-                    (Enums.FileSearchScope.Solution, true) => Enums.FileSearchScope.ActiveProject,
-                    (Enums.FileSearchScope.ActiveProject, false) => Enums.FileSearchScope.Solution,
-                    (Enums.FileSearchScope.ActiveProject, true) => Enums.FileSearchScope.Solution,
-                    _ => FileScope
-                };
-                await SwitchFileScopeAsync(nextScope);
+                await SwitchFileScopeAsync(reverse: e.ShiftPressed);
             }
-            // Cycle only among command search modes, and only if enabled by the invoker
-            else if (_enableCommandTabCycle && (SearchType == SearchType.Commands || SearchType == SearchType.KnownCommands || SearchType == SearchType.FastFetchCommands)) {
-                var reverse = e.ShiftPressed;
-                var nextType = (SearchType, reverse) switch {
-                    (SearchType.Commands, false) => SearchType.KnownCommands,
-                    (SearchType.Commands, true) => SearchType.FastFetchCommands,
-                    (SearchType.KnownCommands, false) => SearchType.FastFetchCommands,
-                    (SearchType.KnownCommands, true) => SearchType.Commands,
-                    (SearchType.FastFetchCommands, false) => SearchType.Commands,
-                    (SearchType.FastFetchCommands, true) => SearchType.KnownCommands,
-                    _ => SearchType
-                };
-                await SwitchCommandSearchTypeAsync(nextType);
+            else if (SearchType 
+                is SearchType.Commands 
+                or SearchType.KnownCommands 
+                or SearchType.FastFetchCommands
+            ) {
+                await SwitchCommandSearchTypeAsync(reverse: e.ShiftPressed);
             }
         }
         else if (e.Key == Key.Escape) {
