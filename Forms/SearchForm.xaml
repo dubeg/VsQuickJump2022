@@ -47,6 +47,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Search Input (using experimental InputTextEditor) -->
@@ -101,8 +102,84 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
+        <!-- Command Metadata Section -->
+        <Border 
+            Grid.Row="2" 
+            Visibility="{Binding ElementName=dialogWnd, Path=ShowCommandMetadata, Converter={StaticResource BooleanToVisibilityConverter}}" 
+            BorderThickness="0,1,0,1" 
+            BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.MainWindowActiveBuildingBorderBrushKey}}"
+            Padding="8,6"
+            SnapsToDevicePixels="True"
+            UseLayoutRounding="True"
+            >
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Command Icon and Name -->
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                    <!--<imaging:CrispImage 
+                        x:Name="metadataIcon"
+                        Width="16" 
+                        Height="16" 
+                        Margin="0,0,8,0" 
+                        />-->
+                    <TextBlock 
+                        x:Name="metadataCommandName"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"
+                        />
+                </StackPanel>
+
+                <!-- Command GUID and ID -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Command ID:" Opacity="0.7" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1" Grid.Column="1" 
+                    x:Name="metadataCommandId" 
+                    Margin="0,2"
+                    Padding="5"
+                    VerticalAlignment="Center"
+                    />
+                <Button Grid.Row="1" Grid.Column="2"
+                    x:Name="btnCopyCommandId"
+                    Content="Copy"
+                    Padding="6,2"
+                    Margin="6,0,0,0"
+                    VerticalAlignment="Center"
+                    ToolTipService.ToolTip="Copy Command ID to clipboard"
+                    />
+                    <!--Command="{Binding ElementName=dialogWnd, Path=CopyCommandIdCommand}"-->
+
+                <!-- Command Bindings -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Bindings:" Opacity="0.7" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="2" Grid.Column="1" 
+                    x:Name="metadataBindings" 
+                    Margin="0,0"
+                    Padding="5"
+                    VerticalAlignment="Center"
+                    />
+
+                <!-- Command Location -->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Location:" Opacity="0.7" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="3" Grid.Column="1" 
+                    x:Name="metadataLocation"
+                    Margin="0,2"
+                    Padding="5"
+                    VerticalAlignment="Center"
+                    />
+            </Grid>
+        </Border>
+
         <!-- Status Bar -->
-        <Border Grid.Row="2" 
+        <Border Grid.Row="3" 
                 Padding="4" 
                 BorderThickness="0,1,0,0" 
                 BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.MainWindowActiveBuildingBorderBrushKey }}"

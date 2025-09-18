@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Commands\ShowCanonicalCommandSearchForm.cs" />
     <Compile Include="Commands\ShowFastFetchCommandSearchForm.cs" />
+    <Compile Include="Commands\ToggleCommandMetadataCommand.cs" />
     <Compile Include="Models\ListItemFastFetchCommand.cs" />
     <Compile Include="Services\FastFetchCommandService.cs" />
     <Compile Include="Services\PackageInfoService.cs" />
@@ -61,10 +62,12 @@
     <Compile Include="Models\KnownCommandItem.cs" />
     <Compile Include="Models\ListItemKnownCommand.cs" />
     <Compile Include="Services\KnownCommandService.cs" />
+    <None Include="Specs\Spec.CommandMetadataVisualizer.md" />
     <Compile Include="TextEditor\CodeWindowBehaviourFlags.cs" />
     <Compile Include="TextEditor\EditorCommandFilter.cs" />
     <Compile Include="TextEditor\EditorHost.AllowedCommands.cs" />
     <Compile Include="TextEditor\EditorHost.cs" />
+    <Compile Include="TextEditor\InputEditorDelegates.cs" />
     <Compile Include="TextEditor\InputTextEditor.xaml.cs">
       <DependentUpon>InputTextEditor.xaml</DependentUpon>
     </Compile>
@@ -144,6 +147,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="Specs\Spec.Command.Scope.md" />
+    <None Include="Specs\Spec.File.Scope.md" />
+    <None Include="Specs\Spec.StatusBar.md" />
+    <None Include="Specs\Spec.Symbol.Scope.md" />
     <VSCTCompile Include="VSCommandTable.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <Generator>VsctGenerator</Generator>

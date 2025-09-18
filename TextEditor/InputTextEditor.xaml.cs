@@ -21,7 +21,7 @@ namespace QuickJump2022.TextEditor;
 
 public partial class InputTextEditor : UserControl {
     public event EventHandler TextChanged;
-    public event EditorCommandFilter.InputEditorSpecialKeyHandler SpecialKeyPressed;
+    public event InputEditorSpecialKeyHandler SpecialKeyPressed;
     public static readonly DependencyProperty TextProperty = DP.Register<InputTextEditor, string>(nameof(Text), string.Empty, OnTextChanged);
     public static readonly DependencyProperty BorderBackgroundProperty = DP.Register<InputTextEditor, Brush>(nameof(BorderBackground), Brushes.Transparent, null);
 
@@ -82,16 +82,15 @@ public partial class InputTextEditor : UserControl {
             + EditorBorder.BorderThickness.Bottom
             ;
         EditorHost.Content = textViewHost.HostControl;
-        if (_editorHost.CommandFilter != null) {
-            _editorHost.CommandFilter.KeyPressed += (_, args) => SpecialKeyPressed?.Invoke(this, args);
-            _editorHost.CommandFilter.PreCommand += (_, _) => _textLastValue = Text;
-            _editorHost.CommandFilter.PostCommand += (_, _) => {
-                Text = TextBuffer.CurrentSnapshot.GetText();
-                if (Text != _textLastValue) {
-                    TextChanged?.Invoke(this, EventArgs.Empty);
-                }
-            };
-        }
+        _editorHost.KeyPressed += (_, args) => SpecialKeyPressed?.Invoke(this, args);
+        _editorHost.CommandFilter.KeyPressed += (_, args) => SpecialKeyPressed?.Invoke(this, args);
+        _editorHost.CommandFilter.PreCommand += (_, _) => _textLastValue = Text;
+        _editorHost.CommandFilter.PostCommand += (_, _) => {
+            Text = TextBuffer.CurrentSnapshot.GetText();
+            if (Text != _textLastValue) {
+                TextChanged?.Invoke(this, EventArgs.Empty);
+            }
+        };
         // --
         var formatMap = EditorFormatMapService.GetEditorFormatMap(TextView);
         var resources = formatMap.GetProperties("TextView Background");

@@ -26,6 +26,12 @@ public sealed class QuickJumpPackage : ToolkitPackage {
     public DTEEvents DteEvents;
     public DTE Dte;
     public QuickJumpPackage Package { get; private set; }
+    
+    /// <summary>
+    /// Static variable to track whether command metadata should be displayed.
+    /// Persists only for the current session (off by default).
+    /// </summary>
+    public static bool ShowCommandMetadata { get; set; } = false;
     public SymbolService SymbolService { get; private set; }
     public ProjectFileService ProjectFileService { get; private set; }
     public SettingsService SettingsService { get; private set; }

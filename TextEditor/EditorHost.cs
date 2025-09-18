@@ -1,4 +1,10 @@
-﻿using EnvDTE;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Management.Instrumentation;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
+using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -8,11 +14,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Interop;
+using static QuickJump2022.TextEditor.EditorCommandFilter;
 
 namespace QuickJump2022.TextEditor;
 
@@ -45,6 +47,7 @@ public partial class EditorHost {
     private uint _unregisterPriorityCommandTargetCookie;
     private IVsTextView _vsTextView;
     private ThreadMessageEventHandler _threadFilter;
+    public event InputEditorSpecialKeyHandler KeyPressed;
 
     public IWpfTextView WpfTextView => _wpfTextView;
     public EditorCommandFilter CommandFilter { get; private set; }
@@ -158,6 +161,31 @@ public partial class EditorHost {
         if (this.VsFilterKeys == null || msg.message < 256 || msg.message > 264) {
             return;
         }
+        // ------------------
+        // Hack to intercept Ctrl+` 
+        // ------------------
+        // Ctrl + (VK_OEM_3) intercept before VS handles it 
+        const int WM_KEYDOWN = 0x0100;
+        const int WM_SYSKEYDOWN = 0x0104;
+        const int VK_OEM_3 = 0xC0;
+        // backtick/tilde on US layout
+        if ((msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN)
+            && msg.wParam.ToInt32() == VK_OEM_3
+            && (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Control) == System.Windows.Input.ModifierKeys.Control
+            && _wpfTextViewHost?.HostControl?.IsKeyboardFocusWithin == true
+            ) {
+            handled = true;
+            var keyInfo = new VsKeyInfo() { 
+                ControlPressed = true,
+                Key = System.Windows.Input.Key.OemTilde,
+                KeyChar = '`',
+                VirtualKey = VK_OEM_3,
+                KeyStates = System.Windows.Input.KeyStates.Down
+            };
+            KeyPressed?.Invoke(this, keyInfo);
+            return;
+        }
+        // ------------------
         Microsoft.VisualStudio.OLE.Interop.MSG msg1 = new Microsoft.VisualStudio.OLE.Interop.MSG() {
             hwnd = msg.hwnd,
             lParam = msg.lParam,

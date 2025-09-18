@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using EnvDTE;
@@ -22,6 +23,7 @@ using Rect = System.Windows.Rect;
 namespace QuickJump2022.Forms;
 
 public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
+    public static readonly DependencyProperty ShowCommandMetadataProperty = DP.Register<SearchForm, bool>(nameof(ShowCommandMetadata), false);
     public static readonly DependencyProperty HintFontSizeProperty = DP.Register<SearchForm, double>(nameof(HintFontSize), 0d);
     public static readonly DependencyProperty StatusLeftIconProperty = DP.Register<SearchForm, ImageMoniker>(nameof(StatusLeftIcon), default(ImageMoniker));
     public static readonly DependencyProperty StatusLeftTextProperty = DP.Register<SearchForm, string>(nameof(StatusLeftText), string.Empty);
@@ -39,6 +41,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     public string StatusRightText { get => (string)GetValue(StatusRightTextProperty); set => SetValue(StatusRightTextProperty, value);    }
     public bool StatusRightIconVisibility { get => (bool)GetValue(StatusRightIconVisibilityProperty); set => SetValue(StatusRightIconVisibilityProperty, value);    }
     // --
+    public bool ShowCommandMetadata { get => (bool)GetValue(ShowCommandMetadataProperty); set => SetValue(ShowCommandMetadataProperty, value); }
     private DismissOnClickOutsideBounds _dismissOnClickOutsideBounds;
     public int PageSize => 20; // TODO: make it configurable
     public double HintFontSize { get => (double)GetValue(HintFontSizeProperty); set => SetValue(HintFontSizeProperty, value); }
@@ -106,6 +109,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         // --
         this.lstItems.PreviewMouseLeftButtonUp += lstItems_PreviewMouseLeftButtonUp;
         this.lstItems.PreviewKeyUp += lstItems_PreviewKeyUp;
+        this.lstItems.SelectionChanged += (_, _) => UpdateCommandMetadata();
         Action<bool, ListItemFile> goToItem = (commit, file) => {
             if (commit) GoToService.GoToFile(file);
             else GoToService.PreviewFileAsync(file);
@@ -264,16 +268,20 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     }
 
     private async void txtSearch_HandleKey(object sender, VsKeyInfo e) {
-        if (e.Key == Key.Tab) {
-			if (SearchType == SearchType.Files) {
+        if (e.Key == Key.OemTilde && e.ControlPressed) {
+            QuickJumpPackage.ShowCommandMetadata = !QuickJumpPackage.ShowCommandMetadata;
+            UpdateCommandMetadata();
+        }
+        else if (e.Key == Key.Tab) {
+            if (SearchType == SearchType.Files) {
                 await SwitchFileScopeAsync(reverse: e.ShiftPressed);
             }
-			else if (SearchType == SearchType.Symbols) {
-				await SwitchSymbolScopeAsync(reverse: e.ShiftPressed);
-			}
-            else if (SearchType 
-                is SearchType.Commands 
-                or SearchType.KnownCommands 
+            else if (SearchType == SearchType.Symbols) {
+                await SwitchSymbolScopeAsync(reverse: e.ShiftPressed);
+            }
+            else if (SearchType
+                is SearchType.Commands
+                or SearchType.KnownCommands
                 or SearchType.FastFetchCommands
             ) {
                 await SwitchCommandSearchTypeAsync(reverse: e.ShiftPressed);
@@ -381,6 +389,40 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         var editor = txtSearch as InputTextEditor;
         if (editor != null) {
             //editor.Focus();
+        }
+    }
+
+    private void UpdateCommandMetadata() {
+        // Only show metadata if the feature is enabled and we're showing commands
+        var shouldShowMetadata = 
+            QuickJumpPackage.ShowCommandMetadata 
+            && SearchType is 
+                SearchType.Commands or
+                SearchType.KnownCommands or
+                SearchType.FastFetchCommands;
+        var selectedItem = lstItems.SelectedItem as ListItemViewModel;
+        ShowCommandMetadata = shouldShowMetadata && selectedItem is not null;
+        if (selectedItem is null) return;
+
+        var listItem = selectedItem.Item;
+        // metadataIcon.Moniker = selectedItem.IconMoniker;
+        metadataCommandName.Text = selectedItem.Name;
+        if (listItem is ListItemCommand command) {
+            metadataCommandId.Text = $"{command.Item.Guid}:{command.Item.ID}";
+            metadataBindings.Text = string.Join(", ", command.Item.Shortcuts);
+            metadataLocation.Text = "N/A";
+        }
+        else if (listItem is ListItemKnownCommand knownCommand) {
+            var cmdId = knownCommand.Item.Command;
+            metadataCommandId.Text = $"{cmdId.Guid}:{cmdId.ID}";
+            metadataBindings.Text = knownCommand.Item.Shortcut;
+            metadataLocation.Text = "N/A";
+        }
+        else if (listItem is ListItemFastFetchCommand fastFetch) {
+            var cmdId = fastFetch.Item.CommandID;
+            metadataCommandId.Text = $"{cmdId.Guid}:{cmdId.ID}";
+            metadataBindings.Text = string.Join(", ", fastFetch.Item.Shortcuts);
+            metadataLocation.Text = fastFetch.Item.Description ?? "N/A";
         }
     }
 
