@@ -65,9 +65,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private readonly QuickJumpPackage _package;
 
     public static async Task<SearchForm> ShowModalAsync(
-        QuickJumpPackage package, 
-        SearchType searchType, 
-        string initialText = "", 
+        QuickJumpPackage package,
+        SearchType searchType,
+        string initialText = "",
         FileSearchScope? fileSearchScope = null,
         string initialSelectedCommandText = ""
     ) {
@@ -408,9 +408,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
 
     private void UpdateCommandMetadata() {
         // Only show metadata if the feature is enabled and we're showing commands
-        var shouldShowMetadata = 
-            QuickJumpPackage.ShowCommandMetadata 
-            && SearchType is 
+        var shouldShowMetadata =
+            QuickJumpPackage.ShowCommandMetadata
+            && SearchType is
                 SearchType.Commands or
                 SearchType.KnownCommands or
                 SearchType.FastFetchCommands;
@@ -488,8 +488,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                     _ => throw new NotImplementedException()
                 };
             case SearchType.Commands: return ("Canonical names", KnownMonikers.None);
-            case SearchType.KnownCommands: return ("Custom names", KnownMonikers.None);
-            case SearchType.FastFetchCommands: return ("Friendly names", KnownMonikers.None);
+            case SearchType.KnownCommands: return ("Curated names", KnownMonikers.None);
+            case SearchType.FastFetchCommands: return ("Menu names", KnownMonikers.None);
             case SearchType.All:
             default: return (string.Empty, KnownMonikers.None);
         }
