@@ -425,9 +425,9 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                     Enums.SymbolSearchScope.Field => ("Fields", KnownMonikers.Property),
                     _ => throw new NotImplementedException()
                 };
-            case SearchType.Commands: return ("Canonical Name", KnownMonikers.None);
-            case SearchType.KnownCommands: return ("Custom Name", KnownMonikers.None);
-            case SearchType.FastFetchCommands: return ("Friendly Name", KnownMonikers.None);
+            case SearchType.Commands: return ("Canonical names", KnownMonikers.None);
+            case SearchType.KnownCommands: return ("Custom names", KnownMonikers.None);
+            case SearchType.FastFetchCommands: return ("Friendly names", KnownMonikers.None);
             case SearchType.All:
             default: return (string.Empty, KnownMonikers.None);
         }

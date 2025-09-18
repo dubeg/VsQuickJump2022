@@ -45,19 +45,11 @@ public class KnownCommandService {
             new (KnownCommands.Debug_AttachtoProcess,"Debug: Attach to process",KnownMonikers.Process),
             new (KnownCommands.Debug_Autos,"Debug: Autos",KnownMonikers.LocalsWindow),
             new (KnownCommands.Debug_BreakAll,"Debug: Break all",default),
-            new (KnownCommands.Debug_CallStack,"Debug: Callstack",KnownMonikers.CallStackWindow),
+            new (KnownCommands.Debug_CallStack,"Debug: Call Stack",KnownMonikers.CallStackWindow),
             new (KnownCommands.Debug_ToggleBreakpoint,"Debug: Toggle breakpoint",KnownMonikers.BreakpointEnabled),
             //new (KnownCommands.Debug_EnableBreakpoint,"Debug: Enable breakpoint",KnownMonikers.BreakpointEnabled),
-            new (
-                new CommandID(new Guid("{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"), 0x123),
-                "Debug: Enable all breakpoints",
-                KnownMonikers.EnableAllBreakpoints
-            ),
-            new (
-                new CommandID(new Guid("{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"), 0x122),
-                "Debug: Disable all breakpoints",
-                KnownMonikers.DisableAllBreakpoints
-            ),
+            new (KnownCommandsEx.Debug_EnableAllBreakpoints,"Debug: Enable all breakpoints",KnownMonikers.EnableAllBreakpoints),
+            new (KnownCommandsEx.Debug_DisableAllBreakpoints,"Debug: Disable all breakpoints",KnownMonikers.DisableAllBreakpoints),
             new (KnownCommands.Debug_DeleteAllBreakpoints,"Debug: Delete all breakpoints",KnownMonikers.DeleteBreakpoint),
             new (KnownCommands.Debug_DetachAll,"Debug: Detach all",default),
             new (KnownCommands.Debug_ExceptionSettings,"Debug: Exception settings",KnownMonikers.ExceptionSettings),
@@ -138,61 +130,17 @@ public class KnownCommandService {
             new (KnownCommands.Edit_GotoBrace,"Edit: Go To Brace",default),
             new (KnownCommands.Edit_GoToDeclaration,"Edit: Go To Declaration",KnownMonikers.GoToDeclaration),
             new (KnownCommands.Edit_GoToDefinition,"Edit: Go To Definition",KnownMonikers.GoToDefinition),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToLastEditLocation),
-                "Edit: Go To Last Edit Location",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToBase),
-                "Edit: Go To Base",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToContainingDeclaration),
-                "Edit: Go To Containing Block",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, 66),
-                "Edit: Expand Selection to Line",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.JoinLines),
-                "Edit: Join Lines",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.SortLines),
-                "Edit: Sort Lines",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, 94),
-                "Edit: Next Suggestion",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, 93),
-                "Edit: Previous Suggestion",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.ToggleLineComments),
-                "Edit: Toggle Line Comment",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.ToggleBlockComments),
-                "Edit: Toggle Block Comment",
-                default
-            ),
-            new (
-                new CommandID(EditorConstants.EditorCommandSet, 59),
-                "Edit: Toggle Spell Checker",
-                default
-            ),
+            new (KnownCommandsEx.Edit_GoToLastEditLocation,"Edit: Go To Last Edit Location",default),
+            new (KnownCommandsEx.Edit_GoToBase,"Edit: Go To Base",default),
+            new (KnownCommandsEx.Edit_GoToContainingDeclaration,"Edit: Go To Containing Block",default),
+            new (KnownCommandsEx.Edit_ExpandSelectionToLine,"Edit: Expand Selection to Line",default),
+            new (KnownCommandsEx.Edit_JoinLines,"Edit: Join Lines",default),
+            new (KnownCommandsEx.Edit_SortLines,"Edit: Sort Lines",default),
+            new (KnownCommandsEx.Edit_NextSuggestion,"Edit: Next Suggestion",default),
+            new (KnownCommandsEx.Edit_PreviousSuggestion,"Edit: Previous Suggestion",default),
+            new (KnownCommandsEx.Edit_ToggleLineComments,"Edit: Toggle Line Comment",default),
+            new (KnownCommandsEx.Edit_ToggleBlockComments,"Edit: Toggle Block Comment",default),
+            new (KnownCommandsEx.Edit_ToggleSpellChecker,"Edit: Toggle Spell Checker",default),
             new (KnownCommands.View_QuickActions,"Edit: Quick Fixes",default),
             new (KnownCommands.Edit_PeekDefinition,"Edit: Peek Definition",default),
             //new (KnownCommands.Edit_GoToFindResults1Location,"Edit: Go To Location",default),
@@ -208,11 +156,7 @@ public class KnownCommandService {
             //new (KnownCommands.Edit_GoToOutputWindowPrevLocation,"Edit: Go To Previous Location",default),
             new (KnownCommands.Edit_GoToReference,"Edit: Go To Reference",KnownMonikers.GoToReference),
             new (KnownCommands.Edit_GoToTypeDefinition,"Edit: Go To Type Definition",KnownMonikers.GoToTypeDefinition),
-            new (
-                new CommandID(new Guid("{B61E1A20-8C13-49A9-A727-A0EC091647DD}"),0x200),
-                "Edit: Go To Implementation",
-                default
-            ),
+            new (KnownCommandsEx.Edit_GoToImplementation,"Edit: Go To Implementation",default),
             //new (KnownCommands.Edit_HideAdvancedCompletionMembers,"Edit: Hide Advanced Completion Members",default),
             //new (KnownCommands.Edit_HideSelection,"Edit: Hide Selection",default),
             //new (KnownCommands.Edit_HideSnippetHighlighting,"Edit: Hide Snippet Highlighting",default),
@@ -331,14 +275,14 @@ public class KnownCommandService {
             new (KnownCommands.Edit_SurroundWith,"Edit: Surround With...",default),
             //new (KnownCommands.Edit_SwapAnchor,"Edit: Swap Anchor",default),
             // new (KnownCommands.Edit_SwitchbetweenautomaticandtabonlyIntelliSensecompletion,"Switch between automatic and tab-only,IntelliSense Edit: completion",default),
-            //new (KnownCommands.Edit_SwitchtoFindinFiles,"Edit: Find in Files",KnownMonikers.SearchFolderClosed),
-            //new (KnownCommands.Edit_SwitchtoQuickFind,"Edit: Quick Find",default),
-            //new (KnownCommands.Edit_SwitchtoQuickReplace,"Edit: Quick Replace",default),
-            //new (KnownCommands.Edit_SwitchtoReplaceinFiles,"Edit: Replace in Files",default),
+            new (KnownCommands.Edit_SwitchtoFindinFiles,"Edit: Find in Files",KnownMonikers.SearchFolderClosed),
+            new (KnownCommands.Edit_SwitchtoQuickFind,"Edit: Quick Find",default),
+            new (KnownCommands.Edit_SwitchtoQuickReplace,"Edit: Quick Replace",default),
+            new (KnownCommands.Edit_SwitchtoReplaceinFiles,"Edit: Replace in Files",default),
             new (KnownCommands.Edit_TabifySelectedLines,"Edit: Tabify Selected Lines",default),
             new (KnownCommands.Edit_TabLeft,"Edit: Tab Left",default),
             new (KnownCommands.Edit_ToggleAllOutlining,"Edit: Toggle All Outlining",default),
-            new (KnownCommands.Edit_ToggleBookmark,"Edit: Toggle Bookmark",default),
+            new (KnownCommands.Edit_ToggleBookmark,"Edit: Toggle Bookmark",KnownMonikers.Bookmark),
             new (KnownCommands.Edit_ToggleCase,"Edit: Toggle Case",default),
             new (KnownCommands.Edit_ToggleOutliningExpansion,"Edit: Toggle Outlining Expansion",default),
             new (KnownCommands.Edit_ToggleTaskListShortcut,"Edit: Toggle Task List Shortcut",default),
@@ -364,7 +308,7 @@ public class KnownCommandService {
             //new (KnownCommands.File_AdvancedSaveOptions,"File: Advanced Save Options...",default),
             new (KnownCommands.File_BrowseWith,"File: Browse With...",default),
             new (KnownCommands.File_Close,"File: Close",KnownMonikers.Close),
-            //new (KnownCommands.File_CloseAllButThis,"File: Close Other Tabs",default),
+            new (KnownCommands.File_CloseAllButThis,"File: Close Other Tabs",default),
             new (KnownCommands.File_CloseProject,"File: Close Project",default),
             new (KnownCommands.File_CloseSolution,"File: Close Solution",KnownMonikers.CloseSolution),
             new (KnownCommands.File_CopyFullPath,"File: Copy Full Path",default),
@@ -387,8 +331,7 @@ public class KnownCommandService {
             //new (KnownCommands.File_SaveSelection,"File: Save Selection",default),
             //new (KnownCommands.File_SelectProjectTemplate,"File: Select Project Template...",default),
             new (KnownCommands.File_ViewinBrowser,"File: View in Browser",KnownMonikers.ViewInBrowser),
-            // --
-            new (new CommandID(new Guid("{EC3F30E6-52A0-4A93-97BD-2660FF3A7AD5}"), 0x1),"File: Add quick file...",KnownMonikers.NewDocument),
+            new (KnownCommandsEx.File_AddQuickFile,"File: Add quick file...",KnownMonikers.NewDocument),
         ]);
 
         _commands.AddRange([
@@ -454,6 +397,7 @@ public class KnownCommandService {
             new (KnownCommands.Help_RegisterProduct,"Help: Register Visual Studio",default),
             new (KnownCommands.Help_TechnicalSupport,"Help: Technical Support",default),
             new (KnownCommands.Help_WindowHelp,"Help: Window Help",default),
+            new (KnownCommandsEx.Help_SuggestAFeature,"Help: Suggest A Feature",default),
         ]);
 
         _commands.AddRange([
@@ -514,12 +458,10 @@ public class KnownCommandService {
             //new (KnownCommands.Project_UpdateServiceReference,"Project: Update Service Reference",default),
             //new (KnownCommands.Project_UpdateWebReference,"Project: Update Web Reference",default),
             // --
-            new (new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x100),"Project: Manage NuGet packages...",KnownMonikers.NuGet),
+            new (KnownCommandsEx.Project_ManageNugetPackages,"Project: Manage NuGet packages...",KnownMonikers.NuGet),
         ]);
 
-        _commands.AddRange([
-            new(new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x200), "Solution: Manage NuGet packages...", KnownMonikers.NuGet),
-        ]);
+        _commands.AddRange([new(KnownCommandsEx.Solution_ManageNugetPackages, "Solution: Manage NuGet packages...", KnownMonikers.NuGet),]);
 
         //commands.AddRange([
         //    new (KnownCommands.Refactor_EncapsulateField,"Refactor: Encapsulate Field...",KnownMonikers.EncapsulateField),
@@ -529,7 +471,6 @@ public class KnownCommandService {
         //    new (KnownCommands.Refactor_Rename,"Refactor: Rename...",KnownMonikers.Rename),
         //    new (KnownCommands.Refactor_ReorderParameters,"Refactor: Reorder Parameters...",KnownMonikers.ReorderParameters),
         //]);
-
 
         //new (KnownCommands.RepeatFind,"Modify Find",KnownMonikers.Edit),
         //new (KnownCommands.SwitchtoFindSymbol,"Find Symbol",default),
@@ -550,11 +491,7 @@ public class KnownCommandService {
         ]);
 
         _commands.AddRange([
-            new (
-                new CommandID(new Guid("{E286548F-5085-4E2B-A4FD-5984CCB553BC}"), 0x300),
-                "View: Call Hierarchy",
-                KnownMonikers.CallHierarchy
-            ),
+            new (KnownCommandsEx.View_CallHierarchy,"View: Call Hierarchy",KnownMonikers.CallHierarchy),
             //new (KnownCommands.View_AddRemoveColumns,"View: Add/Remove Columns...",default),
             //new (KnownCommands.View_Autosize,"View: Autosize",default),
             //new (KnownCommands.View_Backward,"View: Backward",default), // Is it for a browser?
@@ -587,6 +524,7 @@ public class KnownCommandService {
             //new (KnownCommands.View_Open,"View: Open",KnownMonikers.Open),
             //new (KnownCommands.View_OpenWith,"View: Open With...",default),
             new (KnownCommands.View_Output,"View: Output",KnownMonikers.Output),
+            new (KnownCommandsEx.View_Terminal,"View: Terminal",KnownMonikers.PowershellInteractiveWindow),
             new (KnownCommands.View_PropertiesWindow,"View: Properties Window",KnownMonikers.Property),
             new (KnownCommands.View_PropertyPages,"View: Property Pages",default),
             new (KnownCommands.View_ResourceView,"View: Resource View",KnownMonikers.ResourceView),
@@ -752,11 +690,30 @@ public class KnownCommandService {
         public static CommandID VsDbg_ToggleAspnetIntegratedTerminal = new CommandID(KnownPackages.VsDbg, 0x700);
 
         private static Guid TestExplorer_CmdSet = new Guid("{1E198C22-5980-4E7E-92F3-F73168D1FB63}");
+        public static CommandID Debug_DisableAllBreakpoints = new CommandID(new Guid("{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"), 0x122);
+        public static CommandID Debug_EnableAllBreakpoints = new CommandID(new Guid("{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"), 0x123);
+        public static CommandID Edit_ExpandSelectionToLine = new CommandID(EditorConstants.EditorCommandSet, 66);
+        public static CommandID Edit_GoToBase = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToBase);
+        public static CommandID Edit_GoToContainingDeclaration = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToContainingDeclaration);
+        public static CommandID Edit_GoToImplementation = new CommandID(new Guid("{B61E1A20-8C13-49A9-A727-A0EC091647DD}"), 0x200);
+        public static CommandID Edit_GoToLastEditLocation = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.GoToLastEditLocation);
+        public static CommandID Edit_JoinLines = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.JoinLines);
+        public static CommandID Edit_NextSuggestion = new CommandID(EditorConstants.EditorCommandSet, 94);
+        public static CommandID Edit_PreviousSuggestion = new CommandID(EditorConstants.EditorCommandSet, 93);
+        public static CommandID Edit_SortLines = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.SortLines);
+        public static CommandID Edit_ToggleBlockComments = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.ToggleBlockComments);
+        public static CommandID Edit_ToggleLineComments = new CommandID(EditorConstants.EditorCommandSet, (int)EditorConstants.EditorCommandID.ToggleLineComments);
+        public static CommandID Edit_ToggleSpellChecker = new CommandID(EditorConstants.EditorCommandSet, 59);
+        public static CommandID File_AddQuickFile = new CommandID(new Guid("{EC3F30E6-52A0-4A93-97BD-2660FF3A7AD5}"), 0x1);
+        public static CommandID File_StartWindow = new CommandID(new Guid("{7C57081E-4F31-4EBF-A96F-4769E1D688EC}"), 0x120);
+        public static CommandID Help_SuggestAFeature = new CommandID(new Guid("{769A4361-AD47-4FF4-86D8-D13BFDB7ED65}"), 0x104);
+        public static CommandID Project_ManageNugetPackages = new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x100);
+        public static CommandID Solution_ManageNugetPackages = new CommandID(new Guid("{25FD982B-8CAE-4CBD-A440-E03FFCCDE106}"), 0x200);
+        public static CommandID TestExplorer_ClearResults = new CommandID(TestExplorer_CmdSet, 0x322);
+        public static CommandID TestExplorer_DebugTests = new CommandID(TestExplorer_CmdSet, 0x315);
         public static CommandID TestExplorer_OpenToolWindow = new CommandID(TestExplorer_CmdSet, 0x200);
         public static CommandID TestExplorer_RunTests = new CommandID(TestExplorer_CmdSet, 0x310);
-        public static CommandID TestExplorer_DebugTests = new CommandID(TestExplorer_CmdSet, 0x315);
-        public static CommandID TestExplorer_ClearResults = new CommandID(TestExplorer_CmdSet, 0x322);
-
-        public static CommandID File_StartWindow = new CommandID(new Guid("{7C57081E-4F31-4EBF-A96F-4769E1D688EC}"), 0x120);
+        public static CommandID View_CallHierarchy = new CommandID(new Guid("{E286548F-5085-4E2B-A4FD-5984CCB553BC}"), 0x300);
+        public static CommandID View_Terminal = new CommandID(new Guid("{AACF025C-9916-4FBB-9B72-FA9F639F253F}"), 0x100);
     }
 }
