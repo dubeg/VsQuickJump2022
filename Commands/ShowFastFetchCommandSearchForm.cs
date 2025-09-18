@@ -13,9 +13,7 @@ internal sealed class ShowFastFetchCommandSearchForm : BaseCommand<ShowFastFetch
         await Package.JoinableTaskFactory.SwitchToMainThreadAsync();
         var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.FastFetchCommands, _lastFilter, initialSelectedCommandText: _lastSelectedCommandText);
         _lastFilter = dialog.CurrentText;
-        if (!string.IsNullOrWhiteSpace(dialog.ResultText)) {
-            _lastSelectedCommandText = dialog.ResultText;
-        }
+        _lastSelectedCommandText = dialog.ResultText;
     }
 }
 

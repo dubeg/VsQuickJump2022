@@ -8,7 +8,7 @@ namespace QuickJump2022;
 [Command(PackageIds.ShowCommandSearchForm)]
 internal sealed class ShowCommandSearchForm : BaseCommand<ShowCommandSearchForm> {
     private static string _lastFilter = string.Empty;
-    private static Enums.SearchType _lastCommandScope = Enums.SearchType.Commands;
+    private static Enums.SearchType _lastCommandScope = Enums.SearchType.KnownCommands;
     private static string _lastSelectedCommandText = string.Empty;
     
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) {
