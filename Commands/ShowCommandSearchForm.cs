@@ -17,5 +17,10 @@ internal sealed class ShowCommandSearchForm : BaseCommand<ShowCommandSearchForm>
         _lastFilter = dialog.CurrentText;
         _lastCommandScope = dialog.SearchType;
         _lastSelectedCommandText = dialog.ResultText;
+        // Quick hack: if user dismissed the dialog (ie. didn't select anything),
+        // reset the filter to null so that next time all commands are shown.
+        if (string.IsNullOrWhiteSpace(_lastSelectedCommandText)) {
+            _lastFilter = null;
+        }
     }
 }

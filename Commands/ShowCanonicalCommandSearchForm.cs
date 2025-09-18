@@ -16,7 +16,11 @@ internal sealed class ShowCanonicalCommandSearchForm : BaseCommand<ShowCanonical
         var dialog = await SearchForm.ShowModalAsync(Package as QuickJumpPackage, Enums.SearchType.Commands, _lastFilter, initialSelectedCommandText: _lastSelectedCommandText);
         _lastFilter = dialog.CurrentText;
         _lastSelectedCommandText = dialog.ResultText;
+        // Quick hack: if user dismissed the dialog (ie. didn't select anything),
+        // reset the filter to null so that next time all commands are shown.
+        if (string.IsNullOrWhiteSpace(_lastSelectedCommandText)) {
+            _lastFilter = null;
+        }
     }
 }
-
 
