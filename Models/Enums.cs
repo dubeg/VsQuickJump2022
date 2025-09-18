@@ -16,6 +16,13 @@ public static class Enums {
         ActiveProject
     }
 
+    public enum SymbolSearchScope {
+        All,
+        Type, // Includes Class, Struct, Interface, Enum, Delegate
+        Method, // Includes Method, ctor, Operator
+        Field, // Includes Field, Property, Event
+    }
+
     public enum TokenType {
         None,
         Namespace,

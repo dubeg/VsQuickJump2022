@@ -36,7 +36,8 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         if (document is null) return new();
         var semanticModel = await document.GetSemanticModelAsync();
         var syntaxRoot = await document.GetSyntaxRootAsync();
-        return ProcessSyntaxNodeWithSemantics(documentId, syntaxRoot, semanticModel);
+        var items = ProcessSyntaxNodeWithSemantics(documentId, syntaxRoot, semanticModel);
+        return items;
     }
 
     private List<CodeItem> ProcessSyntaxNodeWithSemantics(DocumentId documentId, SyntaxNode node, SemanticModel semanticModel) {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using QuickJump2022.Models;
+using static QuickJump2022.Models.Enums;
 
 namespace QuickJump2022.Services;
 
@@ -21,6 +22,7 @@ public class SearchInstance(
     Enums.SortType CSharpSortType,
     Enums.SortType MixedSortType
 ) {
+    public SymbolSearchScope SymbolScope { get; set; }
     public List<ListItemFile> Files { get; set; } = new();
     public List<ListItemSymbol> Symbols { get; set; } = new();
     public List<ListItemCommand> Commands { get; set; } = new();
@@ -74,7 +76,7 @@ public class SearchInstance(
         if (searchText.All(x => char.IsUpper(x))) { 
             searchText = searchText.ToLower();
         }
-        void FilterItems<T>(List<T> items) where T : ListItemBase {
+        void FilterItems<T>(IEnumerable<T> items) where T : ListItemBase {
             if (string.IsNullOrEmpty(searchText)) results.AddRange(items);
             else {
                 foreach (var item in items) {
@@ -86,8 +88,32 @@ public class SearchInstance(
                 }
             }
         }
+        if (SearchType is Enums.SearchType.Symbols or Enums.SearchType.All) {
+            var items =
+                SymbolScope is Enums.SymbolSearchScope.All ? 
+                Symbols :
+                Symbols.Where(x => SymbolScope switch { 
+                    SymbolSearchScope.Type => x.Item.BindType is 
+                        TokenType.Class or 
+                        TokenType.Struct or 
+                        TokenType.Interface or 
+                        TokenType.Enum or 
+                        TokenType.Delegate or
+                        TokenType.Record or 
+                        TokenType.RecordStruct,
+                    SymbolSearchScope.Method => x.Item.BindType is 
+                        TokenType.Method or 
+                        TokenType.Constructor or
+                        TokenType.Operator, // ?
+                    SymbolSearchScope.Field => x.Item.BindType is 
+                        TokenType.Field or 
+                        TokenType.Property or 
+                        TokenType.Event,
+                    _ => false
+                });
+            FilterItems(items);
+        }
         if (SearchType is Enums.SearchType.Files or Enums.SearchType.All) FilterItems(Files);
-        if (SearchType is Enums.SearchType.Symbols or Enums.SearchType.All) FilterItems(Symbols);
         if (SearchType is Enums.SearchType.Commands or Enums.SearchType.All) FilterItems(Commands);
         if (SearchType is Enums.SearchType.KnownCommands or Enums.SearchType.All) FilterItems(KnownCommands);
         if (SearchType is Enums.SearchType.FastFetchCommands or Enums.SearchType.All) FilterItems(FastFetchCommands);

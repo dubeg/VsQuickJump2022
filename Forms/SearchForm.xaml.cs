@@ -53,7 +53,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
     public SearchType SearchType { get; private set; }
-    public Enums.FileSearchScope FileScope { get; private set; } = Enums.FileSearchScope.Solution;
+	public Enums.FileSearchScope FileScope { get; private set; } = Enums.FileSearchScope.Solution;
+	public Enums.SymbolSearchScope SymbolScope { get; private set; } = Enums.SymbolSearchScope.All;
     public string ResultText { get; private set; }
     private readonly QuickJumpPackage _package;
 
@@ -124,14 +125,14 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         };
         SearchType = nextType;
         UpdateStatusBar();
-        SearchInstance = new SearchInstance(
+		SearchInstance = new SearchInstance(
             _package.ProjectFileService,
             _package.SymbolService,
             _package.CommandService,
             _package.KnownCommandService,
             _package.FastFetchCommandService,
-            nextType,
-            FileScope,
+            SearchType,
+			FileScope,
             _package.GeneralOptions.FileSortType,
             _package.GeneralOptions.CSharpSortType,
             _package.GeneralOptions.MixedSortType
@@ -144,17 +145,35 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
     }
 
+    private async Task SwitchSymbolScopeAsync(bool reverse = false) {
+        var order = new[] {
+            Enums.SymbolSearchScope.All,
+            Enums.SymbolSearchScope.Type,
+            Enums.SymbolSearchScope.Method,
+            Enums.SymbolSearchScope.Field,
+        };
+        var currentIndex = Array.IndexOf(order, SymbolScope);
+        if (currentIndex < 0) currentIndex = 0;
+        var nextIndex = reverse ? (currentIndex - 1 + order.Length) % order.Length : (currentIndex + 1) % order.Length;
+        SymbolScope = order[nextIndex];
+        UpdateStatusBar();
+        SearchInstance.SymbolScope = SymbolScope;
+        RefreshList();
+        if (Items.Count > 0) {
+            lstItems.SelectedIndex = 0;
+            EnsureSelectedItemIsVisible();
+        }
+    }
+
     private async Task SwitchFileScopeAsync(bool reverse) {
-        var nextScope = (FileScope, reverse) switch {
-            (Enums.FileSearchScope.Solution, false) => Enums.FileSearchScope.ActiveProject,
-            (Enums.FileSearchScope.Solution, true) => Enums.FileSearchScope.ActiveProject,
-            (Enums.FileSearchScope.ActiveProject, false) => Enums.FileSearchScope.Solution,
-            (Enums.FileSearchScope.ActiveProject, true) => Enums.FileSearchScope.Solution,
+        var nextScope = FileScope switch {
+            Enums.FileSearchScope.Solution => Enums.FileSearchScope.ActiveProject,
+            Enums.FileSearchScope.ActiveProject => Enums.FileSearchScope.Solution,
             _ => FileScope
         };
         FileScope = nextScope;
         UpdateStatusBar();
-        SearchInstance = new SearchInstance(
+		SearchInstance = new SearchInstance(
             _package.ProjectFileService,
             _package.SymbolService,
             _package.CommandService,
@@ -246,9 +265,12 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
 
     private async void txtSearch_HandleKey(object sender, VsKeyInfo e) {
         if (e.Key == Key.Tab) {
-            if (SearchType == SearchType.Files) {
+			if (SearchType == SearchType.Files) {
                 await SwitchFileScopeAsync(reverse: e.ShiftPressed);
             }
+			else if (SearchType == SearchType.Symbols) {
+				await SwitchSymbolScopeAsync(reverse: e.ShiftPressed);
+			}
             else if (SearchType 
                 is SearchType.Commands 
                 or SearchType.KnownCommands 
@@ -393,8 +415,16 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
                 return FileScope switch {
                     Enums.FileSearchScope.ActiveProject => ("Active Project", KnownMonikers.CSProjectNode),
                     Enums.FileSearchScope.Solution => ("Solution", KnownMonikers.Solution),
+                    _ => throw new NotImplementedException()
                 };
-            case SearchType.Symbols: return ("Document", KnownMonikers.Document);
+            case SearchType.Symbols:
+                return SymbolScope switch {
+                    Enums.SymbolSearchScope.All => ("All", KnownMonikers.CodeInformation),
+                    Enums.SymbolSearchScope.Type => ("Classes", KnownMonikers.Class),
+                    Enums.SymbolSearchScope.Method => ("Methods", KnownMonikers.Method),
+                    Enums.SymbolSearchScope.Field => ("Fields", KnownMonikers.Property),
+                    _ => throw new NotImplementedException()
+                };
             case SearchType.Commands: return ("Canonical Name", KnownMonikers.None);
             case SearchType.KnownCommands: return ("Custom Name", KnownMonikers.None);
             case SearchType.FastFetchCommands: return ("Friendly Name", KnownMonikers.None);
