@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="Commands\ShowCanonicalCommandSearchForm.cs" />
     <Compile Include="Commands\ShowFastFetchCommandSearchForm.cs" />
-    <Compile Include="Commands\ToggleCommandMetadataCommand.cs" />
     <Compile Include="Models\ListItemFastFetchCommand.cs" />
     <Compile Include="Services\FastFetchCommandService.cs" />
     <Compile Include="Services\PackageInfoService.cs" />

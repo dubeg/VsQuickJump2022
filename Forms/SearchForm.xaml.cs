@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -55,6 +56,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private DTE _dte;
     private List<ListItemViewModel> Items = new();
     private string _initialText = string.Empty;
+    private string _initialSelectedCommandText = string.Empty;
+    private bool _initialSelectionApplied = false;
     public SearchType SearchType { get; private set; }
 	public Enums.FileSearchScope FileScope { get; private set; } = Enums.FileSearchScope.Solution;
 	public Enums.SymbolSearchScope SymbolScope { get; private set; } = Enums.SymbolSearchScope.All;
@@ -65,10 +68,12 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         QuickJumpPackage package, 
         SearchType searchType, 
         string initialText = "", 
-        FileSearchScope? fileSearchScope = null
+        FileSearchScope? fileSearchScope = null,
+        string initialSelectedCommandText = ""
     ) {
         var dialog = new SearchForm(package, searchType, initialText);
         dialog.FileScope = fileSearchScope ?? dialog.FileScope;
+        dialog._initialSelectedCommandText = initialSelectedCommandText ?? string.Empty;
         await dialog.LoadDataAsync();
         dialog.ShowModal();
         return dialog;
@@ -236,9 +241,18 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         );
         await SearchInstance.LoadDataAsync();
         RefreshList();
-        if (Items.Count > 0) {
-            lstItems.SelectedIndex = 0;
-            EnsureSelectedItemIsVisible();
+        // Try to restore initial selection for command search types once
+        if (!_initialSelectionApplied
+            && (SearchType is SearchType.Commands or SearchType.KnownCommands or SearchType.FastFetchCommands)
+            && !string.IsNullOrWhiteSpace(_initialSelectedCommandText)
+            && Items.Count > 0) {
+            var index = Items.FindIndex(vm => string.Equals(vm.Name, _initialSelectedCommandText, StringComparison.OrdinalIgnoreCase));
+            if (index >= 0) {
+                lstItems.SelectedIndex = index;
+                EnsureSelectedItemIsVisible();
+                UpdateCommandMetadata();
+            }
+            _initialSelectionApplied = true;
         }
     }
 
