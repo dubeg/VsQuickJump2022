@@ -426,6 +426,12 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         }
     }
 
+    private void btnCopyCommandId_Click(object sender, RoutedEventArgs e) {
+		var text = metadataCommandId?.Text;
+		if (string.IsNullOrWhiteSpace(text)) return;
+		Clipboard.SetText(text);
+	}
+
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

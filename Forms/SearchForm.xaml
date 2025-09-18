@@ -155,8 +155,8 @@
                     Margin="6,0,0,0"
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Copy Command ID to clipboard"
+                    Click="btnCopyCommandId_Click"
                     />
-                    <!--Command="{Binding ElementName=dialogWnd, Path=CopyCommandIdCommand}"-->
 
                 <!-- Command Bindings -->
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Bindings:" Opacity="0.7" VerticalAlignment="Center" />
