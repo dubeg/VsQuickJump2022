@@ -390,9 +390,10 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
     private (string text, ImageMoniker moniker) GetScopeDisplay() {
         switch (SearchType) {
             case SearchType.Files:
-                return FileScope == Enums.FileSearchScope.ActiveProject
-                    ? ("Active Project", KnownMonikers.CSProjectNode)
-                    : ("Solution", KnownMonikers.Solution);
+                return FileScope switch {
+                    Enums.FileSearchScope.ActiveProject => ("Active Project", KnownMonikers.CSProjectNode),
+                    Enums.FileSearchScope.Solution => ("Solution", KnownMonikers.Solution),
+                };
             case SearchType.Symbols: return ("Document", KnownMonikers.Document);
             case SearchType.Commands: return ("Canonical Name", KnownMonikers.None);
             case SearchType.KnownCommands: return ("Custom Name", KnownMonikers.None);
