@@ -106,18 +106,6 @@
 					<CanonicalName>.QuickJump.RefreshPreloadedData</CanonicalName>
 				</Strings>
 			</Button>
-			
-			<Button guid="QuickJump2022" id="ToggleCommandMetadata" priority="0x0100" type="Button">
-				<Parent guid="QuickJump2022" id="MainCmdGroup" />
-				<Icon guid="ImageCatalogGuid" id="StatusInformation" />
-				<CommandFlag>IconIsMoniker</CommandFlag>
-				<CommandFlag>CommandWellOnly</CommandFlag>
-				<Strings>
-					<ButtonText>Toggle command metadata display</ButtonText>
-					<LocCanonicalName>.QuickJump.ToggleCommandMetadata</LocCanonicalName>
-					<CanonicalName>.QuickJump.ToggleCommandMetadata</CanonicalName>
-				</Strings>
-			</Button>
     </Buttons>
   </Commands>
 
@@ -133,7 +121,6 @@
 			<IDSymbol name="RefreshPreloadedData" value="0x0700" />
 			<IDSymbol name="ShowFastFetchCommandSearchForm" value="0x0800" />
 			<IDSymbol name="ShowCanonicalCommandSearchForm" value="0x0900" />
-			<IDSymbol name="ToggleCommandMetadata" value="0x0A00" />
 		</GuidSymbol> 
   </Symbols>
 </CommandTable>
