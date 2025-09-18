@@ -387,6 +387,8 @@ public class KnownCommandService {
             //new (KnownCommands.File_SaveSelection,"File: Save Selection",default),
             //new (KnownCommands.File_SelectProjectTemplate,"File: Select Project Template...",default),
             new (KnownCommands.File_ViewinBrowser,"File: View in Browser",KnownMonikers.ViewInBrowser),
+            // --
+            new (new CommandID(new Guid("{EC3F30E6-52A0-4A93-97BD-2660FF3A7AD5}"), 0x1),"File: Add quick file...",KnownMonikers.NewDocument),
         ]);
 
         _commands.AddRange([
