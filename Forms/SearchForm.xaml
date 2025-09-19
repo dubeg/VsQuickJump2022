@@ -187,9 +187,8 @@
                 >
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <!-- Search Type -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -206,10 +205,12 @@
                         />
                 </StackPanel>
                 <!-- Scope -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                     <TextBlock 
                         VerticalAlignment="Center"
                         Text="{Binding ElementName=dialogWnd, Path=StatusRightText}"
+                        TextWrapping="NoWrap"
+                        TextTrimming="None" 
                         />
                     <imaging:CrispImage 
                         Width="16" 
