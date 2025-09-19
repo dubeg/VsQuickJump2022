@@ -75,6 +75,7 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         dialog.FileScope = fileSearchScope ?? dialog.FileScope;
         dialog._initialSelectedCommandText = initialSelectedCommandText ?? string.Empty;
         await dialog.LoadDataAsync();
+        dialog.UpdateWidthBasedOnSearchType();
         dialog.ShowModal();
         return dialog;
     }
@@ -97,11 +98,6 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         this.SizeChanged += (s, e) => AdjustPosition();
         _dismissOnClickOutsideBounds = new(this);
         // TODO: configure via options.
-        Width = searchType switch {
-            SearchType.Files => 800,
-            SearchType.Symbols => 800,
-            _ => 600
-        };
         // TODO: check the active document's width & don't make it larger than that.
         _initialText = initialText; // TODO: configure via options.
         if (!string.IsNullOrWhiteSpace(_initialText)) {
@@ -122,6 +118,19 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         DebouncedGoToFile = goToItem.Debounce(TaskScheduler.FromCurrentSynchronizationContext(), 50);
     }
 
+    private void UpdateWidthBasedOnSearchType() {
+        var targetWidth = SearchType switch {
+            SearchType.Files => 800,
+            SearchType.Symbols => 800,
+            SearchType.FastFetchCommands => 800,
+            _ => 600
+        };
+        if (Math.Abs(ActualWidth - targetWidth) > 1) {
+            Width = targetWidth;
+            AdjustPosition();
+        }
+    }
+
     private async Task SwitchCommandSearchTypeAsync(bool reverse = false) {
         var nextType = (SearchType, reverse) switch {
             (SearchType.Commands, false) => SearchType.KnownCommands,
@@ -134,7 +143,8 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         };
         SearchType = nextType;
         UpdateStatusBar();
-		SearchInstance = new SearchInstance(
+        UpdateWidthBasedOnSearchType();
+        SearchInstance = new SearchInstance(
             _package.ProjectFileService,
             _package.SymbolService,
             _package.CommandService,

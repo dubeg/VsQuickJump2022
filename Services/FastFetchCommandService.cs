@@ -39,25 +39,33 @@ public class FastFetchCommandService(IServiceProvider _serviceProvider) {
         }
         _cachedScope ??= GetScopeLocations();
         var fastFetch = await VS.GetServiceAsync<SVsCommandSearchPrivate, IVsFastFetchCommands>();
-        var searchFlags = 
-            __SearchCandidateProcessingFlags.ConsiderDynamicText |
-            __SearchCandidateProcessingFlags.ExpandDynamicItemStartCommands |
-            __SearchCandidateProcessingFlags.ConsiderCommandWellOnlyCommands;
-        var commandEnumerator2 = fastFetch.GetCommandEnumerator((uint)searchFlags, 0, null);
-        var commandEnumerator = fastFetch.GetCommandEnumerator((uint)searchFlags, (uint)_cachedScope.Length, _cachedScope);
-        var commands = (CommandMetadata[])(object)new CommandMetadata[commandEnumerator.Count];
-        var commands2 = (CommandMetadata[])(object)new CommandMetadata[commandEnumerator2.Count];
-        commandEnumerator.GetCommands(0, commands.Length, commands);
-        commandEnumerator2.GetCommands(0, commands2.Length, commands2);
+        var searchFlags =
+            __SearchCandidateProcessingFlags.ConsiderDynamicText
+            | __SearchCandidateProcessingFlags.ExpandDynamicItemStartCommands
+            | __SearchCandidateProcessingFlags.ConsiderCommandWellOnlyCommands;
+            // | __SearchCandidateProcessingFlags.ConsiderOnlyEnabledCommands
+            // |  __SearchCandidateProcessingFlags.ConsiderOnlyVisibleCommands;
+        
+        var commandEnumeratorNoScope = fastFetch.GetCommandEnumerator((uint)searchFlags, 0, null);
+        var commandsFromRootScope = (CommandMetadata[])(object)new CommandMetadata[commandEnumeratorNoScope.Count];
+        commandEnumeratorNoScope.GetCommands(0, commandsFromRootScope.Length, commandsFromRootScope);
+
+        var commandEnumeratorExtraScopes = fastFetch.GetCommandEnumerator((uint)searchFlags, (uint)_cachedScope.Length, _cachedScope);
+        var commandsFromExtraScopes = (CommandMetadata[])(object)new CommandMetadata[commandEnumeratorExtraScopes.Count];
+        commandEnumeratorExtraScopes.GetCommands(0, commandsFromExtraScopes.Length, commandsFromExtraScopes);
+
+        var allCommands = commandsFromRootScope;
+        // var allCommands = commandsFromExtraScopes.Concat(commandsFromRootScope);
+
         var commandInfos = new List<FastFetchCommandItem>();
         var AccessKeyRemovingConverter = new AccessKeyRemovingConverter();
-        foreach (var cmd in commands.Concat(commands2)) {
+        foreach (var cmd in allCommands) {
             if (cmd.CommandId.CommandSet == Guid.Empty) continue;
             var (name, description) = FormatNameAndDescription(cmd.CommandPlacementText);
             name = Accelerator.StripAccelerators(name, null);
             description = Accelerator.StripAccelerators(description, null);
             commandInfos.Add(new() { 
-                Name = name,
+                Name = description, // name,
                 Description = description,
                 CommandID = new CommandID(cmd.CommandId.CommandSet, (int)cmd.CommandId.CommandId),
                 Index = (int)cmd.DiscoveryOrder,
