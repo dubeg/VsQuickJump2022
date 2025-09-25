@@ -20,6 +20,7 @@ using QuickJump2022.TextEditor;
 using QuickJump2022.Tools;
 using static QuickJump2022.Models.Enums;
 using Rect = System.Windows.Rect;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace QuickJump2022.Forms;
 
@@ -74,10 +75,18 @@ public partial class SearchForm : DialogWindow, INotifyPropertyChanged {
         var dialog = new SearchForm(package, searchType, initialText);
         dialog.FileScope = fileSearchScope ?? dialog.FileScope;
         dialog._initialSelectedCommandText = initialSelectedCommandText ?? string.Empty;
-        await dialog.LoadDataAsync();
-        dialog.UpdateWidthBasedOnSearchType();
-        dialog.ShowModal();
-        return dialog;
+        try {
+            await dialog.LoadDataAsync();
+            dialog.UpdateWidthBasedOnSearchType();
+            dialog.ShowModal();
+            return dialog;
+        }
+        catch {
+            if (dialog is not null) {
+                dialog.SuspendAndClose();
+            }
+            throw;
+        }
     }
 
     protected SearchForm(QuickJumpPackage package, SearchType searchType, string initialText = "") {

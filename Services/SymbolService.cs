@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.LanguageServices;
+using Microsoft.VisualStudio.Shell.Interop;
 using QuickJump2022.Models;
 
 namespace QuickJump2022.Services;
@@ -34,8 +35,10 @@ public class SymbolService(VisualStudioWorkspace workspace) {
         }
         
         if (document is null) return new();
+        
         var semanticModel = await document.GetSemanticModelAsync();
         var syntaxRoot = await document.GetSyntaxRootAsync();
+        if (semanticModel is null || syntaxRoot is null) return new();
         var items = ProcessSyntaxNodeWithSemantics(documentId, syntaxRoot, semanticModel);
         return items;
     }
@@ -247,4 +250,6 @@ public class SymbolService(VisualStudioWorkspace workspace) {
 
         return string.Empty;
     }
+
+    // --
 }
