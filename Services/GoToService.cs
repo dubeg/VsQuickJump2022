@@ -38,8 +38,8 @@ public class GoToService {
         if (!IsTextFile(file.FilePath)) return;
         var openedDoc = await VS.Documents.IsOpenAsync(fileName: file.FilePath);
         if (openedDoc) await VS.Documents.OpenAsync(file.FilePath);
-        //else await VS.Documents.OpenInPreviewTabAsync(file.FilePath);
-        else OpenDocumentInPreview(file.FilePath);
+        else await VS.Documents.OpenInPreviewTabAsync(file.FilePath);
+        //else OpenDocumentInPreview(file.FilePath);
     }
 
     public void OpenDocumentInPreview(string filePath) {
